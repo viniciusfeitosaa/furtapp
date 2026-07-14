@@ -18,7 +18,21 @@ npm install
 npm run dev
 ```
 
-## Contatos
+Abra [http://localhost:3000](http://localhost:3000).
+
+### Rotas úteis
+
+| URL | O que é |
+|-----|---------|
+| `/` | Home institucional (versão inicial) |
+| `/contato` | Agendamento → WhatsApp |
+| `/paciente/login` · `/paciente` | Protótipo do painel do paciente |
+| `/admin/login` · `/admin` | Protótipo do painel do Dr. |
+
+### Upload de materiais
+
+Envie fotos, vídeos e textos em **[`conteudos-para-o-site/`](./conteudos-para-o-site/)** (há README e checklist na pasta).
+
 
 - WhatsApp: (88) 9.9252-4200
 - E-mail: atendimento@ffurtado.com.br

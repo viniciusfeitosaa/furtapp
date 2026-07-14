@@ -2,7 +2,7 @@
 
 > **Regra permanente:** tudo o que for decidido, feito, adiado ou sugerido neste projeto **deve** ser registrado neste arquivo. Nenhuma entrega fica só no chat ou no código sem espelho aqui. Atualizar nas seções **Feito**, **Pendente** e **Ideias** a cada ciclo de trabalho.
 
-**Última atualização:** 2026-07-14  
+**Última atualização:** 2026-07-14 (pasta `conteudos-para-o-site/`)  
 **Branch:** `cursor/site-institucional-mapa-bordo-e94e`  
 **Domínio:** www.ffurtado.com.br  
 **Região SEO:** Fortaleza e todo o Ceará
@@ -232,6 +232,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 - [x] Protótipo `/paciente/login` + `/paciente` (timeline + upload 5 regiões)
 - [x] Protótipo `/admin/login` + `/admin` (fila + wireframe sala de análise)
 - [x] Links “Área do paciente” / admin no header e footer
+- [x] Pasta de upload do cliente: `conteudos-para-o-site/` (marca, fotos, vídeos, textos, depoimentos)
 
 ---
 
@@ -239,7 +240,8 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 
 ### Site (F1)
 
-- [ ] Assets reais (logo nos formatos, fotos, vídeo) — aguardando envio
+- [ ] Conteúdo da pasta `conteudos-para-o-site/` — **aguardando upload do cliente**
+- [ ] Assets reais no `public/` (logo, fotos, vídeo) após organizar o que vier na pasta
 - [ ] Bio, textos finais, CRM, endereço físico do consultório
 - [ ] Polir seções (resultados, depoimentos) com conteúdo real
 - [ ] Schema MedicalBusiness / Physician / FAQPage
@@ -264,6 +266,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 
 ### Conteúdo / negócio (depende do cliente)
 
+- [ ] Preencher `conteudos-para-o-site/` (ver README e CHECKLIST-UPLOAD na pasta)
 - [ ] Logo vetorial / PNG alta (positiva e negativa)
 - [ ] Fotos e vídeo do Dr. e da clínica
 - [ ] Casos antes/depois com consentimento publicado
@@ -313,6 +316,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 |------|---------|
 | 2026-07-14 | Criação do MAPA DE BORDO. Decisões: Next.js, Fortaleza/Ceará, sem WordPress. Portal admin+paciente especificado com protocolo 5 fotos, M0–M12, comparador, feedback, LGPD. |
 | 2026-07-14 | Aprimoramento da área do cliente: papéis, fluxo de status, janelas, sala de análise, segurança. Scaffold Next.js + UI do site + protótipos `/admin` e `/paciente`. |
+| 2026-07-14 | Criada pasta `conteudos-para-o-site/` para o cliente enviar marca, fotos, vídeos e textos. |
 
 ---
 

@@ -1,0 +1,119 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { NAV_LINKS, SITE, whatsappUrl } from "@/lib/site";
+
+export function Header() {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        scrolled || open
+          ? "bg-black/95 text-white shadow-sm"
+          : "bg-transparent text-white"
+      }`}
+    >
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-6">
+        <Link href="/" className="group min-w-0" onClick={() => setOpen(false)}>
+          <span className="block truncate text-sm font-semibold tracking-[0.18em] uppercase md:text-base">
+            {SITE.name}
+          </span>
+          <span className="mt-0.5 block truncate text-[0.625rem] tracking-[0.28em] text-white/75 uppercase">
+            {SITE.tagline}
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-6 lg:flex" aria-label="Principal">
+          {NAV_LINKS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-xs tracking-wide text-white/80 transition-colors hover:text-brand-gold"
+            >
+              {item.label}
+            </Link>
+          ))}
+          <Link
+            href="/paciente/login"
+            className="text-xs tracking-wide text-white/60 transition-colors hover:text-white"
+          >
+            Área do paciente
+          </Link>
+          <a
+            href={whatsappUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center bg-brand-gold px-4 py-2.5 text-xs font-semibold tracking-wide text-black transition-opacity hover:opacity-90"
+          >
+            Agende sua avaliação
+          </a>
+        </nav>
+
+        <button
+          type="button"
+          className="inline-flex h-10 w-10 items-center justify-center border border-white/30 lg:hidden"
+          aria-expanded={open}
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span className="sr-only">Menu</span>
+          <span className="flex flex-col gap-1.5">
+            <span className="block h-px w-5 bg-white" />
+            <span className="block h-px w-5 bg-white" />
+            <span className="block h-px w-5 bg-white" />
+          </span>
+        </button>
+      </div>
+
+      {open ? (
+        <div className="border-t border-white/10 bg-black px-4 py-6 lg:hidden">
+          <nav className="flex flex-col gap-4" aria-label="Mobile">
+            {NAV_LINKS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm tracking-wide text-white/85"
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+            <Link
+              href="/paciente/login"
+              className="text-sm text-white/60"
+              onClick={() => setOpen(false)}
+            >
+              Área do paciente
+            </Link>
+            <Link
+              href="/admin/login"
+              className="text-sm text-white/40"
+              onClick={() => setOpen(false)}
+            >
+              Área administrativa
+            </Link>
+            <a
+              href={whatsappUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center justify-center bg-brand-gold px-4 py-3 text-sm font-semibold text-black"
+              onClick={() => setOpen(false)}
+            >
+              Agende sua avaliação
+            </a>
+          </nav>
+        </div>
+      ) : null}
+    </header>
+  );
+}

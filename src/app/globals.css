@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+:root {
+  /* Marca — cores oficiais */
+  --color-black: #000000;
+  --color-gold: #b6a46e;
+  --color-gold-dark: #463a18;
+  --color-gold-soft: #baa366;
+  --color-white: #ffffff;
+
+  /* Apoio */
+  --color-blue-soft: #82c4d1;
+  --color-blue-mist: #a5e1ed;
+  --color-blue-gray: #96a4c9;
+  --color-ice: #c2dadf;
+  --color-slate: #39426b;
+  --color-charcoal: #323232;
+  --color-gray: #7b7b7b;
+  --color-gray-mid: #d6d6d6;
+  --color-gray-light: #ededed;
+  --color-cloud: #cad0d1;
+  --color-linen: #c1c2bd;
+  --color-lavender: #c7ccdb;
+  --color-mist: #dcdfe6;
+
+  --background: var(--color-white);
+  --foreground: var(--color-black);
+  --muted: var(--color-gray);
+  --accent: var(--color-gold);
+  --accent-contrast: var(--color-black);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-black: var(--color-black);
+  --color-brand-gold: var(--color-gold);
+  --color-brand-gold-dark: var(--color-gold-dark);
+  --color-brand-white: var(--color-white);
+  --color-brand-blue-soft: var(--color-blue-soft);
+  --color-brand-ice: var(--color-ice);
+  --color-brand-gray: var(--color-gray);
+  --color-brand-gray-light: var(--color-gray-light);
+  --color-brand-charcoal: var(--color-charcoal);
+  --font-sans: var(--font-poppins);
+  --font-display: var(--font-bebas);
+  --font-serif: var(--font-arapey);
+  --font-script: var(--font-script);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-gold) 45%, white);
+  color: var(--color-black);
+}
+
+.font-display {
+  font-family: var(--font-bebas), Impact, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.font-serif-body {
+  font-family: var(--font-arapey), Georgia, serif;
+}
+
+.font-signature {
+  font-family: var(--font-script), cursive;
+}
+
+.text-balance {
+  text-wrap: balance;
+}

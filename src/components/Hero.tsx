@@ -12,7 +12,7 @@ export function Hero() {
         alt="Dr. Francisco Furtado"
         fill
         priority
-        className="object-cover object-[68%_18%] sm:object-[72%_15%] md:object-[78%_12%]"
+        className="object-cover object-[38%_14%] sm:object-[32%_12%] md:object-[28%_10%] lg:object-[24%_8%]"
         sizes="100vw"
       />
 

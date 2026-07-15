@@ -2,28 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NAV_LINKS, SITE, whatsappUrl } from "@/lib/site";
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled || open
-          ? "bg-black/95 text-white shadow-sm"
-          : "bg-transparent text-white"
-      }`}
-    >
+    <header className="fixed inset-x-0 top-0 z-50 bg-black/95 text-white shadow-sm transition-colors duration-300">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-2 py-3 sm:gap-3 sm:px-3 md:px-4">
         <Link
           href="/"

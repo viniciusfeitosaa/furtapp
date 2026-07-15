@@ -7,18 +7,37 @@ export function Hero() {
       id="inicio"
       className="relative flex min-h-[100svh] items-end overflow-hidden text-white"
       style={{
+        /* Cinza final ≈ fundo do estúdio (#afafaf) para suavizar a borda direita */
         background:
-          "linear-gradient(105deg, #000000 0%, #000000 32%, #1a1a1a 48%, #323232 68%, #5c5c5c 88%, #7b7b7b 100%)",
+          "linear-gradient(105deg, #000000 0%, #000000 30%, #1f1f1f 45%, #4a4a4a 62%, #7a7a7a 78%, #afafaf 100%)",
       }}
     >
-      <Image
-        src="/media/dr-francisco-retrato-hero6.png"
-        alt="Dr. Francisco Furtado"
-        fill
-        priority
-        className="object-contain object-right object-bottom"
-        sizes="100vw"
-      />
+      {/* Caixa da foto (proporção real) + máscara nas bordas para fundir no degradê */}
+      <div
+        className="pointer-events-none absolute bottom-0 right-0 h-full max-w-full"
+        style={{
+          aspectRatio: "922 / 1152",
+          WebkitMaskImage:
+            "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.25) 8%, #000 22%, #000 92%, rgba(0,0,0,0.4) 97%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 5%, #000 14%, #000 90%, rgba(0,0,0,0.45) 96%, transparent 100%)",
+          maskImage:
+            "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.25) 8%, #000 22%, #000 92%, rgba(0,0,0,0.4) 97%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 5%, #000 14%, #000 90%, rgba(0,0,0,0.45) 96%, transparent 100%)",
+          WebkitMaskComposite: "source-in",
+          maskComposite: "intersect",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskSize: "100% 100%",
+          maskSize: "100% 100%",
+        }}
+      >
+        <Image
+          src="/media/dr-francisco-retrato-hero6.png"
+          alt="Dr. Francisco Furtado"
+          fill
+          priority
+          className="object-contain object-bottom object-right"
+          sizes="(max-width: 768px) 100vw, 55vw"
+        />
+      </div>
 
       {/* Degradê preto → cinza + legibilidade do texto à esquerda */}
       <div
@@ -26,7 +45,7 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "linear-gradient(105deg, #000000 0%, rgba(0,0,0,0.92) 28%, rgba(50,50,50,0.55) 52%, rgba(123,123,123,0.18) 78%, transparent 100%)",
+            "linear-gradient(105deg, #000000 0%, rgba(0,0,0,0.88) 26%, rgba(40,40,40,0.45) 48%, rgba(175,175,175,0.12) 72%, transparent 100%)",
         }}
       />
       <div
@@ -34,14 +53,14 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.85) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.8) 100%)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-36"
         aria-hidden
         style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.55), transparent)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)",
         }}
       />
 

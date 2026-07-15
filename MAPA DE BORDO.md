@@ -333,6 +333,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Correção “tudo branco”: conflito de `--color-*` no CSS; hero volta a `bg-black` e tokens `--ff-*` / `@theme` com hex literais. |
 | 2026-07-15 | Restaurado degradê do hero (preto → navy `#1a2035` → charcoal), mantendo base `bg-black` estável. |
 | 2026-07-15 | Foto de cirurgia posicionada em full-bleed no início da seção Tratamentos (`/media/cirurgia-procedimento.jpg`). |
+| 2026-07-15 | Retrato do Dr. no hero (`/media/dr-francisco-retrato-hero.jpg`) full-bleed à direita, com overlay escuro à esquerda para a marca. |
 
 ---
 

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { SITE, whatsappUrl } from "@/lib/site";
 
 export function Hero() {
@@ -6,28 +7,37 @@ export function Hero() {
       id="inicio"
       className="relative flex min-h-[100svh] items-end overflow-hidden bg-black text-white"
     >
+      <Image
+        src="/media/dr-francisco-retrato-hero.jpg"
+        alt="Dr. Francisco Furtado"
+        fill
+        priority
+        className="object-cover object-[72%_center] md:object-[78%_center]"
+        sizes="100vw"
+      />
+
+      {/* Overlay sólido/escuro à esquerda — legibilidade + marca em primeiro plano */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 65% 48% at 78% 28%, #1a2035 0%, transparent 55%), linear-gradient(155deg, #000000 0%, #1a2035 48%, #323232 100%)",
-          opacity: 0.98,
+            "linear-gradient(90deg, #000000 0%, #000000 38%, rgba(0,0,0,0.72) 58%, rgba(26,32,53,0.35) 78%, rgba(0,0,0,0.15) 100%)",
         }}
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-45"
+        className="pointer-events-none absolute inset-0 md:hidden"
         aria-hidden
         style={{
           background:
-            "radial-gradient(circle at 60% 45%, rgba(26,32,53,0.7), transparent 55%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.82) 100%)",
         }}
       />
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-36"
         aria-hidden
         style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.65), transparent)",
         }}
       />
 
@@ -36,10 +46,10 @@ export function Hero() {
         <p className="mb-5 text-[0.7rem] tracking-[0.35em] text-brand-gold uppercase">
           {SITE.tagline}
         </p>
-        <h1 className="font-display max-w-3xl text-5xl leading-[0.95] text-white sm:text-6xl md:text-7xl lg:text-8xl">
+        <h1 className="font-display max-w-xl text-5xl leading-[0.95] text-white sm:text-6xl md:max-w-2xl md:text-7xl lg:text-8xl">
           Francisco Furtado
         </h1>
-        <p className="font-serif-body mt-8 max-w-xl text-lg leading-relaxed text-white/75 md:text-xl">
+        <p className="font-serif-body mt-8 max-w-md text-lg leading-relaxed text-white/80 md:max-w-lg md:text-xl">
           Transplante capilar seguro, ético e natural — devolver autoestima com
           ciência, arte e cuidado humano em Fortaleza e em todo o Ceará.
         </p>

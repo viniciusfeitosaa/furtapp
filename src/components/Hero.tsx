@@ -1,29 +1,30 @@
-import Image from "next/image";
 import { SITE, whatsappUrl } from "@/lib/site";
 
+/**
+ * Hero sem next/image — evita travar o preview (optimizer + HMR)
+ * e usa alturas em svh (nunca % de pai com height:auto).
+ */
 export function Hero() {
   return (
     <section
       id="inicio"
-      className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden text-white"
+      className="relative flex h-[100svh] flex-col justify-end overflow-hidden text-white"
       style={{
         background:
           "linear-gradient(165deg, #afafaf 0%, #9a9a9a 18%, #6e6e6e 40%, #2e2e2e 68%, #000000 100%)",
       }}
     >
-      {/* Foto leve (JPEG ~63KB) — sem blur/máscaras pesadas */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[55%] md:inset-y-0 md:left-auto md:right-0 md:h-auto md:w-[min(52%,520px)] lg:w-[min(48%,560px)]">
-        <Image
-          src="/media/dr-francisco-retrato-hero6.jpg"
-          alt="Dr. Francisco Furtado"
-          fill
-          priority
-          className="object-contain object-top md:object-bottom md:object-right"
-          sizes="(max-width: 768px) 90vw, 520px"
-        />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/media/dr-francisco-retrato-hero6.jpg"
+        alt="Dr. Francisco Furtado"
+        width={922}
+        height={1152}
+        decoding="async"
+        fetchPriority="high"
+        className="pointer-events-none absolute top-0 right-0 left-0 mx-auto h-[52svh] w-auto max-w-[92%] object-contain object-top md:top-auto md:right-0 md:bottom-0 md:left-auto md:mx-0 md:h-[92svh] md:max-w-[min(48vw,520px)] md:object-bottom"
+      />
 
-      {/* Transição suave foto → fundo / texto (só CSS, leve) */}
       <div
         className="pointer-events-none absolute inset-0 hidden md:block"
         aria-hidden
@@ -41,7 +42,7 @@ export function Hero() {
         }}
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-28 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-5 md:px-6 md:pb-28 md:pt-32">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-28 pb-8 sm:px-5 md:px-6 md:pb-28">
         <div className="mb-5 h-px w-12 bg-brand-gold md:mb-8 md:w-16" aria-hidden />
         <p className="mb-3 text-[0.65rem] tracking-[0.28em] text-brand-gold uppercase sm:mb-5 sm:text-[0.7rem] sm:tracking-[0.35em]">
           {SITE.tagline}

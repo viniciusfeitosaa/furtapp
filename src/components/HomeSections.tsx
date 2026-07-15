@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { PHOTO_REGIONS, CHECKPOINTS } from "@/lib/site";
 
 export function SectionShell({
@@ -93,13 +92,15 @@ export function HomeSections() {
 
       <section id="tratamentos" className="bg-white text-brand-charcoal">
         <div className="relative h-[52vh] min-h-[280px] w-full overflow-hidden md:h-[62vh] md:min-h-[420px]">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/media/cirurgia-procedimento.jpg"
             alt="Dr. Francisco Furtado em procedimento — precisão clínica"
-            fill
-            className="object-cover object-[center_28%]"
-            sizes="100vw"
-            priority={false}
+            width={1536}
+            height={1024}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover object-[center_28%]"
           />
         </div>
         <div className="mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">

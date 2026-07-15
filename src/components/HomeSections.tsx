@@ -90,9 +90,9 @@ export function HomeSections() {
             style={{
               aspectRatio: "1 / 1",
               WebkitMaskImage:
-                "linear-gradient(180deg, #000 0%, #000 40%, rgba(0,0,0,0.75) 58%, rgba(0,0,0,0.3) 78%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 100%)",
+                "linear-gradient(180deg, transparent 0%, #000 6%, #000 90%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 100%)",
               maskImage:
-                "linear-gradient(180deg, #000 0%, #000 40%, rgba(0,0,0,0.75) 58%, rgba(0,0,0,0.3) 78%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 100%)",
+                "linear-gradient(180deg, transparent 0%, #000 6%, #000 90%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 100%)",
               WebkitMaskComposite: "source-in",
               maskComposite: "intersect",
               WebkitMaskRepeat: "no-repeat",
@@ -119,9 +119,9 @@ export function HomeSections() {
             style={{
               aspectRatio: "1 / 1",
               WebkitMaskImage:
-                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 22%, #000 82%, rgba(0,0,0,0.4) 94%, transparent 100%)",
+                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 100%), linear-gradient(180deg, transparent 0%, #000 7%, #000 93%, transparent 100%)",
               maskImage:
-                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 22%, #000 82%, rgba(0,0,0,0.4) 94%, transparent 100%)",
+                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 100%), linear-gradient(180deg, transparent 0%, #000 7%, #000 93%, transparent 100%)",
               WebkitMaskComposite: "source-in",
               maskComposite: "intersect",
               WebkitMaskRepeat: "no-repeat",

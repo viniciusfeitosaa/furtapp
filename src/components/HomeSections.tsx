@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { PHOTO_REGIONS, CHECKPOINTS } from "@/lib/site";
 
 export function SectionShell({
@@ -88,22 +89,42 @@ export function HomeSections() {
         </div>
       </SectionShell>
 
-      <SectionShell id="tratamentos" eyebrow="Procedimentos" title="Tratamentos">
-        <ul className="grid gap-6 md:grid-cols-3">
-          {[
-            "Transplante capilar (técnicas e indicação individualizada)",
-            "Avaliação tricológica completa",
-            "Cuidados pós-operatórios (incl. menção à câmara hiperbárica)",
-          ].map((item) => (
-            <li
-              key={item}
-              className="border-t border-brand-gray-mid pt-4 text-sm leading-relaxed text-brand-charcoal"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
-      </SectionShell>
+      <section id="tratamentos" className="bg-white text-brand-charcoal">
+        <div className="relative h-[52vh] min-h-[280px] w-full overflow-hidden md:h-[62vh] md:min-h-[420px]">
+          <Image
+            src="/media/cirurgia-procedimento.jpg"
+            alt="Dr. Francisco Furtado em procedimento — precisão clínica"
+            fill
+            className="object-cover object-[center_28%]"
+            sizes="100vw"
+            priority={false}
+          />
+        </div>
+        <div className="mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">
+          <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
+            Procedimentos
+          </p>
+          <h2 className="font-display text-4xl md:text-5xl">Tratamentos</h2>
+          <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-brand-charcoal">
+            Avaliação criteriosa, técnica individualizada e acompanhamento —
+            do procedimento ao pós-operatório.
+          </p>
+          <ul className="mt-10 grid gap-6 md:grid-cols-3">
+            {[
+              "Transplante capilar (técnicas e indicação individualizada)",
+              "Avaliação tricológica completa",
+              "Cuidados pós-operatórios (incl. menção à câmara hiperbárica)",
+            ].map((item) => (
+              <li
+                key={item}
+                className="border-t border-brand-gray-mid pt-4 text-sm leading-relaxed text-brand-charcoal"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
       <SectionShell
         id="resultados"

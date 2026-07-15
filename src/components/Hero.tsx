@@ -8,7 +8,7 @@ export function Hero() {
       className="relative flex min-h-[100svh] items-end overflow-hidden bg-black text-white"
     >
       <Image
-        src="/media/dr-francisco-retrato-hero2.png"
+        src="/media/dr-francisco-retrato-hero.png"
         alt="Dr. Francisco Furtado"
         fill
         priority

@@ -1,4 +1,5 @@
-import { PHOTO_REGIONS, CHECKPOINTS } from "@/lib/site";
+import { PHOTO_REGIONS } from "@/lib/site";
+import { JourneyTrack } from "@/components/JourneyTrack";
 import { Reveal } from "@/components/Reveal";
 import { ScrollZoomImage } from "@/components/ScrollZoomImage";
 
@@ -261,21 +262,7 @@ export function HomeSections() {
           </a>
           .
         </p>
-        <ol className="mt-10 grid gap-4 sm:grid-cols-5">
-          {CHECKPOINTS.map((cp) => (
-            <li
-              key={cp}
-              className="border border-brand-gray-light px-3 py-4 text-center"
-            >
-              <span className="block text-xs tracking-[0.2em] text-brand-gray uppercase">
-                Checkpoint
-              </span>
-              <span className="mt-2 block text-xl font-semibold text-black">
-                {cp}
-              </span>
-            </li>
-          ))}
-        </ol>
+        <JourneyTrack />
         <ul className="mt-8 grid gap-2 text-sm text-brand-gray md:grid-cols-2">
           {PHOTO_REGIONS.map((r) => (
             <li key={r.id}>• {r.label}</li>

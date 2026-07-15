@@ -32,7 +32,9 @@ export function SectionShell({
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="font-display text-4xl md:text-5xl">{title}</h2>
+        <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+          {title}
+        </h2>
         <div className="mt-8">{children}</div>
       </div>
     </section>
@@ -104,7 +106,9 @@ export function HomeSections() {
           <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
             Procedimentos
           </p>
-          <h2 className="font-display text-4xl md:text-5xl">Tratamentos</h2>
+          <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+            Tratamentos
+          </h2>
           <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-brand-charcoal">
             Avaliação criteriosa, técnica individualizada e acompanhamento —
             do procedimento ao pós-operatório.

@@ -68,7 +68,7 @@ export function HomeSections() {
       >
         <div
           id="pilares"
-          className="relative flex min-h-[100svh] scroll-mt-24 flex-col justify-end overflow-hidden md:block md:min-h-[90svh]"
+          className="relative flex min-h-[72svh] scroll-mt-24 flex-col justify-end overflow-hidden md:block md:min-h-[64svh]"
           style={{
             background:
               "linear-gradient(180deg, #3a4152 0%, #1a2030 35%, #0c1018 70%, #060810 100%)",
@@ -84,15 +84,15 @@ export function HomeSections() {
             }}
           />
 
-          {/* Mobile: foto em cima com máscara nas bordas */}
+          {/* Mobile: foto colada no topo com máscara nas bordas */}
           <div
-            className="pointer-events-none absolute top-0 left-1/2 h-[52svh] max-w-[92vw] -translate-x-1/2 md:hidden"
+            className="pointer-events-none absolute top-0 left-1/2 h-[48svh] max-w-[92vw] -translate-x-1/2 md:hidden"
             style={{
               aspectRatio: "1 / 1",
               WebkitMaskImage:
-                "linear-gradient(180deg, transparent 0%, #000 6%, #000 90%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 100%)",
+                "linear-gradient(180deg, #000 0%, #000 88%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 100%)",
               maskImage:
-                "linear-gradient(180deg, transparent 0%, #000 6%, #000 90%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 100%)",
+                "linear-gradient(180deg, #000 0%, #000 88%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 100%)",
               WebkitMaskComposite: "source-in",
               maskComposite: "intersect",
               WebkitMaskRepeat: "no-repeat",
@@ -113,15 +113,15 @@ export function HomeSections() {
             />
           </div>
 
-          {/* Desktop: foto à direita com bordas suaves */}
+          {/* Desktop: foto colada no topo à direita */}
           <div
-            className="pointer-events-none absolute top-1/2 right-0 hidden h-[min(85svh,720px)] max-w-[48%] -translate-y-1/2 md:block"
+            className="pointer-events-none absolute top-0 right-0 hidden w-[min(48%,64svh)] max-w-[48%] md:block"
             style={{
               aspectRatio: "1 / 1",
               WebkitMaskImage:
-                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 100%), linear-gradient(180deg, transparent 0%, #000 7%, #000 93%, transparent 100%)",
+                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 100%), linear-gradient(180deg, #000 0%, #000 90%, transparent 100%)",
               maskImage:
-                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 100%), linear-gradient(180deg, transparent 0%, #000 7%, #000 93%, transparent 100%)",
+                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 100%), linear-gradient(180deg, #000 0%, #000 90%, transparent 100%)",
               WebkitMaskComposite: "source-in",
               maskComposite: "intersect",
               WebkitMaskRepeat: "no-repeat",
@@ -163,7 +163,7 @@ export function HomeSections() {
             }}
           />
 
-          <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-28 pb-16 sm:px-5 md:absolute md:inset-x-0 md:bottom-0 md:px-6 md:pt-32 md:pb-28">
+          <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-12 pb-14 sm:px-5 md:absolute md:inset-x-0 md:bottom-0 md:px-6 md:pt-16 md:pb-20">
             <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
               Diferenciais
             </p>

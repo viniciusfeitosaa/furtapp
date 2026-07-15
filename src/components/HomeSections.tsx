@@ -57,23 +57,24 @@ export function HomeSections() {
         </div>
       </SectionShell>
 
+      {/* Pilares + tratamentos unidos: texto → foto full-bleed → procedimentos */}
       <section
-        id="pilares"
-        className="px-4 py-20 text-white md:px-6 md:py-28"
+        id="tratamentos"
+        className="text-white"
         style={{
           background:
             "linear-gradient(90deg, #060810 0%, #0a0e16 18%, #0f1420 36%, #141a28 52%, #1a2232 68%, #243049 84%, #2e3a55 100%)",
         }}
       >
-        <div className="mx-auto max-w-6xl">
-          <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
-            Diferenciais
-          </p>
-          <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
-            Ciência · Arte · Cuidado
-          </h2>
-          <div className="mt-8">
-            <div className="grid gap-10 md:grid-cols-3">
+        <div id="pilares" className="scroll-mt-24 px-4 py-20 md:px-6 md:py-28">
+          <div className="mx-auto max-w-6xl">
+            <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
+              Diferenciais
+            </p>
+            <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+              Ciência · Arte · Cuidado
+            </h2>
+            <div className="mt-8 grid gap-10 md:grid-cols-3">
               {[
                 {
                   t: "Ciência",
@@ -100,46 +101,64 @@ export function HomeSections() {
             </div>
           </div>
         </div>
-      </section>
 
-      <section id="tratamentos" className="bg-white text-brand-charcoal">
-        <div className="relative h-[52vh] min-h-[280px] w-full overflow-hidden md:h-[62vh] md:min-h-[420px]">
+        <div className="relative h-[52vh] min-h-[300px] w-full overflow-hidden md:h-[68vh] md:min-h-[440px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/media/cirurgia-procedimento.jpg"
-            alt="Dr. Francisco Furtado em procedimento — precisão clínica"
+            src="/media/procedimento-precisao.jpg"
+            alt="Dr. Francisco Furtado em procedimento — precisão clínica com lupas"
             width={1536}
             height={1024}
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-[center_28%]"
+            className="absolute inset-0 h-full w-full object-cover object-[center_35%]"
+          />
+          {/* Transição suave do azul para a foto e da foto para o bloco de tratamentos */}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-24"
+            aria-hidden
+            style={{
+              background:
+                "linear-gradient(180deg, #060810 0%, transparent 100%)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-28"
+            aria-hidden
+            style={{
+              background:
+                "linear-gradient(180deg, transparent 0%, #0a0e16 100%)",
+            }}
           />
         </div>
-        <div className="mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">
-          <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
-            Procedimentos
-          </p>
-          <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
-            Tratamentos
-          </h2>
-          <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-brand-charcoal">
-            Avaliação criteriosa, técnica individualizada e acompanhamento —
-            do procedimento ao pós-operatório.
-          </p>
-          <ul className="mt-10 grid gap-6 md:grid-cols-3">
-            {[
-              "Transplante capilar (técnicas e indicação individualizada)",
-              "Avaliação tricológica completa",
-              "Cuidados pós-operatórios (incl. menção à câmara hiperbárica)",
-            ].map((item) => (
-              <li
-                key={item}
-                className="border-t border-brand-gray-mid pt-4 text-sm leading-relaxed text-brand-charcoal"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
+
+        <div className="px-4 py-20 md:px-6 md:py-28">
+          <div className="mx-auto max-w-6xl">
+            <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
+              Procedimentos
+            </p>
+            <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+              Tratamentos
+            </h2>
+            <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-white/80">
+              Avaliação criteriosa, técnica individualizada e acompanhamento —
+              do procedimento ao pós-operatório.
+            </p>
+            <ul className="mt-10 grid gap-6 md:grid-cols-3">
+              {[
+                "Transplante capilar (técnicas e indicação individualizada)",
+                "Avaliação tricológica completa",
+                "Cuidados pós-operatórios (incl. menção à câmara hiperbárica)",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="border-t border-white/20 pt-4 text-sm leading-relaxed text-white/85"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 

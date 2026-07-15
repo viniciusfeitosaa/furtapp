@@ -318,6 +318,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-14 | Aprimoramento da área do cliente: papéis, fluxo de status, janelas, sala de análise, segurança. Scaffold Next.js + UI do site + protótipos `/admin` e `/paciente`. |
 | 2026-07-14 | Criada pasta `conteudos-para-o-site/` para o cliente enviar marca, fotos, vídeos e textos. |
 | 2026-07-15 | Branch do projeto integrada na `main` (fast-forward) e push em `origin/main`. |
+| 2026-07-15 | Ocultado badge das Next.js Dev Tools via `devIndicators: false` no `next.config.ts`. |
 
 ---
 

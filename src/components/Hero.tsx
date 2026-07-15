@@ -7,33 +7,37 @@ export function Hero() {
       id="inicio"
       className="relative flex min-h-[100svh] items-end overflow-hidden bg-black text-white"
     >
-      {/* Retrato ancorado à direita — teste com hero3 (sem fundo) */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-[92%] sm:w-[78%] md:w-[62%] lg:w-[55%] xl:w-[50%]">
-        <Image
-          src="/media/dr-francisco-retrato-hero3.png"
-          alt="Dr. Francisco Furtado"
-          fill
-          priority
-          className="object-contain object-right object-bottom md:object-cover md:object-[center_12%]"
-          sizes="(max-width: 768px) 92vw, 55vw"
-        />
-      </div>
+      <Image
+        src="/media/dr-francisco-retrato-hero.png"
+        alt="Dr. Francisco Furtado"
+        fill
+        priority
+        className="object-cover object-[38%_14%] sm:object-[32%_12%] md:object-[28%_10%] lg:object-[24%_8%]"
+        sizes="100vw"
+      />
 
-      {/* Degradê só à esquerda para texto — deixa a direita com a foto */}
+      {/* Overlay escuro à esquerda — marca e texto legíveis sobre o retrato */}
       <div
-        className="pointer-events-none absolute inset-0 z-[2]"
+        className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "linear-gradient(90deg, #000000 0%, #000000 42%, rgba(0,0,0,0.55) 58%, rgba(0,0,0,0.12) 78%, transparent 100%)",
+            "linear-gradient(90deg, #000000 0%, #000000 34%, rgba(0,0,0,0.78) 52%, rgba(0,0,0,0.28) 72%, rgba(0,0,0,0.08) 100%)",
         }}
       />
       <div
-        className="pointer-events-none absolute inset-0 z-[2] md:hidden"
+        className="pointer-events-none absolute inset-0 md:hidden"
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.8) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0.88) 100%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
+        aria-hidden
+        style={{
+          background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)",
         }}
       />
 

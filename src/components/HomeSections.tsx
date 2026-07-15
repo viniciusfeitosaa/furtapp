@@ -89,12 +89,11 @@ export function HomeSections() {
             className="pointer-events-none absolute top-0 left-1/2 h-[52svh] max-w-[92vw] -translate-x-1/2 md:hidden"
             style={{
               aspectRatio: "1 / 1",
+              /* Só fade leve à direita — sem blur em cima, embaixo nem à esquerda */
               WebkitMaskImage:
-                "linear-gradient(180deg, #000 0%, #000 40%, rgba(0,0,0,0.75) 58%, rgba(0,0,0,0.3) 78%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 78%, rgba(0,0,0,0.4) 90%, transparent 100%)",
+                "linear-gradient(90deg, #000 0%, #000 88%, rgba(0,0,0,0.55) 96%, transparent 100%)",
               maskImage:
-                "linear-gradient(180deg, #000 0%, #000 40%, rgba(0,0,0,0.75) 58%, rgba(0,0,0,0.3) 78%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 78%, rgba(0,0,0,0.4) 90%, transparent 100%)",
-              WebkitMaskComposite: "source-in",
-              maskComposite: "intersect",
+                "linear-gradient(90deg, #000 0%, #000 88%, rgba(0,0,0,0.55) 96%, transparent 100%)",
               WebkitMaskRepeat: "no-repeat",
               maskRepeat: "no-repeat",
               WebkitMaskSize: "100% 100%",
@@ -113,17 +112,15 @@ export function HomeSections() {
             />
           </div>
 
-          {/* Desktop: foto à direita com bordas suaves */}
+          {/* Desktop: foto à direita — sem blur em cima/baixo/esquerda */}
           <div
             className="pointer-events-none absolute top-1/2 right-0 hidden h-[min(85svh,720px)] max-w-[48%] -translate-y-1/2 md:block"
             style={{
               aspectRatio: "1 / 1",
               WebkitMaskImage:
-                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 88%, rgba(0,0,0,0.45) 96%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 22%, #000 82%, rgba(0,0,0,0.4) 94%, transparent 100%)",
+                "linear-gradient(90deg, #000 0%, #000 86%, rgba(0,0,0,0.5) 95%, transparent 100%)",
               maskImage:
-                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 88%, rgba(0,0,0,0.45) 96%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 22%, #000 82%, rgba(0,0,0,0.4) 94%, transparent 100%)",
-              WebkitMaskComposite: "source-in",
-              maskComposite: "intersect",
+                "linear-gradient(90deg, #000 0%, #000 86%, rgba(0,0,0,0.5) 95%, transparent 100%)",
               WebkitMaskRepeat: "no-repeat",
               maskRepeat: "no-repeat",
               WebkitMaskSize: "100% 100%",

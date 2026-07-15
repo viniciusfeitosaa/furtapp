@@ -323,6 +323,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Ícone da marca (símbolo pincelada) aplicado como favicon, apple-icon, header e footer. Arquivos em `public/brand/` e `conteudos-para-o-site/01-marca/`. |
 | 2026-07-15 | Ícone trocado pela versão oficial enviada (PNG pincelada + hélice azul); favicon via `src/app/icon.png`. |
 | 2026-07-15 | Header: menos padding/gap e remoção de `truncate` para exibir nome e tagline completos. |
+| 2026-07-15 | Header sempre com `bg-black/95` (sem variante transparente) para leitura do menu. |
 
 ---
 

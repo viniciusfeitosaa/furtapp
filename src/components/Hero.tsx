@@ -12,17 +12,17 @@ export function Hero() {
         alt="Dr. Francisco Furtado"
         fill
         priority
-        className="object-cover object-[72%_center] md:object-[78%_center]"
+        className="object-cover object-[68%_20%] sm:object-[72%_18%] md:object-[80%_15%]"
         sizes="100vw"
       />
 
-      {/* Overlay sólido/escuro à esquerda — legibilidade + marca em primeiro plano */}
+      {/* Overlay escuro à esquerda — marca e texto legíveis sobre o retrato */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "linear-gradient(90deg, #000000 0%, #000000 38%, rgba(0,0,0,0.72) 58%, rgba(26,32,53,0.35) 78%, rgba(0,0,0,0.15) 100%)",
+            "linear-gradient(90deg, #000000 0%, #000000 34%, rgba(0,0,0,0.78) 52%, rgba(0,0,0,0.28) 72%, rgba(0,0,0,0.08) 100%)",
         }}
       />
       <div
@@ -30,14 +30,14 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.82) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0.88) 100%)",
         }}
       />
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-36"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
         aria-hidden
         style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.65), transparent)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)",
         }}
       />
 

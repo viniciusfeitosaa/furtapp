@@ -11,16 +11,16 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 65% 48% at 78% 28%, #39426b 0%, transparent 55%), linear-gradient(155deg, #000000 0%, #39426b 50%, #323232 100%)",
-          opacity: 0.97,
+            "radial-gradient(ellipse 65% 48% at 78% 28%, #1a2035 0%, transparent 55%), linear-gradient(155deg, #000000 0%, #1a2035 48%, #323232 100%)",
+          opacity: 0.98,
         }}
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-40"
+        className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-45"
         aria-hidden
         style={{
           background:
-            "radial-gradient(circle at 60% 45%, rgba(57,66,107,0.55), transparent 55%)",
+            "radial-gradient(circle at 60% 45%, rgba(26,32,53,0.7), transparent 55%)",
         }}
       />
       <div

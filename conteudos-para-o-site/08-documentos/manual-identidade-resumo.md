@@ -15,7 +15,8 @@ Objetivo visual: **seriedade, confiança e profissionalismo**.
 |-----|-----|--------|
 | Preto | `#000000` | Autoridade, base pontual / hero profundo |
 | Charcoal | `#323232` | Texto e profundidade |
-| Azul-marinho | `#39426b` | Confiança / superfícies escuras |
+| Azul-marinho (manual) | `#39426b` | Referência do manual |
+| Azul-marinho (site / superfícies) | `#1a2035` | Versão mais escura — seriedade na tela |
 | Azul acinzentado | `#96a4c9` | Detalhe frio sóbrio |
 | Lavanda / névoa | `#c7ccdb` `#dcdfe6` | Fundos leves sem “descontrair” |
 | Dourado | `#b6a46e` `#baa366` | CTA / premium |

@@ -97,7 +97,7 @@ export function HomeSections() {
           ].map((item) => (
             <li
               key={item}
-              className="border-t border-brand-blue-gray/60 pt-4 text-sm leading-relaxed text-brand-charcoal"
+              className="border-t border-brand-navy/35 pt-4 text-sm leading-relaxed text-brand-charcoal"
             >
               {item}
             </li>

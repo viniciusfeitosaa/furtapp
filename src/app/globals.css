@@ -4,14 +4,16 @@
   /*
    * Paleta de uso ativo (seriedade / confiança / profissionalismo)
    * Preferidas: #000000 #323232 #7b7b7b #c1c2bd #d6d6d6 #baa366
-   *             #39426b #96a4c9 #c7ccdb #dcdfe6
-   * + institucionais: #b6a46e #463a18 #ffffff
+   *             navy escuro (abaixo) #96a4c9 #c7ccdb #dcdfe6
+   * Manual cita #39426b — no site usamos versão mais profunda para superfícies.
    *
-   * Evitar em superfícies principais (tom mais descontraído):
+   * Evitar em superfícies principais:
    * #82c4d1 #a5e1ed #c2dadf
    */
   --color-black: #000000;
-  --color-navy: #39426b;
+  /* #39426b do manual escurecido (~mistura com preto) para maior seriedade */
+  --color-navy-manual: #39426b;
+  --color-navy: #1a2035; /* rgb(26, 32, 53) — navy escuro de superfície */
   --color-charcoal: #323232;
   --color-gray: #7b7b7b;
   --color-linen: #c1c2bd;
@@ -102,6 +104,6 @@ body {
 }
 
 .surface-soft {
-  background: color-mix(in srgb, var(--color-mist) 80%, var(--color-lavender));
+  background: color-mix(in srgb, var(--color-navy) 6%, white);
   color: var(--color-charcoal);
 }

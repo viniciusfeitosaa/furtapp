@@ -31,7 +31,7 @@ export function Header() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
         solid
-          ? "bg-black/95 text-white shadow-sm"
+          ? "bg-brand-navy/95 text-white shadow-sm"
           : "bg-transparent text-white"
       }`}
     >
@@ -102,7 +102,7 @@ export function Header() {
       </div>
 
       {open ? (
-        <div className="border-t border-white/10 bg-black px-4 py-6 lg:hidden">
+        <div className="border-t border-white/10 bg-brand-navy px-4 py-6 lg:hidden">
           <nav className="flex flex-col gap-4" aria-label="Mobile">
             {NAV_LINKS.map((item) => (
               <Link

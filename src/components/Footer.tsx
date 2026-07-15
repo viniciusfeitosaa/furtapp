@@ -4,7 +4,7 @@ import { SITE, whatsappUrl } from "@/lib/site";
 
 export function Footer() {
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-brand-navy text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-3 md:px-6">
         <div>
           <Image
@@ -20,13 +20,13 @@ export function Footer() {
           <p className="mt-2 text-[0.65rem] tracking-[0.28em] text-white/70 uppercase">
             {SITE.tagline}
           </p>
-          <p className="font-signature mt-6 text-2xl text-brand-gold">
+          <p className="font-signature mt-6 text-2xl text-brand-blue-mist">
             Dr. Francisco Furtado
           </p>
         </div>
 
         <div className="space-y-2 text-sm text-white/75">
-          <p className="text-xs tracking-[0.2em] text-brand-gold uppercase">
+          <p className="text-xs tracking-[0.2em] text-brand-blue-mist uppercase">
             Contato
           </p>
           <a
@@ -55,7 +55,7 @@ export function Footer() {
         </div>
 
         <div className="space-y-2 text-sm text-white/75">
-          <p className="text-xs tracking-[0.2em] text-brand-gold uppercase">
+          <p className="text-xs tracking-[0.2em] text-brand-blue-mist uppercase">
             Acesso
           </p>
           <Link href="/paciente/login" className="block hover:text-white">

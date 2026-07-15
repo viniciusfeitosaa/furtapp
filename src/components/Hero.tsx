@@ -21,10 +21,11 @@ const MASK_DESKTOP = {
 };
 
 const MASK_MOBILE = {
+  /* Máscara na caixa real da foto — fade longo embaixo e nas laterais */
   WebkitMaskImage:
-    "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 5%, #000 14%, #000 55%, rgba(0,0,0,0.55) 72%, transparent 92%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 8%, #000 18%, #000 82%, rgba(0,0,0,0.4) 92%, transparent 100%)",
+    "linear-gradient(180deg, #000 0%, #000 42%, rgba(0,0,0,0.85) 58%, rgba(0,0,0,0.45) 72%, rgba(0,0,0,0.12) 86%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 10%, #000 22%, #000 78%, rgba(0,0,0,0.35) 90%, transparent 100%)",
   maskImage:
-    "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 5%, #000 14%, #000 55%, rgba(0,0,0,0.55) 72%, transparent 92%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 8%, #000 18%, #000 82%, rgba(0,0,0,0.4) 92%, transparent 100%)",
+    "linear-gradient(180deg, #000 0%, #000 42%, rgba(0,0,0,0.85) 58%, rgba(0,0,0,0.45) 72%, rgba(0,0,0,0.12) 86%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 10%, #000 22%, #000 78%, rgba(0,0,0,0.35) 90%, transparent 100%)",
   WebkitMaskComposite: "source-in" as const,
   maskComposite: "intersect" as const,
   WebkitMaskRepeat: "no-repeat",
@@ -50,10 +51,10 @@ export function Hero() {
         style={{ background: BG_DESKTOP }}
       />
 
-      {/* Mobile: retrato em cima, inteiro, fundido no degradê */}
+      {/* Mobile: caixa na proporção da foto + máscara nas bordas reais */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 flex h-[58svh] items-start justify-center md:hidden"
-        style={MASK_MOBILE}
+        className="pointer-events-none absolute top-0 left-1/2 h-[60svh] max-w-[94vw] -translate-x-1/2 md:hidden"
+        style={{ aspectRatio: "922 / 1152", ...MASK_MOBILE }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -63,9 +64,19 @@ export function Hero() {
           height={1152}
           decoding="async"
           fetchPriority="high"
-          className="h-full w-auto max-w-[92%] object-contain object-top"
+          className="h-full w-full object-cover object-top"
         />
       </div>
+
+      {/* Véu extra só no mobile — dissolve a base da foto no degradê */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-[28svh] h-[40svh] md:hidden"
+        aria-hidden
+        style={{
+          background:
+            "linear-gradient(180deg, transparent 0%, rgba(110,110,110,0.15) 20%, rgba(40,40,40,0.45) 50%, rgba(0,0,0,0.75) 75%, #000000 100%)",
+        }}
+      />
 
       {/* Desktop: retrato à direita na proporção, bordas suaves */}
       <div
@@ -95,13 +106,13 @@ export function Hero() {
         }}
       />
 
-      {/* Overlay mobile — transição foto → texto */}
+      {/* Overlay mobile — transição foto → texto (bem longa) */}
       <div
         className="pointer-events-none absolute inset-0 md:hidden"
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.04) 22%, rgba(0,0,0,0.35) 48%, rgba(0,0,0,0.72) 64%, rgba(0,0,0,0.92) 80%, #000000 100%)",
+            "linear-gradient(180deg, rgba(175,175,175,0.18) 0%, rgba(0,0,0,0.02) 18%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.55) 56%, rgba(0,0,0,0.85) 70%, rgba(0,0,0,0.96) 84%, #000000 100%)",
         }}
       />
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { scrollProgressThrough } from "@/lib/motion";
+import { getPrefersReducedMotion, scrollProgressThrough } from "@/lib/motion";
 
 type Props = {
   className?: string;
@@ -28,17 +28,22 @@ export function HeroParallaxImage({
     const img = imgRef.current;
     if (!wrap || !img) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (getPrefersReducedMotion()) {
+      img.style.transform = "";
+      return;
+    }
+
     const section = document.getElementById("inicio");
 
     let active = false;
     let raf = 0;
 
+    const isVisibleWrapper = () => {
+      const style = window.getComputedStyle(wrap);
+      return style.display !== "none" && style.visibility !== "hidden";
+    };
+
     const apply = () => {
-      if (reduce.matches) {
-        img.style.transform = "";
-        return;
-      }
       const el = section ?? wrap;
       const rect = el.getBoundingClientRect();
       const p = scrollProgressThrough(
@@ -54,22 +59,30 @@ export function HeroParallaxImage({
       if (active) raf = requestAnimationFrame(tick);
     };
 
+    const stop = () => {
+      active = false;
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      if (isVisibleWrapper()) apply();
+    };
+
     const start = () => {
+      if (!isVisibleWrapper()) {
+        stop();
+        return;
+      }
       if (active) return;
       active = true;
       raf = requestAnimationFrame(tick);
     };
 
-    const stop = () => {
-      active = false;
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0;
-      apply();
-    };
-
     const target = section ?? wrap;
     const io = new IntersectionObserver(
       ([entry]) => {
+        if (!isVisibleWrapper()) {
+          stop();
+          return;
+        }
         if (entry?.isIntersecting) start();
         else stop();
       },
@@ -77,16 +90,31 @@ export function HeroParallaxImage({
     );
     io.observe(target);
 
-    const rect = target.getBoundingClientRect();
-    if (rect.bottom > 0 && rect.top < window.innerHeight) start();
-    else apply();
+    const onResize = () => {
+      if (!isVisibleWrapper()) {
+        stop();
+        return;
+      }
+      const rect = target.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < window.innerHeight) start();
+      else stop();
+    };
 
-    reduce.addEventListener("change", apply);
+    const rect = target.getBoundingClientRect();
+    if (isVisibleWrapper() && rect.bottom > 0 && rect.top < window.innerHeight) {
+      start();
+    } else if (isVisibleWrapper()) {
+      apply();
+    } else {
+      stop();
+    }
+
+    window.addEventListener("resize", onResize);
 
     return () => {
       stop();
       io.disconnect();
-      reduce.removeEventListener("change", apply);
+      window.removeEventListener("resize", onResize);
     };
   }, [maxShift]);
 

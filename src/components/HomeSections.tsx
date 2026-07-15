@@ -1,4 +1,5 @@
 import { PHOTO_REGIONS, CHECKPOINTS } from "@/lib/site";
+import { Reveal } from "@/components/Reveal";
 import { ScrollZoomImage } from "@/components/ScrollZoomImage";
 
 export function SectionShell({
@@ -181,15 +182,15 @@ export function HomeSections() {
                   t: "Cuidado",
                   d: "Acolhimento real — da avaliação ao pós-operatório e ao acompanhamento de 12 meses.",
                 },
-              ].map((item) => (
-                <div key={item.t}>
+              ].map((item, i) => (
+                <Reveal key={item.t} delayMs={i * 120}>
                   <h3 className="text-lg font-semibold tracking-wide text-brand-gold">
                     {item.t}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-white/80">
                     {item.d}
                   </p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>

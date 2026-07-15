@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BrandMark } from "@/components/BrandMark";
 import { NAV_LINKS, SITE, whatsappUrl } from "@/lib/site";
 
 /** Rotas com fundo claro no topo: header sempre sólido para o texto branco continuar legível */
@@ -38,14 +39,7 @@ export function Header() {
           className="group flex min-w-0 items-center gap-2 sm:gap-3"
           onClick={() => setOpen(false)}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/simbolo-pincelada.png"
-            alt=""
-            width={40}
-            height={40}
-            className="h-8 w-8 shrink-0 rounded-sm sm:h-9 sm:w-9 md:h-10 md:w-10"
-          />
+          <BrandMark className="h-8 w-8 shrink-0 text-white sm:h-9 sm:w-9 md:h-10 md:w-10" />
           <span className="min-w-0">
             <span className="block truncate text-[0.8rem] font-semibold tracking-[0.1em] uppercase sm:text-sm sm:tracking-[0.18em] md:text-base">
               {SITE.name}

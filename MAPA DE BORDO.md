@@ -233,6 +233,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 - [x] Protótipo `/admin/login` + `/admin` (fila + wireframe sala de análise)
 - [x] Links “Área do paciente” / admin no header e footer
 - [x] Pasta de upload do cliente: `conteudos-para-o-site/` (marca, fotos, vídeos, textos, depoimentos)
+- [x] Ícone do site: símbolo pincelada (favicon SVG/PNG + header/footer)
 
 ---
 
@@ -241,11 +242,11 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 ### Site (F1)
 
 - [ ] Conteúdo da pasta `conteudos-para-o-site/` — **aguardando upload do cliente**
-- [ ] Assets reais no `public/` (logo, fotos, vídeo) após organizar o que vier na pasta
+- [ ] Se o PNG/SVG original do símbolo for enviado em alta resolução, substituir a versão em `public/brand/`
+- [ ] Assets reais no `public/` (logo completa com texto, fotos, vídeo)
 - [ ] Bio, textos finais, CRM, endereço físico do consultório
 - [ ] Polir seções (resultados, depoimentos) com conteúdo real
 - [ ] Schema MedicalBusiness / Physician / FAQPage
-- [ ] Favicon monograma F.F
 - [ ] Botão flutuante WhatsApp
 - [ ] LGPD página pública + cookie mínimo se necessário
 - [ ] Remover SVGs padrão do create-next-app em `public/`
@@ -319,6 +320,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-14 | Criada pasta `conteudos-para-o-site/` para o cliente enviar marca, fotos, vídeos e textos. |
 | 2026-07-15 | Branch do projeto integrada na `main` (fast-forward) e push em `origin/main`. |
 | 2026-07-15 | Ocultado badge das Next.js Dev Tools via `devIndicators: false` no `next.config.ts`. |
+| 2026-07-15 | Ícone da marca (símbolo pincelada) aplicado como favicon, apple-icon, header e footer. Arquivos em `public/brand/` e `conteudos-para-o-site/01-marca/`. |
 
 ---
 

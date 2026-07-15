@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Francisco Furtado">
+  <rect width="64" height="64" fill="#000000"/>
+  <!-- Folículo (U) -->
+  <path
+    d="M22 48
+       C22 54 28 58 32 58
+       C36 58 42 54 42 48"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+  <!-- Haste / pincelada -->
+  <path
+    d="M32 52
+       C31.2 42 31.6 32 32.4 22
+       C32.9 15 34.2 10 38 6"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="2.4"
+    stroke-linecap="round"
+  />
+  <path
+    d="M32.2 48
+       C31.6 40 31.8 30 32.5 21
+       C33 14.5 34.5 9.5 37.6 6.2"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="1.1"
+    stroke-linecap="round"
+    opacity="0.55"
+  />
+  <!-- Dupla hélice / pontos científicos (#82c4d1) -->
+  <circle cx="29.5" cy="18" r="1.35" fill="#82c4d1"/>
+  <circle cx="35.2" cy="15.2" r="1.2" fill="#82c4d1"/>
+  <circle cx="30.2" cy="12.5" r="1.15" fill="#a5e1ed"/>
+  <circle cx="36.5" cy="10.8" r="1.05" fill="#82c4d1"/>
+  <circle cx="32.8" cy="8.2" r="0.95" fill="#a5e1ed"/>
+  <circle cx="37.8" cy="7.2" r="0.85" fill="#82c4d1"/>
+</svg>

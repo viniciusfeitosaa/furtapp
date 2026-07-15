@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NAV_LINKS, SITE, whatsappUrl } from "@/lib/site";
@@ -24,12 +25,26 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-6">
-        <Link href="/" className="group min-w-0" onClick={() => setOpen(false)}>
-          <span className="block truncate text-sm font-semibold tracking-[0.18em] uppercase md:text-base">
-            {SITE.name}
-          </span>
-          <span className="mt-0.5 block truncate text-[0.625rem] tracking-[0.28em] text-white/75 uppercase">
-            {SITE.tagline}
+        <Link
+          href="/"
+          className="group flex min-w-0 items-center gap-3"
+          onClick={() => setOpen(false)}
+        >
+          <Image
+            src="/brand/simbolo-pincelada.svg"
+            alt=""
+            width={40}
+            height={40}
+            className="h-9 w-9 shrink-0 rounded-sm md:h-10 md:w-10"
+            priority
+          />
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-semibold tracking-[0.18em] uppercase md:text-base">
+              {SITE.name}
+            </span>
+            <span className="mt-0.5 block truncate text-[0.625rem] tracking-[0.28em] text-white/75 uppercase">
+              {SITE.tagline}
+            </span>
           </span>
         </Link>
 

@@ -48,6 +48,22 @@ export const metadata: Metadata = {
       "Ciência, arte e cuidado humano. Avaliação e acompanhamento em Fortaleza e no Ceará.",
     locale: "pt_BR",
     type: "website",
+    images: [
+      {
+        url: "/brand/simbolo-pincelada.png",
+        width: 512,
+        height: 512,
+        alt: SITE.name,
+      },
+    ],
+  },
+  icons: {
+    icon: [
+      { url: "/brand/simbolo-pincelada.svg", type: "image/svg+xml" },
+      { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 

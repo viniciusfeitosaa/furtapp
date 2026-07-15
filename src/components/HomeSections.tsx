@@ -1,3 +1,4 @@
+import { FollicleSection } from "@/components/follicle/FollicleSection";
 import { PHOTO_REGIONS } from "@/lib/site";
 import { JourneyTrack } from "@/components/JourneyTrack";
 import { Reveal } from "@/components/Reveal";
@@ -225,6 +226,7 @@ export function HomeSections() {
             </ul>
           </div>
         </div>
+        <FollicleSection />
       </section>
 
       <SectionShell

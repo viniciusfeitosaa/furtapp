@@ -11,23 +11,23 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 70% 50% at 75% 30%, #96a4c9 0%, transparent 52%), linear-gradient(155deg, #000000 0%, #39426b 42%, #323232 100%)",
-          opacity: 0.95,
+            "radial-gradient(ellipse 65% 48% at 78% 28%, #39426b 0%, transparent 55%), linear-gradient(155deg, #000000 0%, #39426b 50%, #323232 100%)",
+          opacity: 0.97,
         }}
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-35"
+        className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-40"
         aria-hidden
         style={{
           background:
-            "radial-gradient(circle at 60% 45%, rgba(150,164,201,0.4), transparent 55%)",
+            "radial-gradient(circle at 60% 45%, rgba(57,66,107,0.55), transparent 55%)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
         aria-hidden
         style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.45), transparent)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)",
         }}
       />
 
@@ -53,7 +53,7 @@ export function Hero() {
           </a>
           <a
             href="#sobre"
-            className="inline-flex items-center justify-center border border-brand-blue-gray/70 px-8 py-4 text-sm tracking-wide text-white transition-colors hover:border-brand-gold hover:text-brand-gold"
+            className="inline-flex items-center justify-center border border-white/35 px-8 py-4 text-sm tracking-wide text-white transition-colors hover:border-brand-gold hover:text-brand-gold"
           >
             Conhecer o Dr. Francisco
           </a>

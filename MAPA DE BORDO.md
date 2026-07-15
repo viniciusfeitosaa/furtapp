@@ -327,6 +327,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Header: efeito transparente de volta só na home; nas rotas claras (ex. `/paciente/login`) fica sólido. Login do paciente com contraste reforçado. |
 | 2026-07-15 | Paleta: menos preto puro; superfícies escuras em azul-marinho `#39426b` + azuis claros. Manual resumido em `conteudos-para-o-site/08-documentos/`. |
 | 2026-07-15 | Paleta refinada: removidos `#82c4d1` `#a5e1ed` `#c2dadf` das superfícies; prioridade preto/cinza/navy/`#96a4c9`/`#c7ccdb`/`#dcdfe6` + dourado. |
+| 2026-07-15 | Azuis claros de apoio (`#96a4c9` etc.) trocados por navy `#39426b` em hero, seções soft e formulários. |
 
 ---
 

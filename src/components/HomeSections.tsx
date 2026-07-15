@@ -15,7 +15,7 @@ export function SectionShell({
 }) {
   const tones = {
     light: "bg-white text-brand-charcoal",
-    soft: "bg-brand-mist text-brand-charcoal",
+    soft: "bg-brand-navy/[0.06] text-brand-charcoal",
     dark: "bg-brand-navy text-white",
   } as const;
 

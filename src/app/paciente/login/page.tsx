@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function PacienteLoginPage() {
   return (
-    <div className="min-h-screen bg-brand-mist/80 pt-28 pb-20">
+    <div className="min-h-screen bg-brand-gray-light pt-28 pb-20">
       <div className="mx-auto max-w-md px-4">
         <p className="text-[0.7rem] tracking-[0.3em] text-brand-navy uppercase">
           Área do paciente
@@ -22,7 +22,7 @@ export default function PacienteLoginPage() {
           e receba o retorno do Dr. Francisco no seu painel.
         </p>
 
-        <form className="mt-8 space-y-4 border border-brand-blue-gray/40 bg-white p-6 shadow-sm">
+        <form className="mt-8 space-y-4 border border-brand-navy/20 bg-white p-6 shadow-sm">
           <p className="text-xs text-brand-gray">
             Autenticação real entra na Fase 2. Este é o protótipo de tela.
           </p>

@@ -75,7 +75,7 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-blue-gray) 45%, white);
+  background: color-mix(in srgb, var(--color-navy) 28%, white);
   color: var(--color-navy);
 }
 

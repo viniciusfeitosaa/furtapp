@@ -57,38 +57,50 @@ export function HomeSections() {
         </div>
       </SectionShell>
 
-      <SectionShell
+      <section
         id="pilares"
-        eyebrow="Diferenciais"
-        title="Ciência · Arte · Cuidado"
-        tone="dark"
+        className="px-4 py-20 text-white md:px-6 md:py-28"
+        style={{
+          background:
+            "linear-gradient(90deg, #060810 0%, #0a0e16 18%, #0f1420 36%, #141a28 52%, #1a2232 68%, #243049 84%, #2e3a55 100%)",
+        }}
       >
-        <div className="grid gap-10 md:grid-cols-3">
-          {[
-            {
-              t: "Ciência",
-              d: "Critério médico, personalização e protocolos seguros em cada etapa.",
-            },
-            {
-              t: "Arte",
-              d: "Linha anterior e densidade pensadas para um resultado natural e harmônico.",
-            },
-            {
-              t: "Cuidado",
-              d: "Acolhimento real — da avaliação ao pós-operatório e ao acompanhamento de 12 meses.",
-            },
-          ].map((item) => (
-            <div key={item.t}>
-              <h3 className="text-lg font-semibold tracking-wide text-brand-gold">
-                {item.t}
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/80">
-                {item.d}
-              </p>
+        <div className="mx-auto max-w-6xl">
+          <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
+            Diferenciais
+          </p>
+          <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+            Ciência · Arte · Cuidado
+          </h2>
+          <div className="mt-8">
+            <div className="grid gap-10 md:grid-cols-3">
+              {[
+                {
+                  t: "Ciência",
+                  d: "Critério médico, personalização e protocolos seguros em cada etapa.",
+                },
+                {
+                  t: "Arte",
+                  d: "Linha anterior e densidade pensadas para um resultado natural e harmônico.",
+                },
+                {
+                  t: "Cuidado",
+                  d: "Acolhimento real — da avaliação ao pós-operatório e ao acompanhamento de 12 meses.",
+                },
+              ].map((item) => (
+                <div key={item.t}>
+                  <h3 className="text-lg font-semibold tracking-wide text-brand-gold">
+                    {item.t}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-white/80">
+                    {item.d}
+                  </p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-      </SectionShell>
+      </section>
 
       <section id="tratamentos" className="bg-white text-brand-charcoal">
         <div className="relative h-[52vh] min-h-[280px] w-full overflow-hidden md:h-[62vh] md:min-h-[420px]">

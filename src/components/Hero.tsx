@@ -6,6 +6,31 @@ export function Hero() {
       id="inicio"
       className="relative flex min-h-[100svh] items-end overflow-hidden bg-black text-white"
     >
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse 65% 48% at 78% 28%, #1a2035 0%, transparent 55%), linear-gradient(155deg, #000000 0%, #1a2035 48%, #323232 100%)",
+          opacity: 0.98,
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-45"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(circle at 60% 45%, rgba(26,32,53,0.7), transparent 55%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
+        aria-hidden
+        style={{
+          background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)",
+        }}
+      />
+
       <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-32 md:px-6 md:pb-28">
         <div className="mb-8 h-px w-16 bg-brand-gold" aria-hidden />
         <p className="mb-5 text-[0.7rem] tracking-[0.35em] text-brand-gold uppercase">

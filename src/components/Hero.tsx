@@ -11,29 +11,28 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 75% 55% at 72% 35%, #82c4d1 0%, transparent 50%), linear-gradient(155deg, #39426b 0%, #323232 48%, #463a18 130%)",
+            "radial-gradient(ellipse 70% 50% at 75% 30%, #96a4c9 0%, transparent 52%), linear-gradient(155deg, #000000 0%, #39426b 42%, #323232 100%)",
           opacity: 0.95,
         }}
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-3/5 opacity-40"
+        className="pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-35"
         aria-hidden
         style={{
           background:
-            "radial-gradient(circle at 55% 45%, rgba(165,225,237,0.45), transparent 58%)",
+            "radial-gradient(circle at 60% 45%, rgba(150,164,201,0.4), transparent 55%)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
         aria-hidden
         style={{
-          background:
-            "linear-gradient(to top, rgba(57,66,107,0.85), transparent)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.45), transparent)",
         }}
       />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-32 md:px-6 md:pb-28">
-        <p className="mb-4 text-[0.7rem] tracking-[0.35em] text-brand-blue-mist uppercase">
+        <p className="mb-4 text-[0.7rem] tracking-[0.35em] text-brand-gold-soft uppercase">
           {SITE.tagline}
         </p>
         <h1 className="font-display max-w-3xl text-5xl leading-none text-white sm:text-6xl md:text-7xl">
@@ -54,7 +53,7 @@ export function Hero() {
           </a>
           <a
             href="#sobre"
-            className="inline-flex items-center justify-center border border-brand-blue-soft/60 px-8 py-4 text-sm tracking-wide text-white transition-colors hover:border-brand-gold hover:text-brand-gold"
+            className="inline-flex items-center justify-center border border-brand-blue-gray/70 px-8 py-4 text-sm tracking-wide text-white transition-colors hover:border-brand-gold hover:text-brand-gold"
           >
             Conhecer o Dr. Francisco
           </a>

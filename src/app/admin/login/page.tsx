@@ -10,7 +10,7 @@ export default function AdminLoginPage() {
   return (
     <div className="bg-brand-navy pt-28 pb-20 text-white">
       <div className="mx-auto max-w-md px-4">
-        <p className="text-[0.7rem] tracking-[0.3em] text-brand-blue-mist uppercase">
+        <p className="text-[0.7rem] tracking-[0.3em] text-brand-gold-soft uppercase">
           Administração
         </p>
         <h1 className="font-display mt-3 text-4xl">Painel do Dr. Francisco</h1>

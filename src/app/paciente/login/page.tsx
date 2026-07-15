@@ -36,7 +36,7 @@ export default function PacienteLoginPage() {
             <input
               id="email"
               type="email"
-              className="mt-2 w-full border border-brand-gray-mid bg-white px-3 py-2.5 text-sm text-brand-charcoal outline-none focus:border-brand-blue-soft"
+              className="mt-2 w-full border border-brand-gray-mid bg-white px-3 py-2.5 text-sm text-brand-charcoal outline-none focus:border-brand-navy"
               placeholder="seu@email.com"
               autoComplete="email"
             />
@@ -51,7 +51,7 @@ export default function PacienteLoginPage() {
             <input
               id="senha"
               type="password"
-              className="mt-2 w-full border border-brand-gray-mid bg-white px-3 py-2.5 text-sm text-brand-charcoal outline-none focus:border-brand-blue-soft"
+              className="mt-2 w-full border border-brand-gray-mid bg-white px-3 py-2.5 text-sm text-brand-charcoal outline-none focus:border-brand-navy"
               autoComplete="current-password"
             />
           </div>

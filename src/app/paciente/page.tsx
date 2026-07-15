@@ -37,7 +37,7 @@ export default function PacienteDashboardPage() {
               key={cp}
               className={`border px-3 py-4 text-center ${
                 i === 1
-                  ? "border-brand-blue-soft bg-brand-blue-mist/35"
+                  ? "border-brand-navy bg-brand-lavender/50"
                   : "border-brand-gray-light"
               }`}
             >

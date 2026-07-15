@@ -20,13 +20,13 @@ export function Footer() {
           <p className="mt-2 text-[0.65rem] tracking-[0.28em] text-white/70 uppercase">
             {SITE.tagline}
           </p>
-          <p className="font-signature mt-6 text-2xl text-brand-blue-mist">
+          <p className="font-signature mt-6 text-2xl text-brand-gold-soft">
             Dr. Francisco Furtado
           </p>
         </div>
 
         <div className="space-y-2 text-sm text-white/75">
-          <p className="text-xs tracking-[0.2em] text-brand-blue-mist uppercase">
+          <p className="text-xs tracking-[0.2em] text-brand-gold-soft uppercase">
             Contato
           </p>
           <a
@@ -55,7 +55,7 @@ export function Footer() {
         </div>
 
         <div className="space-y-2 text-sm text-white/75">
-          <p className="text-xs tracking-[0.2em] text-brand-blue-mist uppercase">
+          <p className="text-xs tracking-[0.2em] text-brand-gold-soft uppercase">
             Acesso
           </p>
           <Link href="/paciente/login" className="block hover:text-white">

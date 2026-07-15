@@ -42,7 +42,7 @@ Ciência · Arte · Cuidado humano — tom confiante, técnico e acolhedor.
 | Stack site | Next.js (App Router) + TypeScript + Tailwind CSS |
 | Conteúdo público v1 | `content/` (JSON/MDX) + painel admin para gestão clínica; CMS WordPress **fora** |
 | SEO local | Fortaleza + Ceará |
-| Identidade | Azul-marinho `#39426b` como superfície escura principal; preto `#000000` pontual; dourado `#b6a46e`; brancos/cinzas/azuis claros de apoio |
+| Identidade | Paleta séria: preto/cinzas/navy/`#96a4c9`/`#c7ccdb`/`#dcdfe6` + dourado. Evitar `#82c4d1` `#a5e1ed` `#c2dadf` em superfícies |
 | Tipografia | Poppins (Nexa), Bebas Neue (ARCHTH), Arapey, script só na assinatura |
 | Auth portal | Login separado: **Admin** (Dr. Francisco) e **Paciente**; papel opcional **Assistente** |
 | Dados clínicos | PostgreSQL + Prisma; fotos em storage privado (S3/R2) com URLs assinadas |
@@ -326,6 +326,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Header sempre com `bg-black/95` (sem variante transparente) para leitura do menu. |
 | 2026-07-15 | Header: efeito transparente de volta só na home; nas rotas claras (ex. `/paciente/login`) fica sólido. Login do paciente com contraste reforçado. |
 | 2026-07-15 | Paleta: menos preto puro; superfícies escuras em azul-marinho `#39426b` + azuis claros. Manual resumido em `conteudos-para-o-site/08-documentos/`. |
+| 2026-07-15 | Paleta refinada: removidos `#82c4d1` `#a5e1ed` `#c2dadf` das superfícies; prioridade preto/cinza/navy/`#96a4c9`/`#c7ccdb`/`#dcdfe6` + dourado. |
 
 ---
 

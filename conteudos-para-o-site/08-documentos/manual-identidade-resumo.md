@@ -1,35 +1,36 @@
 # Manual de identidade — Criativo Submerso (resumo operacional WEB)
 
-Fonte: Manual da Identidade Visual Dr. Francisco Furtado (19.12.2024).  
-Texto completo colado pelo cliente no chat em 2026-07-15.
+Fonte: Manual da Identidade Visual Dr. Francisco Furtado (19.12.2024).
 
-## Significado das cores (orientação de uso)
+## Diretriz de uso no site (atual)
+
+Objetivo visual: **seriedade, confiança e profissionalismo**.
+
+### Usar com prioridade
+
+`#000000` `#323232` `#7b7b7b` `#c1c2bd` `#d6d6d6` `#baa366` `#39426b` `#96a4c9` `#c7ccdb` `#dcdfe6`  
+(+ dourado institucional `#b6a46e` / `#463a18` e `#ffffff`)
 
 | Cor | Hex | Papel |
 |-----|-----|--------|
-| Azul-marinho | `#39426b` | Confiança, seriedade, tranquilidade — **superfície escura principal no site** |
-| Preto | `#000000` | Autoridade / sofisticação — uso pontual (não preencher tudo) |
-| Dourado | `#b6a46e` | Destaque premium, CTAs |
-| Dourado escuro | `#463a18` | Apoio do dourado |
-| Cinza | `#7b7b7b` etc. | Equilíbrio, textos secundários |
-| Branco | `#ffffff` | Clareza, espaço negativo |
-| Azuis claros | `#82c4d1` `#a5e1ed` `#96a4c9` `#c2dadf` | Seções leves, acolhimento, ciência |
+| Preto | `#000000` | Autoridade, base pontual / hero profundo |
+| Charcoal | `#323232` | Texto e profundidade |
+| Azul-marinho | `#39426b` | Confiança / superfícies escuras |
+| Azul acinzentado | `#96a4c9` | Detalhe frio sóbrio |
+| Lavanda / névoa | `#c7ccdb` `#dcdfe6` | Fundos leves sem “descontrair” |
+| Dourado | `#b6a46e` `#baa366` | CTA / premium |
+| Cinzas | `#7b7b7b` `#c1c2bd` `#d6d6d6` | Hierarquia e divisores |
 
-## Paleta WEB completa
+### Evitar em superfícies principais
 
-```
-#000000  #323232  #7b7b7b  #c1c2bd  #d6d6d6
-#baa366  #39426b  #96a4c9  #c7ccdb  #dcdfe6
-#82c4d1  #a5e1ed  #c2dadf  #cad0d1  #ededed
-(+ institucionais #b6a46e #463a18 #ffffff)
-```
+`#82c4d1` `#a5e1ed` `#c2dadf` — tom mais claro/“leve”, fora do foco de seriedade.
 
 ## Tipografia
 
-- Nexa → Poppins (UI / títulos)
-- ARCHTH → Bebas Neue (display)
-- Arapey → Arapey (corpo)
-- Callifornia Signature → Great Vibes (assinatura pontual)
+- Nexa → Poppins
+- ARCHTH → Bebas Neue
+- Arapey → Arapey
+- Callifornia Signature → Great Vibes (assinatura)
 
 ## Pilares
 

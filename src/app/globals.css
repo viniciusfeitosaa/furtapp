@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  /* Paleta institucional — Manual Criativo Submerso */
-  /* Principais */
+  /*
+   * Paleta de uso ativo (seriedade / confiança / profissionalismo)
+   * Preferidas: #000000 #323232 #7b7b7b #c1c2bd #d6d6d6 #baa366
+   *             #39426b #96a4c9 #c7ccdb #dcdfe6
+   * + institucionais: #b6a46e #463a18 #ffffff
+   *
+   * Evitar em superfícies principais (tom mais descontraído):
+   * #82c4d1 #a5e1ed #c2dadf
+   */
   --color-black: #000000;
-  --color-navy: #39426b; /* azul-marinho: confiança / seriedade */
-  --color-gold: #b6a46e;
-  --color-gold-dark: #463a18;
-  --color-gold-soft: #baa366;
-  --color-white: #ffffff;
-
-  /* Web / secundárias */
+  --color-navy: #39426b;
   --color-charcoal: #323232;
   --color-gray: #7b7b7b;
   --color-linen: #c1c2bd;
   --color-gray-mid: #d6d6d6;
+  --color-gold-soft: #baa366;
+  --color-gold: #b6a46e;
+  --color-gold-dark: #463a18;
   --color-blue-gray: #96a4c9;
   --color-lavender: #c7ccdb;
   --color-mist: #dcdfe6;
-  --color-blue-soft: #82c4d1;
-  --color-blue-mist: #a5e1ed;
-  --color-ice: #c2dadf;
-  --color-cloud: #cad0d1;
   --color-gray-light: #ededed;
+  --color-white: #ffffff;
 
-  /* Superfícies de uso (menos preto puro) */
   --surface-dark: var(--color-navy);
-  --surface-dark-deep: color-mix(in srgb, var(--color-navy) 82%, var(--color-black));
-  --surface-soft: var(--color-ice);
+  --surface-dark-deep: color-mix(in srgb, var(--color-navy) 75%, var(--color-black));
+  --surface-soft: var(--color-mist);
   --surface-soft-alt: var(--color-lavender);
   --surface-page: var(--color-white);
   --surface-muted: var(--color-gray-light);
@@ -48,10 +48,7 @@
   --color-brand-gold-dark: var(--color-gold-dark);
   --color-brand-gold-soft: var(--color-gold-soft);
   --color-brand-white: var(--color-white);
-  --color-brand-blue-soft: var(--color-blue-soft);
-  --color-brand-blue-mist: var(--color-blue-mist);
   --color-brand-blue-gray: var(--color-blue-gray);
-  --color-brand-ice: var(--color-ice);
   --color-brand-lavender: var(--color-lavender);
   --color-brand-mist: var(--color-mist);
   --color-brand-gray: var(--color-gray);
@@ -78,7 +75,7 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-blue-soft) 55%, white);
+  background: color-mix(in srgb, var(--color-blue-gray) 45%, white);
   color: var(--color-navy);
 }
 
@@ -99,13 +96,12 @@ body {
   text-wrap: balance;
 }
 
-/* Superfícies reutilizáveis */
 .surface-dark {
   background: var(--surface-dark);
   color: var(--color-white);
 }
 
 .surface-soft {
-  background: color-mix(in srgb, var(--color-ice) 70%, var(--color-mist));
+  background: color-mix(in srgb, var(--color-mist) 80%, var(--color-lavender));
   color: var(--color-charcoal);
 }

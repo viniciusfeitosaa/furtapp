@@ -2,7 +2,7 @@
 
 > **Regra permanente:** tudo o que for decidido, feito, adiado ou sugerido neste projeto **deve** ser registrado neste arquivo. Nenhuma entrega fica só no chat ou no código sem espelho aqui. Atualizar nas seções **Feito**, **Pendente** e **Ideias** a cada ciclo de trabalho.
 
-**Última atualização:** 2026-07-14 (pasta `conteudos-para-o-site/`)  
+**Última atualização:** 2026-07-15 (Pacote C — folículo 3D em spec/plano)  
 **Branch:** `cursor/site-institucional-mapa-bordo-e94e`  
 **Domínio:** www.ffurtado.com.br  
 **Região SEO:** Fortaleza e todo o Ceará
@@ -250,6 +250,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 - [ ] Botão flutuante WhatsApp
 - [ ] LGPD página pública + cookie mínimo se necessário
 - [ ] Remover SVGs padrão do create-next-app em `public/`
+- [ ] **Pacote C:** folículo 3D em Tratamentos (spec + plano prontos; implementação pendente) — `docs/superpowers/specs/2026-07-15-pacote-c-follicle-3d-design.md`
 
 ### Portal (F2–F3)
 
@@ -339,6 +340,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Hero atualizado para `dr-francisco-retrato-hero2.png` (novo upload do cliente). |
 | 2026-07-15 | Hero voltou para `dr-francisco-retrato-hero.png` (retrato anterior). |
 | 2026-07-15 | Teste hero3 (`dr-francisco-retrato-hero3.png`) ancorado à direita do `#inicio`. |
+| 2026-07-15 | Pacote A (motion) entregue. Pacote C: spec + plano do folículo 3D em Tratamentos (`docs/superpowers/...pacote-c-follicle-3d*`). |
 
 ---
 

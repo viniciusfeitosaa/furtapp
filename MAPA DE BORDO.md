@@ -334,6 +334,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Restaurado degradê do hero (preto → navy `#1a2035` → charcoal), mantendo base `bg-black` estável. |
 | 2026-07-15 | Foto de cirurgia posicionada em full-bleed no início da seção Tratamentos (`/media/cirurgia-procedimento.jpg`). |
 | 2026-07-15 | Retrato do Dr. no hero (`/media/dr-francisco-retrato-hero.jpg`) full-bleed à direita, com overlay escuro à esquerda para a marca. |
+| 2026-07-15 | Nota: anexos do chat não chegam como arquivo no disco — fotos reais devem ir em `conteudos-para-o-site/02-fotos-medico/` (ver LEIA-ME). |
 
 ---
 

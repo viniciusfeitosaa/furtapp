@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { SITE, whatsappUrl } from "@/lib/site";
 
@@ -7,7 +6,8 @@ export function Footer() {
     <footer className="bg-black text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-3 md:px-6">
         <div>
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/brand/simbolo-pincelada.png"
             alt=""
             width={48}

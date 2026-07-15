@@ -338,6 +338,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Retrato oficial do Dr. aplicado no hero: `dr-francisco-retrato-hero.png` (upload do cliente via GitHub). |
 | 2026-07-15 | Hero atualizado para `dr-francisco-retrato-hero2.png` (novo upload do cliente). |
 | 2026-07-15 | Hero voltou para `dr-francisco-retrato-hero.png` (retrato anterior). |
+| 2026-07-15 | Teste hero3 (`dr-francisco-retrato-hero3.png`) ancorado à direita do `#inicio`. |
 
 ---
 

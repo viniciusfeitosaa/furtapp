@@ -1,31 +1,18 @@
 import Image from "next/image";
 import { SITE, whatsappUrl } from "@/lib/site";
 
-/** Degradês com muitos stops intermediários — evita “degraus” de cor */
+/** Degradês com muitos stops — evita degraus de cor sem filtro pesado */
 const BG_MOBILE =
   "linear-gradient(180deg, #afafaf 0%, #a6a6a6 8%, #9a9a9a 16%, #8a8a8a 24%, #767676 34%, #5e5e5e 44%, #484848 54%, #333333 64%, #222222 74%, #141414 84%, #080808 92%, #000000 100%)";
 
 const BG_DESKTOP =
   "linear-gradient(105deg, #000000 0%, #050505 10%, #0c0c0c 18%, #151515 26%, #1f1f1f 34%, #2b2b2b 42%, #3a3a3a 50%, #4c4c4c 58%, #606060 66%, #767676 74%, #8c8c8c 82%, #9e9e9e 90%, #afafaf 100%)";
 
-const PHOTO_MASK_DESKTOP = {
+const PHOTO_MASK = {
   WebkitMaskImage:
-    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.12) 10%, rgba(0,0,0,0.4) 24%, rgba(0,0,0,0.75) 38%, #000 52%, #000 88%, rgba(0,0,0,0.55) 95%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.25) 6%, rgba(0,0,0,0.7) 16%, #000 26%, #000 86%, rgba(0,0,0,0.5) 94%, transparent 100%)",
+    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.15) 12%, rgba(0,0,0,0.45) 28%, rgba(0,0,0,0.8) 42%, #000 55%, #000 90%, rgba(0,0,0,0.5) 96%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 6%, rgba(0,0,0,0.75) 14%, #000 24%, #000 78%, rgba(0,0,0,0.4) 90%, transparent 100%)",
   maskImage:
-    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.12) 10%, rgba(0,0,0,0.4) 24%, rgba(0,0,0,0.75) 38%, #000 52%, #000 88%, rgba(0,0,0,0.55) 95%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.25) 6%, rgba(0,0,0,0.7) 16%, #000 26%, #000 86%, rgba(0,0,0,0.5) 94%, transparent 100%)",
-  WebkitMaskComposite: "source-in" as const,
-  maskComposite: "intersect" as const,
-  WebkitMaskRepeat: "no-repeat",
-  maskRepeat: "no-repeat",
-  WebkitMaskSize: "100% 100%",
-  maskSize: "100% 100%",
-};
-
-const PHOTO_MASK_MOBILE = {
-  WebkitMaskImage:
-    "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 5%, rgba(0,0,0,0.75) 12%, #000 22%, #000 52%, rgba(0,0,0,0.65) 68%, rgba(0,0,0,0.25) 82%, transparent 96%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 20%, #000 80%, rgba(0,0,0,0.35) 92%, transparent 100%)",
-  maskImage:
-    "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 5%, rgba(0,0,0,0.75) 12%, #000 22%, #000 52%, rgba(0,0,0,0.65) 68%, rgba(0,0,0,0.25) 82%, transparent 96%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 20%, #000 80%, rgba(0,0,0,0.35) 92%, transparent 100%)",
+    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.15) 12%, rgba(0,0,0,0.45) 28%, rgba(0,0,0,0.8) 42%, #000 55%, #000 90%, rgba(0,0,0,0.5) 96%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 6%, rgba(0,0,0,0.75) 14%, #000 24%, #000 78%, rgba(0,0,0,0.4) 90%, transparent 100%)",
   WebkitMaskComposite: "source-in" as const,
   maskComposite: "intersect" as const,
   WebkitMaskRepeat: "no-repeat",
@@ -47,62 +34,39 @@ export function Hero() {
         style={{ background: BG_DESKTOP }}
       />
 
-      {/* Mobile: camada blur + foto nítida */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[62%] md:hidden">
-        <div className="absolute inset-0 scale-110 opacity-50 blur-2xl" aria-hidden>
-          <Image
-            src="/media/dr-francisco-retrato-hero6.png"
-            alt=""
-            fill
-            priority
-            className="object-contain object-[center_8%]"
-            sizes="100vw"
-          />
-        </div>
-        <div className="absolute inset-0" style={PHOTO_MASK_MOBILE}>
+      {/*
+        Uma única foto (evita travar no celular).
+        Halo suave via background-image CSS — sem 2º Image + blur-3xl.
+      */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[58%] md:top-auto md:right-0 md:bottom-0 md:left-auto md:h-full md:max-w-full"
+        style={{ aspectRatio: "922 / 1152" }}
+      >
+        <div
+          className="absolute inset-[-8%] opacity-40 md:opacity-35"
+          aria-hidden
+          style={{
+            backgroundImage: "url(/media/dr-francisco-retrato-hero6.png)",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center top",
+            backgroundSize: "contain",
+            filter: "blur(28px)",
+            transform: "scale(1.06)",
+          }}
+        />
+        <div className="absolute inset-0" style={PHOTO_MASK}>
           <Image
             src="/media/dr-francisco-retrato-hero6.png"
             alt="Dr. Francisco Furtado"
             fill
             priority
-            className="object-contain object-[center_8%]"
-            sizes="100vw"
+            className="object-contain object-[center_8%] md:object-right md:object-bottom"
+            sizes="(max-width: 768px) 100vw, 55vw"
           />
         </div>
       </div>
 
-      {/* Desktop: blur suave atrás + máscara longa nas bordas */}
-      <div
-        className="pointer-events-none absolute right-0 bottom-0 hidden h-full max-w-full md:block"
-        style={{ aspectRatio: "922 / 1152" }}
-      >
-        <div
-          className="absolute inset-0 scale-105 opacity-45 blur-3xl"
-          aria-hidden
-        >
-          <Image
-            src="/media/dr-francisco-retrato-hero6.png"
-            alt=""
-            fill
-            priority
-            className="object-contain object-right object-bottom"
-            sizes="55vw"
-          />
-        </div>
-        <div className="absolute inset-0" style={PHOTO_MASK_DESKTOP}>
-          <Image
-            src="/media/dr-francisco-retrato-hero6.png"
-            alt=""
-            fill
-            priority
-            className="object-contain object-right object-bottom"
-            sizes="55vw"
-            aria-hidden
-          />
-        </div>
-      </div>
-
-      {/* Overlay desktop — fades longos (sem bandas) */}
+      {/* Overlay desktop */}
       <div
         className="pointer-events-none absolute inset-0 hidden md:block"
         aria-hidden
@@ -112,7 +76,7 @@ export function Hero() {
         }}
       />
 
-      {/* Overlay mobile — transição longa foto → texto */}
+      {/* Overlay mobile */}
       <div
         className="pointer-events-none absolute inset-0 md:hidden"
         aria-hidden

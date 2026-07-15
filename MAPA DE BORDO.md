@@ -336,6 +336,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Retrato do Dr. no hero (`/media/dr-francisco-retrato-hero.jpg`) full-bleed à direita, com overlay escuro à esquerda para a marca. |
 | 2026-07-15 | Nota: anexos do chat não chegam como arquivo no disco — fotos reais devem ir em `conteudos-para-o-site/02-fotos-medico/` (ver LEIA-ME). |
 | 2026-07-15 | Retrato oficial do Dr. aplicado no hero: `dr-francisco-retrato-hero.png` (upload do cliente via GitHub). |
+| 2026-07-15 | Hero atualizado para `dr-francisco-retrato-hero2.png` (novo upload do cliente). |
 
 ---
 

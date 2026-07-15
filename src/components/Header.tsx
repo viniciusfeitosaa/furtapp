@@ -24,10 +24,10 @@ export function Header() {
           : "bg-transparent text-white"
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-2 py-3 sm:gap-3 sm:px-3 md:px-4">
         <Link
           href="/"
-          className="group flex min-w-0 items-center gap-3"
+          className="group flex shrink-0 items-center gap-2 sm:gap-3"
           onClick={() => setOpen(false)}
         >
           <Image
@@ -38,17 +38,17 @@ export function Header() {
             className="h-9 w-9 shrink-0 rounded-sm md:h-10 md:w-10"
             priority
           />
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold tracking-[0.18em] uppercase md:text-base">
+          <span className="whitespace-nowrap">
+            <span className="block text-sm font-semibold tracking-[0.12em] uppercase sm:tracking-[0.18em] md:text-base">
               {SITE.name}
             </span>
-            <span className="mt-0.5 block truncate text-[0.625rem] tracking-[0.28em] text-white/75 uppercase">
+            <span className="mt-0.5 block text-[0.55rem] tracking-[0.12em] text-white/75 uppercase sm:text-[0.625rem] sm:tracking-[0.2em]">
               {SITE.tagline}
             </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex" aria-label="Principal">
+        <nav className="hidden items-center gap-4 xl:gap-6 lg:flex" aria-label="Principal">
           {NAV_LINKS.map((item) => (
             <Link
               key={item.href}

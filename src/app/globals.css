@@ -2,37 +2,43 @@
 
 :root {
   /*
-   * Paleta de uso ativo (seriedade / confiança / profissionalismo)
-   * Preferidas: #000000 #323232 #7b7b7b #c1c2bd #d6d6d6 #baa366
-   *             navy escuro (abaixo) #96a4c9 #c7ccdb #dcdfe6
-   * Manual cita #39426b — no site usamos versão mais profunda para superfícies.
+   * Sistema cromático premium — planos sólidos (sem degradê).
+   * Poucas cores, alto contraste, intenção clínica e sofisticada.
    *
-   * Evitar em superfícies principais:
-   * #82c4d1 #a5e1ed #c2dadf
+   * Ink        #000000  — hero, chrome escuro
+   * Navy       #1a2035  — blocos escuros secundários
+   * Charcoal   #323232  — texto principal
+   * Gray       #7b7b7b  — texto secundário
+   * Line       #d6d6d6  — divisores
+   * Quiet      #ededed  — seção alternativa
+   * White      #ffffff  — base
+   * Gold       #b6a46e  — CTA / acento premium (áreas grandes)
+   * Gold soft  #baa366  — detalhe
+   *
+   * Evitar: #82c4d1 #a5e1ed #c2dadf e qualquer gradient de fundo.
    */
   --color-black: #000000;
-  /* #39426b do manual escurecido (~mistura com preto) para maior seriedade */
+  --color-navy: #1a2035;
   --color-navy-manual: #39426b;
-  --color-navy: #1a2035; /* rgb(26, 32, 53) — navy escuro de superfície */
   --color-charcoal: #323232;
   --color-gray: #7b7b7b;
   --color-linen: #c1c2bd;
   --color-gray-mid: #d6d6d6;
-  --color-gold-soft: #baa366;
   --color-gold: #b6a46e;
+  --color-gold-soft: #baa366;
   --color-gold-dark: #463a18;
-  --color-blue-gray: #96a4c9;
-  --color-lavender: #c7ccdb;
+  --color-quiet: #ededed;
   --color-mist: #dcdfe6;
-  --color-gray-light: #ededed;
+  --color-lavender: #c7ccdb;
+  --color-blue-gray: #96a4c9;
   --color-white: #ffffff;
+  --color-gray-light: #ededed;
 
+  --surface-ink: var(--color-black);
   --surface-dark: var(--color-navy);
-  --surface-dark-deep: color-mix(in srgb, var(--color-navy) 75%, var(--color-black));
-  --surface-soft: var(--color-mist);
-  --surface-soft-alt: var(--color-lavender);
   --surface-page: var(--color-white);
-  --surface-muted: var(--color-gray-light);
+  --surface-quiet: var(--color-quiet);
+  --surface-line: var(--color-gray-mid);
 
   --background: var(--surface-page);
   --foreground: var(--color-charcoal);
@@ -46,6 +52,7 @@
   --color-foreground: var(--foreground);
   --color-brand-black: var(--color-black);
   --color-brand-navy: var(--color-navy);
+  --color-brand-navy-manual: var(--color-navy-manual);
   --color-brand-gold: var(--color-gold);
   --color-brand-gold-dark: var(--color-gold-dark);
   --color-brand-gold-soft: var(--color-gold-soft);
@@ -53,13 +60,16 @@
   --color-brand-blue-gray: var(--color-blue-gray);
   --color-brand-lavender: var(--color-lavender);
   --color-brand-mist: var(--color-mist);
+  --color-brand-quiet: var(--color-quiet);
   --color-brand-gray: var(--color-gray);
   --color-brand-gray-mid: var(--color-gray-mid);
   --color-brand-gray-light: var(--color-gray-light);
   --color-brand-charcoal: var(--color-charcoal);
   --color-brand-linen: var(--color-linen);
+  --color-surface-ink: var(--surface-ink);
   --color-surface-dark: var(--surface-dark);
-  --color-surface-dark-deep: var(--surface-dark-deep);
+  --color-surface-quiet: var(--surface-quiet);
+  --color-surface-line: var(--surface-line);
   --font-sans: var(--font-poppins);
   --font-display: var(--font-bebas);
   --font-serif: var(--font-arapey);
@@ -77,8 +87,8 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-navy) 28%, white);
-  color: var(--color-navy);
+  background: var(--color-mist);
+  color: var(--color-black);
 }
 
 .font-display {
@@ -98,12 +108,21 @@ body {
   text-wrap: balance;
 }
 
+.surface-ink {
+  background: var(--surface-ink);
+  color: var(--color-white);
+}
+
 .surface-dark {
   background: var(--surface-dark);
   color: var(--color-white);
 }
 
-.surface-soft {
-  background: color-mix(in srgb, var(--color-navy) 6%, white);
+.surface-quiet {
+  background: var(--surface-quiet);
   color: var(--color-charcoal);
+}
+
+.rule-hairline {
+  border-color: var(--surface-line);
 }

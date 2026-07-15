@@ -30,9 +30,7 @@ export function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        solid
-          ? "bg-brand-navy/95 text-white shadow-sm"
-          : "bg-transparent text-white"
+        solid ? "bg-black text-white" : "bg-transparent text-white"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-2 py-3 sm:gap-3 sm:px-3 md:px-4">
@@ -79,7 +77,7 @@ export function Header() {
             href={whatsappUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center bg-brand-gold px-4 py-2.5 text-xs font-semibold tracking-wide text-black transition-opacity hover:opacity-90"
+            className="inline-flex items-center bg-brand-gold px-4 py-2.5 text-xs font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft"
           >
             Agende sua avaliação
           </a>
@@ -102,7 +100,7 @@ export function Header() {
       </div>
 
       {open ? (
-        <div className="border-t border-white/10 bg-brand-navy px-4 py-6 lg:hidden">
+        <div className="border-t border-white/10 bg-black px-4 py-6 lg:hidden">
           <nav className="flex flex-col gap-4" aria-label="Mobile">
             {NAV_LINKS.map((item) => (
               <Link

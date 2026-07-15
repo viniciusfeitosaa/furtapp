@@ -12,10 +12,10 @@ export default function ContatoPage() {
   return (
     <div className="bg-white pt-28 pb-20">
       <div className="mx-auto max-w-3xl px-4 md:px-6">
-        <p className="text-[0.7rem] tracking-[0.3em] text-brand-navy uppercase">
+        <p className="text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
           Contato
         </p>
-        <h1 className="font-display mt-3 text-5xl text-brand-navy">Agende sua avaliação</h1>
+        <h1 className="font-display mt-3 text-5xl text-black">Agende sua avaliação</h1>
         <p className="font-serif-body mt-6 text-lg text-brand-charcoal">
           Atendimento em {SITE.region}. Prefere WhatsApp? Use o botão abaixo ou
           envie os dados pelo formulário.
@@ -26,13 +26,13 @@ export default function ContatoPage() {
             href={whatsappUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center bg-brand-gold px-6 py-3.5 text-sm font-semibold text-brand-charcoal"
+            className="inline-flex items-center justify-center bg-brand-gold px-6 py-3.5 text-sm font-semibold text-brand-charcoal transition-colors hover:bg-brand-gold-soft"
           >
             Falar no WhatsApp
           </a>
           <a
             href={`mailto:${SITE.email}`}
-            className="inline-flex items-center justify-center border border-brand-navy/25 px-6 py-3.5 text-sm text-brand-navy"
+            className="inline-flex items-center justify-center border border-brand-gray-mid px-6 py-3.5 text-sm text-brand-charcoal transition-colors hover:border-black hover:text-black"
           >
             {SITE.email}
           </a>

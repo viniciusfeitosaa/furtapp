@@ -13,10 +13,10 @@ export default function PacienteDashboardPage() {
       <div className="mx-auto max-w-5xl px-4 md:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[0.7rem] tracking-[0.3em] text-brand-navy uppercase">
+            <p className="text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
               Painel do paciente
             </p>
-            <h1 className="font-display mt-2 text-4xl text-brand-navy md:text-5xl">
+            <h1 className="font-display mt-2 text-4xl text-black md:text-5xl">
               Acompanhamento 12 meses
             </h1>
           </div>
@@ -37,8 +37,8 @@ export default function PacienteDashboardPage() {
               key={cp}
               className={`border px-3 py-4 text-center ${
                 i === 1
-                  ? "border-brand-navy bg-brand-navy/10"
-                  : "border-brand-gray-light"
+                  ? "border-black bg-brand-quiet"
+                  : "border-brand-gray-mid"
               }`}
             >
               <span className="text-xs tracking-widest text-brand-gray uppercase">

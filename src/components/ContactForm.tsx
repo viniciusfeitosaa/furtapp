@@ -61,7 +61,7 @@ export function ContactForm() {
       </p>
       <button
         type="submit"
-        className="bg-brand-navy px-6 py-3.5 text-sm font-semibold tracking-wide text-white transition-opacity hover:opacity-90"
+        className="bg-black px-6 py-3.5 text-sm font-semibold tracking-wide text-white transition-colors hover:bg-brand-charcoal"
       >
         Continuar no WhatsApp
       </button>

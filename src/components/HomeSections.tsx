@@ -15,7 +15,7 @@ export function SectionShell({
 }) {
   const tones = {
     light: "bg-white text-brand-charcoal",
-    soft: "bg-brand-navy/[0.06] text-brand-charcoal",
+    soft: "bg-brand-quiet text-brand-charcoal",
     dark: "bg-brand-navy text-white",
   } as const;
 
@@ -25,7 +25,7 @@ export function SectionShell({
         {eyebrow ? (
           <p
             className={`mb-3 text-[0.7rem] tracking-[0.3em] uppercase ${
-              tone === "dark" ? "text-brand-gold-soft" : "text-brand-navy"
+              tone === "dark" ? "text-brand-gold" : "text-brand-charcoal"
             }`}
           >
             {eyebrow}
@@ -77,7 +77,7 @@ export function HomeSections() {
             },
           ].map((item) => (
             <div key={item.t}>
-              <h3 className="text-lg font-semibold tracking-wide text-brand-gold-soft">
+              <h3 className="text-lg font-semibold tracking-wide text-brand-gold">
                 {item.t}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-white/80">
@@ -97,7 +97,7 @@ export function HomeSections() {
           ].map((item) => (
             <li
               key={item}
-              className="border-t border-brand-navy/35 pt-4 text-sm leading-relaxed text-brand-charcoal"
+              className="border-t border-brand-gray-mid pt-4 text-sm leading-relaxed text-brand-charcoal"
             >
               {item}
             </li>
@@ -135,7 +135,7 @@ export function HomeSections() {
         <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
           Da janela crítica das primeiras 48 horas ao acompanhamento fotográfico
           padronizado a cada 3 meses até completar 1 ano — disponível na{" "}
-          <a href="/paciente/login" className="text-brand-navy underline decoration-brand-gold-soft">
+          <a href="/paciente/login" className="text-black underline decoration-brand-gold underline-offset-4">
             área do paciente
           </a>
           .
@@ -149,7 +149,7 @@ export function HomeSections() {
               <span className="block text-xs tracking-[0.2em] text-brand-gray uppercase">
                 Checkpoint
               </span>
-              <span className="mt-2 block text-xl font-semibold text-brand-navy">
+              <span className="mt-2 block text-xl font-semibold text-black">
                 {cp}
               </span>
             </li>

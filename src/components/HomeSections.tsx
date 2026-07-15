@@ -107,7 +107,7 @@ export function HomeSections() {
               alt="Dr. Francisco Furtado em procedimento — precisão clínica com lupas"
               width={640}
               height={640}
-              maxScale={1.12}
+              maxScale={1.45}
               className="h-full w-full object-cover object-center"
             />
           </div>
@@ -134,7 +134,7 @@ export function HomeSections() {
               alt=""
               width={640}
               height={640}
-              maxScale={1.12}
+              maxScale={1.45}
               aria-hidden
               className="h-full w-full object-cover object-center"
             />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   src: string;
@@ -8,7 +8,7 @@ type Props = {
   width: number;
   height: number;
   className?: string;
-  /** Escala máxima no fim do scroll (1.08 = +8%). */
+  /** Escala máxima (1.45 = +45%). */
   maxScale?: number;
   /** Seletor do container que define o progresso do scroll. */
   sectionSelector?: string;
@@ -17,9 +17,14 @@ type Props = {
   "aria-hidden"?: boolean | "true" | "false";
 };
 
+function clamp(n: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, n));
+}
+
 /**
- * Zoom suave na imagem enquanto a seção passa pelo viewport.
- * Respeita prefers-reduced-motion.
+ * Zoom evidenciado na imagem enquanto a seção atravessa o viewport.
+ * Usa rAF enquanto a seção está visível (funciona mesmo se o scroll
+ * for de um container ancestral, não só da window).
  */
 export function ScrollZoomImage({
   src,
@@ -27,62 +32,86 @@ export function ScrollZoomImage({
   width,
   height,
   className = "",
-  maxScale = 1.1,
+  maxScale = 1.45,
   sectionSelector = "#pilares",
   loading = "lazy",
   decoding = "async",
   "aria-hidden": ariaHidden,
 }: Props) {
-  const imgRef = useRef<HTMLImageElement>(null);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const img = imgRef.current;
-    if (!img) return;
-
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const section =
-      (img.closest(sectionSelector) as HTMLElement | null) ??
-      (img.parentElement as HTMLElement | null);
+    const section = document.querySelector(sectionSelector) as HTMLElement | null;
     if (!section) return;
 
+    let active = false;
     let raf = 0;
+    let lastScale = 1;
 
-    const apply = () => {
-      raf = 0;
-      if (reduce.matches) {
-        img.style.transform = "scale(1)";
-        return;
-      }
+    const readScale = () => {
+      if (reduce.matches) return 1;
       const rect = section.getBoundingClientRect();
       const viewH = window.innerHeight || 1;
-      const total = viewH + rect.height;
-      const progressed = viewH - rect.top;
-      const p = Math.min(1, Math.max(0, progressed / total));
-      const scale = 1 + p * (maxScale - 1);
-      img.style.transform = `scale(${scale})`;
+      // Zoom bem perceptível enquanto a seção ainda está em tela
+      const start = viewH * 0.95;
+      const end = viewH * 0.15;
+      const raw = (start - rect.top) / (start - end);
+      const p = clamp(raw, 0, 1);
+      const eased = 1 - (1 - p) * (1 - p);
+      return 1 + eased * (maxScale - 1);
     };
 
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(apply);
+    const tick = () => {
+      const next = readScale();
+      if (Math.abs(next - lastScale) > 0.001) {
+        lastScale = next;
+        setScale(next);
+      }
+      if (active) raf = requestAnimationFrame(tick);
     };
 
-    apply();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    reduce.addEventListener("change", apply);
+    const start = () => {
+      if (active) return;
+      active = true;
+      raf = requestAnimationFrame(tick);
+    };
+
+    const stop = () => {
+      active = false;
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) start();
+        else stop();
+      },
+      { threshold: [0, 0.05, 0.1] },
+    );
+    io.observe(section);
+
+    // Kick inicial (ex.: já na viewport após refresh)
+    const first = section.getBoundingClientRect();
+    if (first.bottom > 0 && first.top < window.innerHeight) start();
+
+    const onReduce = () => {
+      lastScale = 1;
+      setScale(1);
+    };
+    reduce.addEventListener("change", onReduce);
 
     return () => {
-      if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      reduce.removeEventListener("change", apply);
+      stop();
+      io.disconnect();
+      reduce.removeEventListener("change", onReduce);
     };
   }, [maxScale, sectionSelector]);
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      ref={imgRef}
       src={src}
       alt={alt}
       width={width}
@@ -91,7 +120,7 @@ export function ScrollZoomImage({
       decoding={decoding}
       aria-hidden={ariaHidden}
       className={`origin-center will-change-transform ${className}`}
-      style={{ transform: "scale(1)" }}
+      style={{ transform: `scale(${scale})` }}
     />
   );
 }

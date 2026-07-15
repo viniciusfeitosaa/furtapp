@@ -31,7 +31,7 @@ export function Header() {
           onClick={() => setOpen(false)}
         >
           <Image
-            src="/brand/simbolo-pincelada.svg"
+            src="/brand/simbolo-pincelada.png"
             alt=""
             width={40}
             height={40}

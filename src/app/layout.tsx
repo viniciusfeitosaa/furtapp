@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/brand/simbolo-pincelada.svg", type: "image/svg+xml" },
+      { url: "/icon.png", type: "image/png" },
       { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
       { url: "/brand/icon-192.png", sizes: "192x192", type: "image/png" },
     ],

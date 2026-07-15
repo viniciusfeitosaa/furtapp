@@ -321,6 +321,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Branch do projeto integrada na `main` (fast-forward) e push em `origin/main`. |
 | 2026-07-15 | Ocultado badge das Next.js Dev Tools via `devIndicators: false` no `next.config.ts`. |
 | 2026-07-15 | Ícone da marca (símbolo pincelada) aplicado como favicon, apple-icon, header e footer. Arquivos em `public/brand/` e `conteudos-para-o-site/01-marca/`. |
+| 2026-07-15 | Ícone trocado pela versão oficial enviada (PNG pincelada + hélice azul); favicon via `src/app/icon.png`. |
 
 ---
 

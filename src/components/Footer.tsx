@@ -8,7 +8,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-3 md:px-6">
         <div>
           <Image
-            src="/brand/simbolo-pincelada.svg"
+            src="/brand/simbolo-pincelada.png"
             alt=""
             width={48}
             height={48}

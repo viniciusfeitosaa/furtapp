@@ -330,6 +330,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Azuis claros de apoio (`#96a4c9` etc.) trocados por navy `#39426b` em hero, seções soft e formulários. |
 | 2026-07-15 | Navy de superfície escurecido: `#1a2035` (manual `#39426b` ficou claro demais na tela). |
 | 2026-07-15 | Remoção de degradês. Sistema premium de planos sólidos: ink `#000`, navy `#1a2035`, quiet `#ededed`, gold CTA. |
+| 2026-07-15 | Correção “tudo branco”: conflito de `--color-*` no CSS; hero volta a `bg-black` e tokens `--ff-*` / `@theme` com hex literais. |
 
 ---
 

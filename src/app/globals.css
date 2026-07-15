@@ -2,74 +2,41 @@
 
 :root {
   /*
-   * Sistema cromático premium — planos sólidos (sem degradê).
-   * Poucas cores, alto contraste, intenção clínica e sofisticada.
-   *
-   * Ink        #000000  — hero, chrome escuro
-   * Navy       #1a2035  — blocos escuros secundários
-   * Charcoal   #323232  — texto principal
-   * Gray       #7b7b7b  — texto secundário
-   * Line       #d6d6d6  — divisores
-   * Quiet      #ededed  — seção alternativa
-   * White      #ffffff  — base
-   * Gold       #b6a46e  — CTA / acento premium (áreas grandes)
-   * Gold soft  #baa366  — detalhe
-   *
-   * Evitar: #82c4d1 #a5e1ed #c2dadf e qualquer gradient de fundo.
+   * Tokens da marca (prefixo --ff- para NÃO conflitar com --color-* do Tailwind).
+   * Planos sólidos — sem degradê.
    */
-  --color-black: #000000;
-  --color-navy: #1a2035;
-  --color-navy-manual: #39426b;
-  --color-charcoal: #323232;
-  --color-gray: #7b7b7b;
-  --color-linen: #c1c2bd;
-  --color-gray-mid: #d6d6d6;
-  --color-gold: #b6a46e;
-  --color-gold-soft: #baa366;
-  --color-gold-dark: #463a18;
-  --color-quiet: #ededed;
-  --color-mist: #dcdfe6;
-  --color-lavender: #c7ccdb;
-  --color-blue-gray: #96a4c9;
-  --color-white: #ffffff;
-  --color-gray-light: #ededed;
-
-  --surface-ink: var(--color-black);
-  --surface-dark: var(--color-navy);
-  --surface-page: var(--color-white);
-  --surface-quiet: var(--color-quiet);
-  --surface-line: var(--color-gray-mid);
-
-  --background: var(--surface-page);
-  --foreground: var(--color-charcoal);
-  --muted: var(--color-gray);
-  --accent: var(--color-gold);
-  --accent-contrast: var(--color-charcoal);
+  --ff-ink: #000000;
+  --ff-navy: #1a2035;
+  --ff-navy-manual: #39426b;
+  --ff-charcoal: #323232;
+  --ff-gray: #7b7b7b;
+  --ff-linen: #c1c2bd;
+  --ff-line: #d6d6d6;
+  --ff-quiet: #ededed;
+  --ff-gold: #b6a46e;
+  --ff-gold-soft: #baa366;
+  --ff-gold-dark: #463a18;
+  --ff-mist: #dcdfe6;
+  --ff-white: #ffffff;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-brand-black: var(--color-black);
-  --color-brand-navy: var(--color-navy);
-  --color-brand-navy-manual: var(--color-navy-manual);
-  --color-brand-gold: var(--color-gold);
-  --color-brand-gold-dark: var(--color-gold-dark);
-  --color-brand-gold-soft: var(--color-gold-soft);
-  --color-brand-white: var(--color-white);
-  --color-brand-blue-gray: var(--color-blue-gray);
-  --color-brand-lavender: var(--color-lavender);
-  --color-brand-mist: var(--color-mist);
-  --color-brand-quiet: var(--color-quiet);
-  --color-brand-gray: var(--color-gray);
-  --color-brand-gray-mid: var(--color-gray-mid);
-  --color-brand-gray-light: var(--color-gray-light);
-  --color-brand-charcoal: var(--color-charcoal);
-  --color-brand-linen: var(--color-linen);
-  --color-surface-ink: var(--surface-ink);
-  --color-surface-dark: var(--surface-dark);
-  --color-surface-quiet: var(--surface-quiet);
-  --color-surface-line: var(--surface-line);
+  --color-brand-ink: #000000;
+  --color-brand-navy: #1a2035;
+  --color-brand-charcoal: #323232;
+  --color-brand-gray: #7b7b7b;
+  --color-brand-linen: #c1c2bd;
+  --color-brand-gray-mid: #d6d6d6;
+  --color-brand-quiet: #ededed;
+  --color-brand-gray-light: #ededed;
+  --color-brand-gold: #b6a46e;
+  --color-brand-gold-soft: #baa366;
+  --color-brand-gold-dark: #463a18;
+  --color-brand-mist: #dcdfe6;
+  --color-brand-lavender: #c7ccdb;
+  --color-brand-blue-gray: #96a4c9;
+  --color-brand-white: #ffffff;
+  --color-brand-black: #000000;
   --font-sans: var(--font-poppins);
   --font-display: var(--font-bebas);
   --font-serif: var(--font-arapey);
@@ -81,14 +48,14 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: #ffffff;
+  color: #323232;
   font-family: var(--font-poppins), system-ui, sans-serif;
 }
 
 ::selection {
-  background: var(--color-mist);
-  color: var(--color-black);
+  background: #dcdfe6;
+  color: #000000;
 }
 
 .font-display {
@@ -102,27 +69,4 @@ body {
 
 .font-signature {
   font-family: var(--font-script), cursive;
-}
-
-.text-balance {
-  text-wrap: balance;
-}
-
-.surface-ink {
-  background: var(--surface-ink);
-  color: var(--color-white);
-}
-
-.surface-dark {
-  background: var(--surface-dark);
-  color: var(--color-white);
-}
-
-.surface-quiet {
-  background: var(--surface-quiet);
-  color: var(--color-charcoal);
-}
-
-.rule-hairline {
-  border-color: var(--surface-line);
 }

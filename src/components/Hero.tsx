@@ -4,9 +4,8 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      className="relative flex min-h-[100svh] items-end overflow-hidden bg-surface-ink text-white"
+      className="relative flex min-h-[100svh] items-end overflow-hidden bg-black text-white"
     >
-      {/* Plano sólido — sem degradê. Respiro premium via tipografia e espaço. */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-32 md:px-6 md:pb-28">
         <div className="mb-8 h-px w-16 bg-brand-gold" aria-hidden />
         <p className="mb-5 text-[0.7rem] tracking-[0.35em] text-brand-gold uppercase">

@@ -1,11 +1,18 @@
 import Image from "next/image";
 import { SITE, whatsappUrl } from "@/lib/site";
 
+/** Degradês com muitos stops intermediários — evita “degraus” de cor */
+const BG_MOBILE =
+  "linear-gradient(180deg, #afafaf 0%, #a6a6a6 8%, #9a9a9a 16%, #8a8a8a 24%, #767676 34%, #5e5e5e 44%, #484848 54%, #333333 64%, #222222 74%, #141414 84%, #080808 92%, #000000 100%)";
+
+const BG_DESKTOP =
+  "linear-gradient(105deg, #000000 0%, #050505 10%, #0c0c0c 18%, #151515 26%, #1f1f1f 34%, #2b2b2b 42%, #3a3a3a 50%, #4c4c4c 58%, #606060 66%, #767676 74%, #8c8c8c 82%, #9e9e9e 90%, #afafaf 100%)";
+
 const PHOTO_MASK_DESKTOP = {
   WebkitMaskImage:
-    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.25) 8%, #000 22%, #000 92%, rgba(0,0,0,0.4) 97%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 5%, #000 14%, #000 90%, rgba(0,0,0,0.45) 96%, transparent 100%)",
+    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.12) 10%, rgba(0,0,0,0.4) 24%, rgba(0,0,0,0.75) 38%, #000 52%, #000 88%, rgba(0,0,0,0.55) 95%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.25) 6%, rgba(0,0,0,0.7) 16%, #000 26%, #000 86%, rgba(0,0,0,0.5) 94%, transparent 100%)",
   maskImage:
-    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.25) 8%, #000 22%, #000 92%, rgba(0,0,0,0.4) 97%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 5%, #000 14%, #000 90%, rgba(0,0,0,0.45) 96%, transparent 100%)",
+    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.12) 10%, rgba(0,0,0,0.4) 24%, rgba(0,0,0,0.75) 38%, #000 52%, #000 88%, rgba(0,0,0,0.55) 95%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.25) 6%, rgba(0,0,0,0.7) 16%, #000 26%, #000 86%, rgba(0,0,0,0.5) 94%, transparent 100%)",
   WebkitMaskComposite: "source-in" as const,
   maskComposite: "intersect" as const,
   WebkitMaskRepeat: "no-repeat",
@@ -16,9 +23,9 @@ const PHOTO_MASK_DESKTOP = {
 
 const PHOTO_MASK_MOBILE = {
   WebkitMaskImage:
-    "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.55) 4%, #000 12%, #000 62%, rgba(0,0,0,0.4) 78%, transparent 92%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.5) 6%, #000 16%, #000 84%, rgba(0,0,0,0.5) 94%, transparent 100%)",
+    "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 5%, rgba(0,0,0,0.75) 12%, #000 22%, #000 52%, rgba(0,0,0,0.65) 68%, rgba(0,0,0,0.25) 82%, transparent 96%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 20%, #000 80%, rgba(0,0,0,0.35) 92%, transparent 100%)",
   maskImage:
-    "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.55) 4%, #000 12%, #000 62%, rgba(0,0,0,0.4) 78%, transparent 92%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.5) 6%, #000 16%, #000 84%, rgba(0,0,0,0.5) 94%, transparent 100%)",
+    "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 5%, rgba(0,0,0,0.75) 12%, #000 22%, #000 52%, rgba(0,0,0,0.65) 68%, rgba(0,0,0,0.25) 82%, transparent 96%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 20%, #000 80%, rgba(0,0,0,0.35) 92%, transparent 100%)",
   WebkitMaskComposite: "source-in" as const,
   maskComposite: "intersect" as const,
   WebkitMaskRepeat: "no-repeat",
@@ -32,72 +39,86 @@ export function Hero() {
     <section
       id="inicio"
       className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden text-white md:block"
-      style={{
-        background:
-          "linear-gradient(180deg, #afafaf 0%, #8a8a8a 22%, #4a4a4a 48%, #1a1a1a 72%, #000000 100%)",
-      }}
+      style={{ background: BG_MOBILE }}
     >
-      {/* Fundo desktop: preto → cinza horizontal */}
       <div
         className="pointer-events-none absolute inset-0 hidden md:block"
         aria-hidden
-        style={{
-          background:
-            "linear-gradient(105deg, #000000 0%, #000000 30%, #1f1f1f 45%, #4a4a4a 62%, #7a7a7a 78%, #afafaf 100%)",
-        }}
+        style={{ background: BG_DESKTOP }}
       />
 
-      {/* Mobile: retrato na metade superior, inteiro, fundido no degradê vertical */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[62%] md:hidden"
-        style={PHOTO_MASK_MOBILE}
-      >
-        <Image
-          src="/media/dr-francisco-retrato-hero6.png"
-          alt="Dr. Francisco Furtado"
-          fill
-          priority
-          className="object-contain object-[center_8%]"
-          sizes="100vw"
-        />
+      {/* Mobile: camada blur + foto nítida */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[62%] md:hidden">
+        <div className="absolute inset-0 scale-110 opacity-50 blur-2xl" aria-hidden>
+          <Image
+            src="/media/dr-francisco-retrato-hero6.png"
+            alt=""
+            fill
+            priority
+            className="object-contain object-[center_8%]"
+            sizes="100vw"
+          />
+        </div>
+        <div className="absolute inset-0" style={PHOTO_MASK_MOBILE}>
+          <Image
+            src="/media/dr-francisco-retrato-hero6.png"
+            alt="Dr. Francisco Furtado"
+            fill
+            priority
+            className="object-contain object-[center_8%]"
+            sizes="100vw"
+          />
+        </div>
       </div>
 
-      {/* Desktop: retrato à direita na proporção real */}
+      {/* Desktop: blur suave atrás + máscara longa nas bordas */}
       <div
         className="pointer-events-none absolute right-0 bottom-0 hidden h-full max-w-full md:block"
-        style={{
-          aspectRatio: "922 / 1152",
-          ...PHOTO_MASK_DESKTOP,
-        }}
+        style={{ aspectRatio: "922 / 1152" }}
       >
-        <Image
-          src="/media/dr-francisco-retrato-hero6.png"
-          alt=""
-          fill
-          priority
-          className="object-contain object-right object-bottom"
-          sizes="55vw"
+        <div
+          className="absolute inset-0 scale-105 opacity-45 blur-3xl"
           aria-hidden
-        />
+        >
+          <Image
+            src="/media/dr-francisco-retrato-hero6.png"
+            alt=""
+            fill
+            priority
+            className="object-contain object-right object-bottom"
+            sizes="55vw"
+          />
+        </div>
+        <div className="absolute inset-0" style={PHOTO_MASK_DESKTOP}>
+          <Image
+            src="/media/dr-francisco-retrato-hero6.png"
+            alt=""
+            fill
+            priority
+            className="object-contain object-right object-bottom"
+            sizes="55vw"
+            aria-hidden
+          />
+        </div>
       </div>
 
-      {/* Overlay desktop — legibilidade à esquerda */}
+      {/* Overlay desktop — fades longos (sem bandas) */}
       <div
         className="pointer-events-none absolute inset-0 hidden md:block"
         aria-hidden
         style={{
           background:
-            "linear-gradient(105deg, #000000 0%, rgba(0,0,0,0.88) 26%, rgba(40,40,40,0.45) 48%, rgba(175,175,175,0.12) 72%, transparent 100%)",
+            "linear-gradient(105deg, #000000 0%, rgba(0,0,0,0.95) 12%, rgba(0,0,0,0.82) 24%, rgba(0,0,0,0.58) 38%, rgba(30,30,30,0.32) 52%, rgba(80,80,80,0.14) 68%, rgba(175,175,175,0.05) 82%, transparent 100%)",
         }}
       />
 
-      {/* Overlay mobile — texto na base, foto acima */}
+      {/* Overlay mobile — transição longa foto → texto */}
       <div
         className="pointer-events-none absolute inset-0 md:hidden"
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.05) 28%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.92) 78%, #000000 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.04) 18%, rgba(0,0,0,0.18) 36%, rgba(0,0,0,0.42) 50%, rgba(0,0,0,0.68) 62%, rgba(0,0,0,0.86) 74%, rgba(0,0,0,0.96) 86%, #000000 100%)",
         }}
       />
 

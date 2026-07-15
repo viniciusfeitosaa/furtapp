@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 type Props = {
   src: string;
@@ -8,7 +8,7 @@ type Props = {
   width: number;
   height: number;
   className?: string;
-  /** Escala máxima (1.45 = +45%). */
+  /** Escala máxima no fim do scroll (1.12 = +12%). */
   maxScale?: number;
   /** Seletor do container que define o progresso do scroll. */
   sectionSelector?: string;
@@ -22,9 +22,8 @@ function clamp(n: number, min: number, max: number) {
 }
 
 /**
- * Zoom evidenciado na imagem enquanto a seção atravessa o viewport.
- * Usa rAF enquanto a seção está visível (funciona mesmo se o scroll
- * for de um container ancestral, não só da window).
+ * Zoom suave amarrado ao scroll: a escala acompanha a posição
+ * da seção no viewport (sobe e desce junto com a rolagem).
  */
 export function ScrollZoomImage({
   src,
@@ -32,42 +31,43 @@ export function ScrollZoomImage({
   width,
   height,
   className = "",
-  maxScale = 1.45,
+  maxScale = 1.12,
   sectionSelector = "#pilares",
   loading = "lazy",
   decoding = "async",
   "aria-hidden": ariaHidden,
 }: Props) {
-  const [scale, setScale] = useState(1);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
+    const img = imgRef.current;
+    if (!img) return;
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const section = document.querySelector(sectionSelector) as HTMLElement | null;
+    const section =
+      (img.closest(sectionSelector) as HTMLElement | null) ??
+      (document.querySelector(sectionSelector) as HTMLElement | null);
     if (!section) return;
 
     let active = false;
     let raf = 0;
-    let lastScale = 1;
 
-    const readScale = () => {
-      if (reduce.matches) return 1;
+    const apply = () => {
+      if (reduce.matches) {
+        img.style.transform = "scale(1)";
+        return;
+      }
       const rect = section.getBoundingClientRect();
       const viewH = window.innerHeight || 1;
-      // Zoom bem perceptível enquanto a seção ainda está em tela
-      const start = viewH * 0.95;
-      const end = viewH * 0.15;
-      const raw = (start - rect.top) / (start - end);
-      const p = clamp(raw, 0, 1);
-      const eased = 1 - (1 - p) * (1 - p);
-      return 1 + eased * (maxScale - 1);
+      // Progresso linear do scroll: 0 ao entrar, 1 ao sair
+      const total = viewH + rect.height;
+      const progressed = viewH - rect.top;
+      const p = clamp(progressed / total, 0, 1);
+      img.style.transform = `scale(${1 + p * (maxScale - 1)})`;
     };
 
     const tick = () => {
-      const next = readScale();
-      if (Math.abs(next - lastScale) > 0.001) {
-        lastScale = next;
-        setScale(next);
-      }
+      apply();
       if (active) raf = requestAnimationFrame(tick);
     };
 
@@ -81,6 +81,7 @@ export function ScrollZoomImage({
       active = false;
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
+      apply();
     };
 
     const io = new IntersectionObserver(
@@ -88,30 +89,27 @@ export function ScrollZoomImage({
         if (entry?.isIntersecting) start();
         else stop();
       },
-      { threshold: [0, 0.05, 0.1] },
+      { root: null, threshold: [0, 0.01] },
     );
     io.observe(section);
 
-    // Kick inicial (ex.: já na viewport após refresh)
-    const first = section.getBoundingClientRect();
-    if (first.bottom > 0 && first.top < window.innerHeight) start();
+    const rect = section.getBoundingClientRect();
+    if (rect.bottom > 0 && rect.top < window.innerHeight) start();
+    else apply();
 
-    const onReduce = () => {
-      lastScale = 1;
-      setScale(1);
-    };
-    reduce.addEventListener("change", onReduce);
+    reduce.addEventListener("change", apply);
 
     return () => {
       stop();
       io.disconnect();
-      reduce.removeEventListener("change", onReduce);
+      reduce.removeEventListener("change", apply);
     };
   }, [maxScale, sectionSelector]);
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={imgRef}
       src={src}
       alt={alt}
       width={width}
@@ -120,7 +118,7 @@ export function ScrollZoomImage({
       decoding={decoding}
       aria-hidden={ariaHidden}
       className={`origin-center will-change-transform ${className}`}
-      style={{ transform: `scale(${scale})` }}
+      style={{ transform: "scale(1)" }}
     />
   );
 }

@@ -7,22 +7,25 @@ export function Hero() {
       id="inicio"
       className="relative flex min-h-[100svh] items-end overflow-hidden bg-black text-white"
     >
-      <Image
-        src="/media/dr-francisco-retrato-hero5.png"
-        alt="Dr. Francisco Furtado"
-        fill
-        priority
-        className="object-cover object-[38%_14%] sm:object-[32%_12%] md:object-[28%_10%] lg:object-[24%_8%]"
-        sizes="100vw"
-      />
+      {/* Retrato com fundo removido — ancorado à direita sobre o preto */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-[70%] md:w-[58%] lg:w-[52%]">
+        <Image
+          src="/media/dr-francisco-retrato-hero4-removebg-preview.png"
+          alt="Dr. Francisco Furtado"
+          fill
+          priority
+          className="object-contain object-bottom object-right opacity-95"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 70vw, 52vw"
+        />
+      </div>
 
-      {/* Overlay escuro à esquerda — marca e texto legíveis sobre o retrato */}
+      {/* Overlay à esquerda — marca e texto legíveis */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "linear-gradient(90deg, #000000 0%, #000000 34%, rgba(0,0,0,0.78) 52%, rgba(0,0,0,0.28) 72%, rgba(0,0,0,0.08) 100%)",
+            "linear-gradient(90deg, #000000 0%, #000000 38%, rgba(0,0,0,0.72) 55%, rgba(0,0,0,0.2) 75%, transparent 100%)",
         }}
       />
       <div
@@ -30,14 +33,14 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0.88) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.9) 100%)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
         aria-hidden
         style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)",
         }}
       />
 

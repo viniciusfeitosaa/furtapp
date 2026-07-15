@@ -8,11 +8,11 @@ export function Hero() {
       className="relative flex min-h-[100svh] items-end overflow-hidden bg-black text-white"
     >
       <Image
-        src="/media/dr-francisco-retrato-hero.jpg"
+        src="/media/dr-francisco-retrato-hero.png"
         alt="Dr. Francisco Furtado"
         fill
         priority
-        className="object-cover object-[68%_20%] sm:object-[72%_18%] md:object-[80%_15%]"
+        className="object-cover object-[68%_18%] sm:object-[72%_15%] md:object-[78%_12%]"
         sizes="100vw"
       />
 

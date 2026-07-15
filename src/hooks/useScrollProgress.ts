@@ -38,6 +38,7 @@ export function useScrollProgress(ref: RefObject<HTMLElement | null>) {
       active = false;
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
+      read();
     };
 
     const io = new IntersectionObserver(

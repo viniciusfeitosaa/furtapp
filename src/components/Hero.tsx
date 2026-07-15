@@ -1,13 +1,11 @@
 import { SITE, whatsappUrl } from "@/lib/site";
 
-/** Azul-escuro da marca (substitui o preto no degradê): #1a2035 */
-
-/** Degradês azul-escuro → cinza — mesmos stops, só troca o preto pelo navy */
+/** Azul mais escuro à esquerda → cinza à direita */
 const BG_MOBILE =
-  "linear-gradient(180deg, #afafaf 0%, #a6a6a6 8%, #9a9a9a 16%, #8a8a8a 24%, #767676 34%, #5e5e5e 44%, #484848 54%, #32384a 64%, #243049 74%, #1a2035 84%, #141a2c 92%, #121828 100%)";
+  "linear-gradient(180deg, #afafaf 0%, #9a9a9a 12%, #6a6f7a 28%, #3a4152 48%, #1a2030 68%, #0c1018 84%, #060810 100%)";
 
 const BG_DESKTOP =
-  "linear-gradient(105deg, #121828 0%, #141a2c 10%, #1a2035 18%, #1f263c 26%, #243049 34%, #2e3a55 42%, #3a455e 50%, #4c556c 58%, #60677a 66%, #767676 74%, #8c8c8c 82%, #9e9e9e 90%, #afafaf 100%)";
+  "linear-gradient(90deg, #060810 0%, #0a0e16 12%, #0f1420 24%, #141a28 36%, #1a2232 48%, #2a3344 60%, #4a5260 72%, #7a7a7a 86%, #afafaf 100%)";
 
 const MASK_DESKTOP = {
   WebkitMaskImage:
@@ -76,7 +74,7 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, transparent 0%, rgba(110,110,110,0.15) 20%, rgba(36,48,73,0.45) 50%, rgba(26,32,53,0.78) 75%, #121828 100%)",
+            "linear-gradient(180deg, transparent 0%, rgba(110,110,110,0.12) 20%, rgba(20,26,40,0.5) 50%, rgba(10,14,22,0.82) 75%, #060810 100%)",
         }}
       />
 
@@ -104,7 +102,7 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "linear-gradient(105deg, #121828 0%, rgba(18,24,40,0.95) 12%, rgba(26,32,53,0.82) 24%, rgba(26,32,53,0.58) 38%, rgba(36,48,73,0.32) 52%, rgba(80,90,110,0.14) 68%, rgba(175,175,175,0.05) 82%, transparent 100%)",
+            "linear-gradient(90deg, #060810 0%, rgba(6,8,16,0.96) 14%, rgba(10,14,22,0.88) 28%, rgba(15,20,32,0.62) 44%, rgba(26,34,50,0.32) 60%, rgba(80,90,110,0.12) 78%, transparent 100%)",
         }}
       />
 
@@ -114,7 +112,7 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, rgba(175,175,175,0.18) 0%, rgba(26,32,53,0.02) 18%, rgba(26,32,53,0.22) 40%, rgba(26,32,53,0.55) 56%, rgba(26,32,53,0.85) 70%, rgba(18,24,40,0.96) 84%, #121828 100%)",
+            "linear-gradient(180deg, rgba(175,175,175,0.12) 0%, rgba(10,14,22,0.04) 18%, rgba(10,14,22,0.28) 40%, rgba(8,12,20,0.62) 56%, rgba(6,8,16,0.9) 72%, #060810 88%, #060810 100%)",
         }}
       />
 

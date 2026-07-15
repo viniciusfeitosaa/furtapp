@@ -84,21 +84,10 @@ export function HomeSections() {
             }}
           />
 
-          {/* Mobile: foto em cima com máscara nas bordas */}
+          {/* Mobile: foto em cima — sem máscara/blur nas bordas */}
           <div
             className="pointer-events-none absolute top-0 left-1/2 h-[52svh] max-w-[92vw] -translate-x-1/2 md:hidden"
-            style={{
-              aspectRatio: "1 / 1",
-              /* Só fade leve à direita — sem blur em cima, embaixo nem à esquerda */
-              WebkitMaskImage:
-                "linear-gradient(90deg, #000 0%, #000 88%, rgba(0,0,0,0.55) 96%, transparent 100%)",
-              maskImage:
-                "linear-gradient(90deg, #000 0%, #000 88%, rgba(0,0,0,0.55) 96%, transparent 100%)",
-              WebkitMaskRepeat: "no-repeat",
-              maskRepeat: "no-repeat",
-              WebkitMaskSize: "100% 100%",
-              maskSize: "100% 100%",
-            }}
+            style={{ aspectRatio: "1 / 1" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -112,20 +101,10 @@ export function HomeSections() {
             />
           </div>
 
-          {/* Desktop: foto à direita — sem blur em cima/baixo/esquerda */}
+          {/* Desktop: foto à direita — sem blur */}
           <div
             className="pointer-events-none absolute top-1/2 right-0 hidden h-[min(85svh,720px)] max-w-[48%] -translate-y-1/2 md:block"
-            style={{
-              aspectRatio: "1 / 1",
-              WebkitMaskImage:
-                "linear-gradient(90deg, #000 0%, #000 86%, rgba(0,0,0,0.5) 95%, transparent 100%)",
-              maskImage:
-                "linear-gradient(90deg, #000 0%, #000 86%, rgba(0,0,0,0.5) 95%, transparent 100%)",
-              WebkitMaskRepeat: "no-repeat",
-              maskRepeat: "no-repeat",
-              WebkitMaskSize: "100% 100%",
-              maskSize: "100% 100%",
-            }}
+            style={{ aspectRatio: "1 / 1" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -140,23 +119,23 @@ export function HomeSections() {
             />
           </div>
 
-          {/* Overlay desktop — texto legível à esquerda */}
+          {/* Overlay desktop — só na zona do texto (não cobre a foto) */}
           <div
-            className="pointer-events-none absolute inset-0 hidden md:block"
+            className="pointer-events-none absolute inset-y-0 left-0 hidden w-[54%] md:block"
             aria-hidden
             style={{
               background:
-                "linear-gradient(90deg, #060810 0%, rgba(6,8,16,0.96) 18%, rgba(10,14,22,0.82) 34%, rgba(15,20,32,0.45) 52%, rgba(26,34,50,0.15) 70%, transparent 100%)",
+                "linear-gradient(90deg, #060810 0%, rgba(6,8,16,0.94) 55%, rgba(6,8,16,0.4) 82%, transparent 100%)",
             }}
           />
 
-          {/* Overlay mobile — foto → texto */}
+          {/* Overlay mobile — só na base, sob o texto */}
           <div
-            className="pointer-events-none absolute inset-0 md:hidden"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] md:hidden"
             aria-hidden
             style={{
               background:
-                "linear-gradient(180deg, rgba(10,14,22,0.08) 0%, rgba(10,14,22,0.05) 30%, rgba(8,12,20,0.55) 52%, rgba(6,8,16,0.92) 72%, #060810 100%)",
+                "linear-gradient(180deg, transparent 0%, rgba(6,8,16,0.55) 35%, rgba(6,8,16,0.92) 70%, #060810 100%)",
             }}
           />
 

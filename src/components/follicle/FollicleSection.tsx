@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { FollicleFallback } from "@/components/follicle/FollicleFallback";
+import { FollicleErrorBoundary } from "@/components/follicle/FollicleErrorBoundary";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const FollicleCanvas = dynamic(
@@ -75,7 +76,9 @@ export function FollicleSection() {
 
         <div className="mt-10 overflow-hidden border border-white/10">
           {show3d ? (
-            <FollicleCanvas autoRotate={!reduced} />
+            <FollicleErrorBoundary>
+              <FollicleCanvas autoRotate />
+            </FollicleErrorBoundary>
           ) : (
             <FollicleFallback />
           )}

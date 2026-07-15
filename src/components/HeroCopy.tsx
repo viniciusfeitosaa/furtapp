@@ -2,23 +2,22 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { SITE, whatsappUrl } from "@/lib/site";
-import { getPrefersReducedMotion } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 export function HeroCopy() {
+  const reduced = usePrefersReducedMotion();
   const [on, setOn] = useState(false);
+  const show = reduced || on;
 
   useEffect(() => {
-    if (getPrefersReducedMotion()) {
-      setOn(true);
-      return;
-    }
+    if (reduced) return;
     const id = requestAnimationFrame(() => setOn(true));
     return () => cancelAnimationFrame(id);
-  }, []);
+  }, [reduced]);
 
   const item = (delay: number, className: string, children: ReactNode) => (
     <div
-      className={`ff-reveal ${on ? "is-inview" : ""} ${className}`}
+      className={`ff-reveal ${show ? "is-inview" : ""} ${className}`}
       style={{ ["--ff-reveal-delay" as string]: `${delay}ms` }}
     >
       {children}

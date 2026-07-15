@@ -1,22 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getPrefersReducedMotion } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 export function BrandMark({ className = "" }: { className?: string }) {
+  const reduced = usePrefersReducedMotion();
   const [drawn, setDrawn] = useState(false);
+  const show = reduced || drawn;
 
   useEffect(() => {
-    if (getPrefersReducedMotion()) {
-      setDrawn(true);
-      return;
-    }
+    if (reduced) return;
     const id = requestAnimationFrame(() => setDrawn(true));
     return () => cancelAnimationFrame(id);
-  }, []);
+  }, [reduced]);
 
-  const strokeClass = `ff-brand-stroke ${drawn ? "is-drawn" : ""}`;
-  const dotClass = `ff-brand-dot ${drawn ? "is-drawn" : ""}`;
+  const strokeClass = `ff-brand-stroke ${show ? "is-drawn" : ""}`;
+  const dotClass = `ff-brand-dot ${show ? "is-drawn" : ""}`;
 
   return (
     <svg

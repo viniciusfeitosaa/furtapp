@@ -1,21 +1,20 @@
 "use client";
 
 import { useEffect, useState, type RefObject } from "react";
-import { getPrefersReducedMotion } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 export function useInViewOnce(
   ref: RefObject<HTMLElement | null>,
   threshold = 0.15,
 ) {
+  const reduced = usePrefersReducedMotion();
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
+    if (reduced) return;
+
     const el = ref.current;
     if (!el) return;
-    if (getPrefersReducedMotion()) {
-      setInView(true);
-      return;
-    }
 
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -28,7 +27,8 @@ export function useInViewOnce(
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [ref, threshold]);
+  }, [ref, threshold, reduced]);
 
-  return inView;
+  // CSS .ff-reveal sob reduced-motion já força visível; true aqui cobre uso programático.
+  return reduced || inView;
 }

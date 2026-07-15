@@ -1,19 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { CHECKPOINTS } from "@/lib/site";
-import { getPrefersReducedMotion } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 
 export function JourneyTrack() {
   const ref = useRef<HTMLDivElement>(null);
   const raw = useScrollProgress(ref);
-  const [reduced, setReduced] = useState(false);
-
-  useEffect(() => {
-    setReduced(getPrefersReducedMotion());
-  }, []);
-
+  const reduced = usePrefersReducedMotion();
   const progress = reduced ? 1 : raw;
   const activeIdx = Math.min(
     CHECKPOINTS.length - 1,
@@ -27,7 +22,7 @@ export function JourneyTrack() {
         aria-hidden
       >
         <div
-          className="absolute inset-y-0 left-0 origin-left bg-brand-gold"
+          className="absolute inset-y-0 left-0 origin-left bg-brand-gold motion-reduce:transition-none"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
@@ -37,7 +32,7 @@ export function JourneyTrack() {
           return (
             <li
               key={cp}
-              className={`border px-3 py-4 text-center transition-colors duration-300 ${
+              className={`border px-3 py-4 text-center transition-colors duration-300 motion-reduce:transition-none ${
                 on
                   ? "border-brand-gold text-black"
                   : "border-brand-gray-light text-brand-charcoal"

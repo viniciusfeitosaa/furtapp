@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useState, type RefObject } from "react";
-import { getPrefersReducedMotion, scrollProgressThrough } from "@/lib/motion";
+import { scrollProgressThrough } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 /** Retorna 0–1 enquanto o elemento atravessa o viewport (rAF só quando visível). */
 export function useScrollProgress(ref: RefObject<HTMLElement | null>) {
+  const reduced = usePrefersReducedMotion();
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    if (reduced) return;
+
     const el = ref.current;
     if (!el) return;
-    if (getPrefersReducedMotion()) {
-      setProgress(0);
-      return;
-    }
 
     let active = false;
     let raf = 0;
@@ -58,7 +58,7 @@ export function useScrollProgress(ref: RefObject<HTMLElement | null>) {
       stop();
       io.disconnect();
     };
-  }, [ref]);
+  }, [ref, reduced]);
 
-  return progress;
+  return reduced ? 0 : progress;
 }

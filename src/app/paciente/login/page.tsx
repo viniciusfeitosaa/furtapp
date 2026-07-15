@@ -9,51 +9,55 @@ export const metadata: Metadata = {
 
 export default function PacienteLoginPage() {
   return (
-    <div className="bg-brand-gray-light/60 pt-28 pb-20">
+    <div className="min-h-screen bg-[#ededed] pt-28 pb-20">
       <div className="mx-auto max-w-md px-4">
         <p className="text-[0.7rem] tracking-[0.3em] text-brand-gold-dark uppercase">
           Área do paciente
         </p>
-        <h1 className="font-display mt-3 text-4xl">Acompanhe sua evolução</h1>
+        <h1 className="font-display mt-3 text-4xl text-black">
+          Acompanhe sua evolução
+        </h1>
         <p className="mt-4 text-sm leading-relaxed text-brand-charcoal">
           Envie 5 fotos padronizadas a cada checkpoint ({CHECKPOINTS.join(", ")})
           e receba o retorno do Dr. Francisco no seu painel.
         </p>
 
-        <form className="mt-8 space-y-4 rounded-none border border-black/5 bg-white p-6">
+        <form className="mt-8 space-y-4 border border-black/10 bg-white p-6 shadow-sm">
           <p className="text-xs text-brand-gray">
             Autenticação real entra na Fase 2. Este é o protótipo de tela.
           </p>
           <div>
-            <label className="text-xs uppercase" htmlFor="email">
+            <label className="text-xs font-medium text-black uppercase" htmlFor="email">
               E-mail
             </label>
             <input
               id="email"
               type="email"
-              className="mt-2 w-full border border-brand-gray-mid px-3 py-2.5 text-sm"
+              className="mt-2 w-full border border-brand-gray-mid bg-white px-3 py-2.5 text-sm text-black outline-none focus:border-brand-gold"
               placeholder="seu@email.com"
+              autoComplete="email"
             />
           </div>
           <div>
-            <label className="text-xs uppercase" htmlFor="senha">
+            <label className="text-xs font-medium text-black uppercase" htmlFor="senha">
               Senha
             </label>
             <input
               id="senha"
               type="password"
-              className="mt-2 w-full border border-brand-gray-mid px-3 py-2.5 text-sm"
+              className="mt-2 w-full border border-brand-gray-mid bg-white px-3 py-2.5 text-sm text-black outline-none focus:border-brand-gold"
+              autoComplete="current-password"
             />
           </div>
           <Link
             href="/paciente"
-            className="inline-flex w-full items-center justify-center bg-black px-4 py-3 text-sm font-semibold text-white"
+            className="inline-flex w-full items-center justify-center bg-black px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
             Entrar (protótipo)
           </Link>
         </form>
 
-        <ul className="mt-8 space-y-1 text-xs text-brand-gray">
+        <ul className="mt-8 space-y-1.5 text-xs text-brand-charcoal">
           {PHOTO_REGIONS.map((r) => (
             <li key={r.id}>• {r.label}</li>
           ))}

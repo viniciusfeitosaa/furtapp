@@ -324,6 +324,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Ícone trocado pela versão oficial enviada (PNG pincelada + hélice azul); favicon via `src/app/icon.png`. |
 | 2026-07-15 | Header: menos padding/gap e remoção de `truncate` para exibir nome e tagline completos. |
 | 2026-07-15 | Header sempre com `bg-black/95` (sem variante transparente) para leitura do menu. |
+| 2026-07-15 | Header: efeito transparente de volta só na home; nas rotas claras (ex. `/paciente/login`) fica sólido. Login do paciente com contraste reforçado. |
 
 ---
 

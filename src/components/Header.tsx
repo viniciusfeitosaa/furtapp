@@ -2,14 +2,39 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { NAV_LINKS, SITE, whatsappUrl } from "@/lib/site";
 
+/** Rotas com fundo claro no topo: header sempre sólido para o texto branco continuar legível */
+function useSolidHeader(pathname: string) {
+  if (pathname === "/") return false;
+  return true;
+}
+
 export function Header() {
+  const pathname = usePathname();
+  const solidByRoute = useSolidHeader(pathname);
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const solid = solidByRoute || scrolled || open;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-black/95 text-white shadow-sm transition-colors duration-300">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        solid
+          ? "bg-black/95 text-white shadow-sm"
+          : "bg-transparent text-white"
+      }`}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-2 py-3 sm:gap-3 sm:px-3 md:px-4">
         <Link
           href="/"

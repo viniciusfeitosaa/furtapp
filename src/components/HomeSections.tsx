@@ -1,4 +1,5 @@
 import { PHOTO_REGIONS, CHECKPOINTS } from "@/lib/site";
+import { ScrollZoomImage } from "@/components/ScrollZoomImage";
 
 export function SectionShell({
   id,
@@ -86,7 +87,7 @@ export function HomeSections() {
 
           {/* Mobile: foto colada no topo com máscara nas bordas */}
           <div
-            className="pointer-events-none absolute top-0 left-1/2 h-[48svh] max-w-[92vw] -translate-x-1/2 md:hidden"
+            className="pointer-events-none absolute top-0 left-1/2 h-[48svh] max-w-[92vw] -translate-x-1/2 overflow-hidden md:hidden"
             style={{
               aspectRatio: "1 / 1",
               WebkitMaskImage:
@@ -101,21 +102,19 @@ export function HomeSections() {
               maskSize: "100% 100%",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <ScrollZoomImage
               src="/media/procedimento-precisao.jpg"
               alt="Dr. Francisco Furtado em procedimento — precisão clínica com lupas"
               width={640}
               height={640}
-              loading="lazy"
-              decoding="async"
+              maxScale={1.12}
               className="h-full w-full object-cover object-center"
             />
           </div>
 
           {/* Desktop: foto colada no topo à direita */}
           <div
-            className="pointer-events-none absolute top-0 right-0 hidden w-[min(48%,64svh)] max-w-[48%] md:block"
+            className="pointer-events-none absolute top-0 right-0 hidden w-[min(48%,64svh)] max-w-[48%] overflow-hidden md:block"
             style={{
               aspectRatio: "1 / 1",
               WebkitMaskImage:
@@ -130,14 +129,12 @@ export function HomeSections() {
               maskSize: "100% 100%",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <ScrollZoomImage
               src="/media/procedimento-precisao.jpg"
               alt=""
               width={640}
               height={640}
-              loading="lazy"
-              decoding="async"
+              maxScale={1.12}
               aria-hidden
               className="h-full w-full object-cover object-center"
             />

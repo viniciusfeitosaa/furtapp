@@ -57,7 +57,7 @@ export function HomeSections() {
         </div>
       </SectionShell>
 
-      {/* Pilares + tratamentos unidos: texto → foto full-bleed → procedimentos */}
+      {/* Pilares no estilo do hero: texto + foto fundidos no degradê */}
       <section
         id="tratamentos"
         className="text-white"
@@ -66,15 +66,111 @@ export function HomeSections() {
             "linear-gradient(90deg, #060810 0%, #0a0e16 18%, #0f1420 36%, #141a28 52%, #1a2232 68%, #243049 84%, #2e3a55 100%)",
         }}
       >
-        <div id="pilares" className="scroll-mt-24 px-4 py-20 md:px-6 md:py-28">
-          <div className="mx-auto max-w-6xl">
+        <div
+          id="pilares"
+          className="relative flex min-h-[100svh] scroll-mt-24 flex-col justify-end overflow-hidden md:block md:min-h-[90svh]"
+          style={{
+            background:
+              "linear-gradient(180deg, #3a4152 0%, #1a2030 35%, #0c1018 70%, #060810 100%)",
+          }}
+        >
+          {/* Fundo desktop: azul escuro → cinza (esq. → dir.) */}
+          <div
+            className="pointer-events-none absolute inset-0 hidden md:block"
+            aria-hidden
+            style={{
+              background:
+                "linear-gradient(90deg, #060810 0%, #0a0e16 12%, #0f1420 24%, #141a28 36%, #1a2232 48%, #2a3344 60%, #4a5260 72%, #7a7a7a 86%, #afafaf 100%)",
+            }}
+          />
+
+          {/* Mobile: foto em cima com máscara nas bordas */}
+          <div
+            className="pointer-events-none absolute top-0 left-1/2 h-[52svh] max-w-[92vw] -translate-x-1/2 md:hidden"
+            style={{
+              aspectRatio: "1 / 1",
+              WebkitMaskImage:
+                "linear-gradient(180deg, #000 0%, #000 40%, rgba(0,0,0,0.75) 58%, rgba(0,0,0,0.3) 78%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 78%, rgba(0,0,0,0.4) 90%, transparent 100%)",
+              maskImage:
+                "linear-gradient(180deg, #000 0%, #000 40%, rgba(0,0,0,0.75) 58%, rgba(0,0,0,0.3) 78%, transparent 100%), linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 22%, #000 78%, rgba(0,0,0,0.4) 90%, transparent 100%)",
+              WebkitMaskComposite: "source-in",
+              maskComposite: "intersect",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskSize: "100% 100%",
+              maskSize: "100% 100%",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/media/procedimento-precisao.jpg"
+              alt="Dr. Francisco Furtado em procedimento — precisão clínica com lupas"
+              width={640}
+              height={640}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-center"
+            />
+          </div>
+
+          {/* Desktop: foto à direita com bordas suaves */}
+          <div
+            className="pointer-events-none absolute top-1/2 right-0 hidden h-[min(85svh,720px)] max-w-[48%] -translate-y-1/2 md:block"
+            style={{
+              aspectRatio: "1 / 1",
+              WebkitMaskImage:
+                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 88%, rgba(0,0,0,0.45) 96%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 22%, #000 82%, rgba(0,0,0,0.4) 94%, transparent 100%)",
+              maskImage:
+                "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.2) 12%, rgba(0,0,0,0.55) 28%, #000 48%, #000 88%, rgba(0,0,0,0.45) 96%, transparent 100%), linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 8%, #000 22%, #000 82%, rgba(0,0,0,0.4) 94%, transparent 100%)",
+              WebkitMaskComposite: "source-in",
+              maskComposite: "intersect",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskSize: "100% 100%",
+              maskSize: "100% 100%",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/media/procedimento-precisao.jpg"
+              alt=""
+              width={640}
+              height={640}
+              loading="lazy"
+              decoding="async"
+              aria-hidden
+              className="h-full w-full object-cover object-center"
+            />
+          </div>
+
+          {/* Overlay desktop — texto legível à esquerda */}
+          <div
+            className="pointer-events-none absolute inset-0 hidden md:block"
+            aria-hidden
+            style={{
+              background:
+                "linear-gradient(90deg, #060810 0%, rgba(6,8,16,0.96) 18%, rgba(10,14,22,0.82) 34%, rgba(15,20,32,0.45) 52%, rgba(26,34,50,0.15) 70%, transparent 100%)",
+            }}
+          />
+
+          {/* Overlay mobile — foto → texto */}
+          <div
+            className="pointer-events-none absolute inset-0 md:hidden"
+            aria-hidden
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(10,14,22,0.08) 0%, rgba(10,14,22,0.05) 30%, rgba(8,12,20,0.55) 52%, rgba(6,8,16,0.92) 72%, #060810 100%)",
+            }}
+          />
+
+          <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-28 pb-16 sm:px-5 md:absolute md:inset-x-0 md:bottom-0 md:px-6 md:pt-32 md:pb-28">
             <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
               Diferenciais
             </p>
-            <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+            <h2 className="font-display max-w-xl text-[2.15rem] leading-[1.05] sm:text-4xl md:max-w-lg md:text-5xl">
               Ciência · Arte · Cuidado
             </h2>
-            <div className="mt-8 grid gap-10 md:grid-cols-3">
+            <div className="mt-8 grid max-w-md gap-7 md:max-w-lg">
               {[
                 {
                   t: "Ciência",
@@ -93,43 +189,13 @@ export function HomeSections() {
                   <h3 className="text-lg font-semibold tracking-wide text-brand-gold">
                     {item.t}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-white/80">
+                  <p className="mt-2 text-sm leading-relaxed text-white/80">
                     {item.d}
                   </p>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-
-        <div className="relative h-[52vh] min-h-[300px] w-full overflow-hidden md:h-[68vh] md:min-h-[440px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/media/procedimento-precisao.jpg"
-            alt="Dr. Francisco Furtado em procedimento — precisão clínica com lupas"
-            width={1536}
-            height={1024}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          />
-          {/* Transição suave do azul para a foto e da foto para o bloco de tratamentos */}
-          <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-24"
-            aria-hidden
-            style={{
-              background:
-                "linear-gradient(180deg, #060810 0%, transparent 100%)",
-            }}
-          />
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-28"
-            aria-hidden
-            style={{
-              background:
-                "linear-gradient(180deg, transparent 0%, #0a0e16 100%)",
-            }}
-          />
         </div>
 
         <div className="px-4 py-20 md:px-6 md:py-28">

@@ -1,4 +1,5 @@
-import { SITE, whatsappUrl } from "@/lib/site";
+import { HeroCopy } from "@/components/HeroCopy";
+import { HeroParallaxImage } from "@/components/HeroParallaxImage";
 
 /** Azul mais escuro à esquerda → cinza à direita */
 const BG_MOBILE =
@@ -52,21 +53,13 @@ export function Hero() {
       />
 
       {/* Mobile: caixa na proporção da foto + máscara nas bordas reais */}
-      <div
+      <HeroParallaxImage
         className="pointer-events-none absolute top-0 left-1/2 h-[60svh] max-w-[94vw] -translate-x-1/2 md:hidden"
         style={{ aspectRatio: "922 / 1152", ...MASK_MOBILE }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/media/dr-francisco-retrato-hero6.jpg"
-          alt="Dr. Francisco Furtado"
-          width={922}
-          height={1152}
-          decoding="async"
-          fetchPriority="high"
-          className="h-full w-full object-cover object-top"
-        />
-      </div>
+        imgClassName="h-full w-full object-cover object-top"
+        alt="Dr. Francisco Furtado"
+        maxShift={22}
+      />
 
       {/* Véu extra só no mobile — dissolve a base da foto no degradê */}
       <div
@@ -79,22 +72,14 @@ export function Hero() {
       />
 
       {/* Desktop: retrato à direita na proporção, bordas suaves */}
-      <div
+      <HeroParallaxImage
         className="pointer-events-none absolute right-0 bottom-0 hidden h-[100svh] max-w-full md:block"
         style={{ aspectRatio: "922 / 1152", ...MASK_DESKTOP }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/media/dr-francisco-retrato-hero6.jpg"
-          alt=""
-          width={922}
-          height={1152}
-          decoding="async"
-          fetchPriority="high"
-          aria-hidden
-          className="h-full w-full object-contain object-right object-bottom"
-        />
-      </div>
+        imgClassName="h-full w-full object-contain object-right object-bottom"
+        alt=""
+        ariaHidden
+        maxShift={36}
+      />
 
       {/* Overlay desktop — texto à esquerda (navy em vez de preto) */}
       <div
@@ -116,35 +101,7 @@ export function Hero() {
         }}
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-28 pb-8 sm:px-5 md:px-6 md:pb-28">
-        <div className="mb-5 h-px w-12 bg-brand-gold md:mb-8 md:w-16" aria-hidden />
-        <p className="mb-3 text-[0.65rem] tracking-[0.28em] text-brand-gold uppercase sm:mb-5 sm:text-[0.7rem] sm:tracking-[0.35em]">
-          {SITE.tagline}
-        </p>
-        <h1 className="font-display max-w-[14ch] text-[2.75rem] leading-[0.95] text-white sm:max-w-xl sm:text-6xl md:max-w-2xl md:text-7xl lg:text-8xl">
-          Francisco Furtado
-        </h1>
-        <p className="font-serif-body mt-5 max-w-md text-base leading-relaxed text-white/80 sm:mt-8 sm:text-lg md:max-w-lg md:text-xl">
-          Transplante capilar seguro, ético e natural — devolver autoestima com
-          ciência, arte e cuidado humano em Fortaleza e em todo o Ceará.
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:mt-12 sm:flex-row sm:items-center">
-          <a
-            href={whatsappUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-12 items-center justify-center bg-brand-gold px-8 py-3.5 text-sm font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft"
-          >
-            Agende sua avaliação
-          </a>
-          <a
-            href="#sobre"
-            className="inline-flex min-h-12 items-center justify-center border border-white/30 px-8 py-3.5 text-sm tracking-wide text-white transition-colors hover:border-white hover:bg-white hover:text-black"
-          >
-            Conhecer o Dr. Francisco
-          </a>
-        </div>
-      </div>
+      <HeroCopy />
     </section>
   );
 }

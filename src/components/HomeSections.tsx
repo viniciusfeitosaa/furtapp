@@ -111,7 +111,7 @@ export function HomeSections() {
             height={1024}
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-[center_35%]"
+            className="absolute inset-0 h-full w-full object-cover object-center"
           />
           {/* Transição suave do azul para a foto e da foto para o bloco de tratamentos */}
           <div

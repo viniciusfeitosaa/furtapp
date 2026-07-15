@@ -198,15 +198,15 @@ export function HomeSections() {
           </div>
         </div>
 
-        <div className="px-4 py-20 md:px-6 md:py-28">
+        <div className="bg-white px-4 py-20 text-brand-charcoal md:px-6 md:py-28">
           <div className="mx-auto max-w-6xl">
-            <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
+            <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
               Procedimentos
             </p>
             <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
               Tratamentos
             </h2>
-            <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-white/80">
+            <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-brand-charcoal">
               Avaliação criteriosa, técnica individualizada e acompanhamento —
               do procedimento ao pós-operatório.
             </p>
@@ -218,7 +218,7 @@ export function HomeSections() {
               ].map((item) => (
                 <li
                   key={item}
-                  className="border-t border-white/20 pt-4 text-sm leading-relaxed text-white/85"
+                  className="border-t border-brand-gray-mid pt-4 text-sm leading-relaxed text-brand-charcoal"
                 >
                   {item}
                 </li>

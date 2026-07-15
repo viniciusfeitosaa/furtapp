@@ -5,9 +5,13 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      className="relative flex min-h-[100svh] items-end overflow-hidden bg-black text-white"
+      className="relative flex min-h-[100svh] items-end overflow-hidden text-white"
+      style={{
+        background:
+          "linear-gradient(105deg, #000000 0%, #000000 32%, #1a1a1a 48%, #323232 68%, #5c5c5c 88%, #7b7b7b 100%)",
+      }}
     >
-      {/* Retrato com fundo removido — ancorado à direita sobre o preto */}
+      {/* Retrato com fundo removido — ancorado à direita sobre o degradê */}
       <div className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-[70%] md:w-[58%] lg:w-[52%]">
         <Image
           src="/media/dr-francisco-retrato-hero4-removebg-preview.png"
@@ -19,13 +23,13 @@ export function Hero() {
         />
       </div>
 
-      {/* Overlay à esquerda — marca e texto legíveis */}
+      {/* Refino de legibilidade do texto à esquerda / mobile */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "linear-gradient(90deg, #000000 0%, #000000 38%, rgba(0,0,0,0.72) 55%, rgba(0,0,0,0.2) 75%, transparent 100%)",
+            "linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 42%, transparent 68%)",
         }}
       />
       <div
@@ -33,14 +37,14 @@ export function Hero() {
         aria-hidden
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.9) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 35%, rgba(0,0,0,0.72) 100%)",
         }}
       />
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-36"
         aria-hidden
         style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.45), transparent)",
         }}
       />
 

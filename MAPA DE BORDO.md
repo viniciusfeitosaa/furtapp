@@ -317,6 +317,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-14 | Criação do MAPA DE BORDO. Decisões: Next.js, Fortaleza/Ceará, sem WordPress. Portal admin+paciente especificado com protocolo 5 fotos, M0–M12, comparador, feedback, LGPD. |
 | 2026-07-14 | Aprimoramento da área do cliente: papéis, fluxo de status, janelas, sala de análise, segurança. Scaffold Next.js + UI do site + protótipos `/admin` e `/paciente`. |
 | 2026-07-14 | Criada pasta `conteudos-para-o-site/` para o cliente enviar marca, fotos, vídeos e textos. |
+| 2026-07-15 | Branch do projeto integrada na `main` (fast-forward) e push em `origin/main`. |
 
 ---
 

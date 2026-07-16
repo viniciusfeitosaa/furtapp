@@ -77,12 +77,49 @@ export function receptorDensity(p: Vector3, n: Vector3, b: Bounds): number {
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
   if (n.y < 0.05) return 0;
-  if (Math.abs(n.x) > 0.78 && x > 0.45) return 0; // orelha
+  if (isEarRegion(x, y, z, n)) return 0;
 
   let m = 1;
   m *= band(y, 0.7, 0.9, 0.05); // altura das entradas
   m *= band(z, 0.5, 0.7, 0.06); // frontal / têmporas
   m *= band(x, 0.16, 0.5, 0.06); // laterais frontais (M), fora do centro
+  return clamp01(m);
+}
+
+/** Região da orelha — nunca deve receber fios. */
+function isEarRegion(
+  x: number,
+  y: number,
+  z: number,
+  n: Vector3,
+): boolean {
+  if (x > 0.62) return true; // saliência lateral
+  // Faixa auricular (altura/profundidade típicas da orelha)
+  if (x > 0.45 && y > 0.52 && y < 0.78 && z > 0.28 && z < 0.62) {
+    if (Math.abs(n.x) > 0.5) return true;
+    if (x > 0.5) return true;
+  }
+  return false;
+}
+
+/**
+ * Máscara do couro cabeludo (inclui entradas vazias): 1 = couro, 0 = rosto.
+ * Usada para aplicar textura PBR só no couro, sem “falhas” faciais.
+ */
+export function scalpSurfaceMask(p: Vector3, n: Vector3, b: Bounds): number {
+  const y = normY(p.y, b);
+  const z = normZ(p.z, b);
+  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
+
+  if (isEarRegion(x, y, z, n)) return 0;
+  if (y < 0.5) return 0;
+
+  let m = 1;
+  m *= smoothstep(0.52, 0.62, y);
+  // Corta rosto/testa baixa; mantém linha frontal alta (entradas = couro limpo)
+  m *= 1 - smoothstep(0.7, 0.84, z) * (1 - smoothstep(0.72, 0.86, y));
+  m *= 1 - smoothstep(0.6, 0.72, x);
+  if (n.y < -0.15) m *= 0;
   return clamp01(m);
 }
 
@@ -98,17 +135,7 @@ export function residualDensity(p: Vector3, n: Vector3, b: Bounds): number {
   // Bloqueios anatômicos
   if (y < 0.48) return 0; // nuca / pescoço — nunca preenche
   if (z > 0.7 && y < 0.86) return 0; // rosto / testa baixa
-  if (x > 0.68) return 0; // ponta das orelhas
-  if (
-    x > 0.56 &&
-    y > 0.56 &&
-    y < 0.74 &&
-    z > 0.32 &&
-    z < 0.58 &&
-    Math.abs(n.x) > 0.72
-  ) {
-    return 0; // saliência da orelha
-  }
+  if (isEarRegion(x, y, z, n)) return 0;
   if (n.y < -0.2) return 0;
 
   // Na parte de trás, desce até a borda da nuca (sem preenchê-la)
@@ -209,6 +236,13 @@ export function buildHairSites(
     nrm.normalize();
     const d = dens(p, nrm, b);
     if (d < 0.05) continue;
+    // Barreira dura: nunca instancia fio na orelha / faixa auricular
+    {
+      const bx = Math.abs(normX(p.x, b) - 0.5) * 2;
+      const by = normY(p.y, b);
+      const bz = normZ(p.z, b);
+      if (isEarRegion(bx, by, bz, nrm)) continue;
+    }
 
     if (!clump) {
       pushHair(p, nrm);
@@ -228,12 +262,15 @@ export function buildHairSites(
         .clone()
         .addScaledVector(t1, Math.cos(ang) * r)
         .addScaledVector(t2, Math.sin(ang) * r);
-      // Leve inclinação para dispersão natural
       const hn = nrm
         .clone()
         .addScaledVector(t1, (Math.random() - 0.5) * 0.28)
         .addScaledVector(t2, (Math.random() - 0.5) * 0.28)
         .normalize();
+      const hx = Math.abs(normX(hp.x, b) - 0.5) * 2;
+      const hy = normY(hp.y, b);
+      const hz = normZ(hp.z, b);
+      if (isEarRegion(hx, hy, hz, hn)) continue;
       pushHair(hp, hn);
     }
   }
@@ -261,6 +298,7 @@ export function buildHairSites(
 export function buildScalpShades(geometry: BufferGeometry): {
   residual: Float32Array;
   receptor: Float32Array;
+  surface: Float32Array;
 } {
   if (!geometry.attributes.normal) geometry.computeVertexNormals();
   const b = getBounds(geometry);
@@ -269,6 +307,7 @@ export function buildScalpShades(geometry: BufferGeometry): {
   const n = pos.count;
   const residual = new Float32Array(n);
   const receptor = new Float32Array(n);
+  const surface = new Float32Array(n);
   const p = new Vector3();
   const nv = new Vector3();
   const SHADE = 0.55; // escurecimento máximo sob cabelo denso
@@ -278,7 +317,27 @@ export function buildScalpShades(geometry: BufferGeometry): {
     nv.set(nor.getX(i), nor.getY(i), nor.getZ(i)).normalize();
     residual[i] = 1 - SHADE * residualDensity(p, nv, b);
     receptor[i] = 1 - SHADE * receptorDensity(p, nv, b);
+    surface[i] = scalpSurfaceMask(p, nv, b);
   }
 
-  return { residual, receptor };
+  return { residual, receptor, surface };
+}
+
+/**
+ * Conta quantos sites caem na região da orelha (auditoria).
+ * Deve retornar 0 após o filtro duro.
+ */
+export function countEarHairSites(
+  sites: HairSite[],
+  geometry: BufferGeometry,
+): number {
+  const b = getBounds(geometry);
+  let n = 0;
+  for (const s of sites) {
+    const x = Math.abs(normX(s.position.x, b) - 0.5) * 2;
+    const y = normY(s.position.y, b);
+    const z = normZ(s.position.z, b);
+    if (isEarRegion(x, y, z, s.normal)) n += 1;
+  }
+  return n;
 }

@@ -9,6 +9,10 @@ import {
   MathUtils,
   Matrix4,
   Object3D,
+  RepeatWrapping,
+  SRGBColorSpace,
+  TextureLoader,
+  Vector2,
   Vector3,
   type BufferGeometry,
   type Group,
@@ -19,6 +23,7 @@ import {
 import {
   buildHairSites,
   buildScalpShades,
+  countEarHairSites,
   type HairSite,
 } from "@/components/follicle/hairSites";
 
@@ -96,12 +101,34 @@ export function FollicleModel({
 
   const geometry = useHeadGeometry();
 
-  // Sombra de suporte do couro cabeludo (preenche vãos entre os fios)
-  useMemo(() => {
+  const { albedo, normalMap } = useMemo(() => {
+    const loader = new TextureLoader();
+    const a = loader.load("/models/head-albedo.jpg");
+    a.flipY = false;
+    a.colorSpace = SRGBColorSpace;
+    a.wrapS = a.wrapT = RepeatWrapping;
+    a.anisotropy = 8;
+    const n = loader.load("/models/head-normal.jpg");
+    n.flipY = false;
+    n.wrapS = n.wrapT = RepeatWrapping;
+    n.anisotropy = 8;
+    return { albedo: a, normalMap: n };
+  }, []);
+
+  useLayoutEffect(() => {
+    return () => {
+      albedo.dispose();
+      normalMap.dispose();
+    };
+  }, [albedo, normalMap]);
+
+  // Sombra de suporte + máscara do couro (textura só no couro, não no rosto)
+  useLayoutEffect(() => {
     if (!geometry) return;
-    const { residual: rs, receptor: rc } = buildScalpShades(geometry);
+    const { residual: rs, receptor: rc, surface } = buildScalpShades(geometry);
     geometry.setAttribute("aResidualShade", new Float32BufferAttribute(rs, 1));
     geometry.setAttribute("aReceptorShade", new Float32BufferAttribute(rc, 1));
+    geometry.setAttribute("aScalpMask", new Float32BufferAttribute(surface, 1));
   }, [geometry]);
 
   const onBeforeCompile = useCallback(
@@ -115,14 +142,17 @@ export function FollicleModel({
           `#include <common>
 attribute float aResidualShade;
 attribute float aReceptorShade;
+attribute float aScalpMask;
 varying float vResidualShade;
-varying float vReceptorShade;`,
+varying float vReceptorShade;
+varying float vScalpMask;`,
         )
         .replace(
           "#include <begin_vertex>",
           `#include <begin_vertex>
 vResidualShade = aResidualShade;
-vReceptorShade = aReceptorShade;`,
+vReceptorShade = aReceptorShade;
+vScalpMask = aScalpMask;`,
         );
 
       shader.fragmentShader = shader.fragmentShader
@@ -131,15 +161,30 @@ vReceptorShade = aReceptorShade;`,
           `#include <common>
 uniform float uGraftFill;
 varying float vResidualShade;
-varying float vReceptorShade;`,
+varying float vReceptorShade;
+varying float vScalpMask;`,
         )
         .replace(
           "#include <map_fragment>",
           `#include <map_fragment>
 {
+  // Rosto: tom uniforme. Couro: albedo suave (sem falhas faciais).
+  vec3 flatSkin = vec3(0.843, 0.643, 0.529); // #d7a487
+  float scalp = clamp(vScalpMask, 0.0, 1.0);
+  diffuseColor.rgb = mix(flatSkin, diffuseColor.rgb, scalp * 0.5);
+
+  // Sombra de suporte sob cabelo; entradas limpas no Calvo (uGraftFill=0)
   float shade = vResidualShade;
   shade = mix(shade, min(shade, vReceptorShade), clamp(uGraftFill, 0.0, 1.0));
   diffuseColor.rgb *= shade;
+}`,
+        )
+        .replace(
+          "#include <normal_fragment_maps>",
+          `#include <normal_fragment_maps>
+{
+  float scalp = clamp(vScalpMask, 0.0, 1.0);
+  normal = normalize(mix(nonPerturbedNormal, normal, scalp * 0.35));
 }`,
         );
     },
@@ -154,6 +199,18 @@ varying float vReceptorShade;`,
     () => (geometry ? buildHairSites(geometry, RESIDUAL_HAIRS, "residual") : []),
     [geometry],
   );
+
+  // Auditoria: fios na orelha devem ser 0
+  useLayoutEffect(() => {
+    if (!geometry) return;
+    const earResidual = countEarHairSites(residualSites, geometry);
+    const earReceptor = countEarHairSites(receptorSites, geometry);
+    if (earResidual > 0 || earReceptor > 0) {
+      console.warn(
+        `[follicle] fios na orelha: residual=${earResidual} receptor=${earReceptor}`,
+      );
+    }
+  }, [geometry, residualSites, receptorSites]);
 
   useLayoutEffect(() => {
     targetCount.current = graftCount;
@@ -232,18 +289,25 @@ varying float vReceptorShade;`,
       rotation={[0, 0, 0]}
     >
       <mesh geometry={geometry} castShadow receiveShadow>
-        {/* Couro cabeludo PBR; sombra de suporte injetada via onBeforeCompile */}
+        {/*
+          PBR: albedo/normal só no couro (aScalpMask).
+          Rosto permanece tom uniforme — evita falhas faciais da textura.
+          Entradas = couro limpo no Calvo (sombra do receptor só com uGraftFill).
+        */}
         <meshPhysicalMaterial
-          color="#d7a487"
-          roughness={0.82}
+          map={albedo}
+          normalMap={normalMap}
+          normalScale={new Vector2(0.28, 0.28)}
+          color="#ffffff"
+          roughness={0.78}
           metalness={0.0}
-          clearcoat={0.05}
-          clearcoatRoughness={0.65}
-          sheen={0.16}
-          sheenRoughness={0.62}
+          clearcoat={0.08}
+          clearcoatRoughness={0.55}
+          sheen={0.22}
+          sheenRoughness={0.55}
           sheenColor="#c9967d"
           onBeforeCompile={onBeforeCompile}
-          customProgramCacheKey={() => "scalp-shade-v1"}
+          customProgramCacheKey={() => "scalp-pbr-mask-v1"}
         />
       </mesh>
 

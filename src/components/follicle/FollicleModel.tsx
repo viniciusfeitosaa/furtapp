@@ -19,6 +19,8 @@ import { buildHairSites, type HairSite } from "@/components/follicle/hairSites";
 export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
+/** Área do topo/frontal coberta até a densidade 5.000 — já visível no “Antes”. */
+const THINNING_HAIRS = 5000;
 const RESIDUAL_HAIRS = 5200;
 const HEAD_SCALE = 0.3;
 const dummy = new Object3D();
@@ -87,6 +89,7 @@ export function FollicleModel({
   const root = useRef<Group>(null);
   const receptor = useRef<InstancedMesh>(null);
   const residual = useRef<InstancedMesh>(null);
+  const thinning = useRef<InstancedMesh>(null);
   const phase = useRef(0);
   const displayCount = useRef(0);
   const targetCount = useRef<number>(graftCount);
@@ -100,6 +103,10 @@ export function FollicleModel({
   const residualSites = useMemo(
     () => (geometry ? buildHairSites(geometry, RESIDUAL_HAIRS, "residual") : []),
     [geometry],
+  );
+  const thinningSites = useMemo(
+    () => receptorSites.slice(0, THINNING_HAIRS),
+    [receptorSites],
   );
 
   useLayoutEffect(() => {
@@ -125,6 +132,18 @@ export function FollicleModel({
     mesh.instanceMatrix.needsUpdate = true;
     displayCount.current = 0;
   }, [receptorSites]);
+
+  useLayoutEffect(() => {
+    const mesh = thinning.current;
+    if (!mesh || thinningSites.length === 0) return;
+    mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    // Estado inicial: área dos 5.000 já preenchida (calvo / Antes)
+    for (let i = 0; i < thinningSites.length; i += 1) {
+      writeHair(mesh, thinningSites[i]!, 1, 0.28, 0.16, 0.024, i);
+    }
+    mesh.count = thinningSites.length;
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [thinningSites]);
 
   useFrame((_, delta) => {
     if (!root.current) return;
@@ -161,6 +180,26 @@ export function FollicleModel({
       mesh.setMatrixAt(i, dummy.matrix);
     }
     mesh.instanceMatrix.needsUpdate = true;
+
+    // Remanescente do topo: some conforme os enxertos ocupam a mesma área
+    const thin = thinning.current;
+    if (thin && thinningSites.length > 0) {
+      const start = Math.min(visible, thinningSites.length);
+      const remaining = thinningSites.length - start;
+      for (let i = 0; i < remaining; i += 1) {
+        writeHair(
+          thin,
+          thinningSites[start + i]!,
+          1,
+          0.28,
+          0.16,
+          0.024,
+          i,
+        );
+      }
+      thin.count = remaining;
+      thin.instanceMatrix.needsUpdate = true;
+    }
   });
 
   if (!geometry) return null;
@@ -185,7 +224,7 @@ export function FollicleModel({
         />
       </mesh>
 
-      {/* Cabelo remanescente (ferradura) — visível já no “Antes” */}
+      {/* Cabelo remanescente (ferradura) — laterais / nuca da coroa */}
       <instancedMesh
         ref={residual}
         args={[undefined, undefined, RESIDUAL_HAIRS]}
@@ -196,7 +235,18 @@ export function FollicleModel({
         <meshStandardMaterial color="#2a2724" roughness={0.42} metalness={0.12} />
       </instancedMesh>
 
-      {/* Enxertos na zona das entradas / frontal / vértex */}
+      {/* Topo/frontal já com cabelo no “Antes” (área coberta até 5.000) */}
+      <instancedMesh
+        ref={thinning}
+        args={[undefined, undefined, THINNING_HAIRS]}
+        castShadow
+        frustumCulled={false}
+      >
+        <cylinderGeometry args={[1, 0.7, 1, 5]} />
+        <meshStandardMaterial color="#2c2926" roughness={0.48} metalness={0.08} />
+      </instancedMesh>
+
+      {/* Enxertos — densificam / substituem a área acima */}
       <instancedMesh
         ref={receptor}
         args={[undefined, undefined, MAX_GRAFTS]}

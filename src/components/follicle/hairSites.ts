@@ -86,7 +86,7 @@ function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
 }
 
 /**
- * Cabelo remanescente no Calvo: laterais (acima da orelha) + nuca + coroa,
+ * Cabelo remanescente no Calvo: laterais densas + nuca + coroa,
  * EXCETO zona dos enxertos. Sem orelha, sem pescoço, sem rosto.
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
@@ -97,32 +97,33 @@ function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
   // Bloqueios duros
-  if (y < 0.58) return false; // pescoço
+  if (y < 0.56) return false; // pescoço
   if (z > 0.6 && y < 0.9) return false; // rosto
-  if (x > 0.58) return false; // orelhas / laterais salientes
-  if (Math.abs(n.x) > 0.62) return false; // faces laterais = orelha
-  if (n.y < -0.05) return false;
-  // Faixa auricular completa
-  if (x > 0.38 && y < 0.74 && z > 0.28 && z < 0.6) return false;
+  if (x > 0.6) return false; // ponta das orelhas
+  if (n.y < -0.08) return false;
+  // Orelha: saliência lateral na faixa auricular
+  if (x > 0.4 && y < 0.76 && z > 0.3 && z < 0.58) return false;
+  if (x > 0.48 && Math.abs(n.x) > 0.7 && y < 0.8) return false;
 
-  // Coroa residual (fora do receptor)
-  const crown = y >= 0.7 && n.y > 0.25 && x <= 0.55 && z < 0.55;
-  // Laterais — só ACIMA da orelha
+  // Coroa residual (fora do receptor) — um pouco mais larga nas bordas
+  const crown = y >= 0.68 && n.y > 0.2 && x <= 0.58 && z < 0.55;
+  // Laterais / parietais — faixa ampla acima e atrás da orelha
   const sides =
-    x > 0.2 &&
-    x <= 0.55 &&
-    y >= 0.74 &&
-    y < 0.9 &&
-    z < 0.52 &&
-    n.y > 0.05;
-  // Nuca / occipital contínuo (liga coroa → nuca)
+    x > 0.12 &&
+    x <= 0.58 &&
+    y >= 0.64 &&
+    y < 0.92 &&
+    z < 0.55 &&
+    n.y > -0.02 &&
+    !(x > 0.38 && z > 0.32 && z < 0.56 && y < 0.76);
+  // Nuca / occipital contínuo
   const nape =
-    z < 0.46 &&
-    y >= 0.6 &&
-    y < 0.88 &&
-    x < 0.5 &&
-    n.z < 0.28 &&
-    n.y > 0.0;
+    z < 0.48 &&
+    y >= 0.58 &&
+    y < 0.9 &&
+    x < 0.55 &&
+    n.z < 0.3 &&
+    n.y > -0.05;
 
   return crown || sides || nape;
 }

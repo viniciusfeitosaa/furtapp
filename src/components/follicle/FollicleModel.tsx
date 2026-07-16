@@ -19,8 +19,8 @@ import { buildHairSites, type HairSite } from "@/components/follicle/hairSites";
 export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
-/** Cabelo em laterais e acima da nuca (zona dos enxertos vazia no Calvo). */
-const RESIDUAL_HAIRS = 22000;
+/** Cabeça inteira no Calvo; só as entradas (têmporas) ficam vazias. */
+const RESIDUAL_HAIRS = 25000;
 /** Tamanho único padrão dos fios (sem variação). */
 const HAIR_LEN = 0.1;
 const HAIR_THICK = 0.009;

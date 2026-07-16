@@ -54,40 +54,27 @@ function normZ(z: number, b: Bounds) {
 }
 
 /**
- * Couro cabeludo (calota superior): só a coroa da cabeça.
- * Exclui orelhas (laterais salientes + normal lateral), rosto e pescoço.
+ * Zona a preencher com enxertos: só as entradas (têmporas).
+ * No Calvo, a cabeça inteira tem cabelo — apenas as têmporas ficam vazias.
  */
-function isOnScalp(p: Vector3, n: Vector3, b: Bounds): boolean {
+function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const y = normY(p.y, b);
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  if (y < 0.7) return false; // acima da linha das orelhas
-  if (n.y < 0.28) return false; // só calota voltada para cima
-  if (x > 0.62) return false; // corta saliência das orelhas
-  if (Math.abs(n.x) > 0.55 && n.y < 0.5) return false; // faces laterais = orelha/têmpora baixa
-  if (z > 0.58 && y < 0.9) return false; // testa / rosto
-  // Faixa das orelhas: mid-Z + lateral + altura típica
-  if (x > 0.48 && y < 0.78 && z > 0.28 && z < 0.62) return false;
+  // Faixa da linha anterior / têmporas
+  if (y < 0.68 || y > 0.9) return false;
+  if (z < 0.48 || z > 0.7) return false;
+  // Laterais das entradas (não o centro da testa, nem a orelha)
+  if (x < 0.14 || x > 0.5) return false;
+  if (n.y < 0.08) return false;
+  if (Math.abs(n.x) > 0.75 && x > 0.45) return false; // orelha
   return true;
 }
 
 /**
- * Zona calva a preencher: topo/vértex + linha frontal recuada.
- * É a área grande e brilhante do alto da cabeça (calvície avançada).
- */
-function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
-  if (!isOnScalp(p, n, b)) return false;
-  const z = normZ(p.z, b);
-
-  const top = n.y > 0.55; // calota superior (vértex + topo)
-  const front = z > 0.52; // linha anterior recuada (frontal)
-  return top || front;
-}
-
-/**
- * Cabelo remanescente no Calvo: laterais inteiras + occipital alto + coroa,
- * EXCETO zona dos enxertos. Sem orelha (só a saliência), sem nuca baixa, sem rosto.
+ * Calvo: cabeça inteira preenchida, exceto as entradas (têmporas).
+ * Sem orelha, sem nuca baixa, sem rosto.
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   if (isReceptorPoint(p, n, b)) return false;
@@ -98,10 +85,10 @@ function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
 
   // Nuca baixa / pescoço
   if (y < 0.64) return false;
-  // Rosto / testa
-  if (z > 0.62 && y < 0.9) return false;
-  if (n.z > 0.45 && z > 0.58) return false;
-  // Orelha: só a saliência (não a lateral do crânio)
+  // Rosto (mantém frontal central cabeludo, corta só testa baixa)
+  if (z > 0.68 && y < 0.86) return false;
+  if (n.z > 0.5 && z > 0.62 && y < 0.84) return false;
+  // Orelha: só a saliência
   if (x > 0.68) return false;
   if (
     x > 0.56 &&
@@ -114,23 +101,15 @@ function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
     return false;
   }
 
-  // Lateral completa do crânio (parietal / temporal alto)
-  const fullSide =
-    x > 0.08 &&
-    x <= 0.66 &&
-    y >= 0.64 &&
-    y <= 0.94 &&
-    z < 0.58 &&
-    n.y > -0.12;
-
-  // Coroa residual (fora do receptor)
-  const crown = y >= 0.7 && n.y > 0.18 && x <= 0.6 && z < 0.56;
-
-  // Occipital alto (acima da nuca)
-  const aboveNape =
-    z < 0.5 && y >= 0.66 && y <= 0.92 && x < 0.58 && n.y > 0.0;
-
-  return fullSide || crown || aboveNape;
+  // Cabeça inteira (topo + laterais + occipital alto + frontal central)
+  if (y >= 0.64 && y <= 0.96 && x <= 0.66 && z < 0.68 && n.y > -0.15) {
+    return true;
+  }
+  // Occipital alto
+  if (z < 0.5 && y >= 0.66 && y <= 0.94 && x < 0.6 && n.y > -0.05) {
+    return true;
+  }
+  return false;
 }
 
 function regionTest(region: ScalpRegion) {

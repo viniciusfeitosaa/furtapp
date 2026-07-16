@@ -20,11 +20,11 @@ const DENSITY_OPTIONS: { label: string; value: GraftCount; hint: string }[] = [
   {
     label: "Calvo",
     value: 0,
-    hint: "Calvo — laterais e acima da nuca preenchidos; zona do transplante vazia",
+    hint: "Calvo — cabeça preenchida; só as entradas (têmporas) vazias",
   },
-  { label: "1.000", value: 1000, hint: "Preenche a linha frontal (1.000 unidades)" },
-  { label: "5.000", value: 5000, hint: "Amplia cobertura do topo e frontal" },
-  { label: "Máximo", value: 8000, hint: "Cobertura plena (~8.000 unidades)" },
+  { label: "1.000", value: 1000, hint: "Começa a preencher as entradas" },
+  { label: "5.000", value: 5000, hint: "Amplia o preenchimento das têmporas" },
+  { label: "Máximo", value: 8000, hint: "Entradas totalmente preenchidas" },
 ];
 
 function canUseWebGL(): boolean {
@@ -84,9 +84,9 @@ export function FollicleSection() {
           Da área calva à densidade
         </h2>
         <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Simulação do planejamento: no Calvo a cabeça já tem cabelo, mas a zona
-          do transplante fica vazia. Ao escolher 1.000, 5.000 ou Máximo, essa área
-          vai sendo preenchida progressivamente.
+          Simulação do planejamento: no Calvo a cabeça já está preenchida — só as
+          entradas (têmporas) ficam vazias. Ao escolher 1.000, 5.000 ou Máximo,
+          essas entradas vão sendo preenchidas progressivamente.
         </p>
 
         <div

@@ -31,7 +31,7 @@ export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
 /** Cabeça inteira no Calvo; só as entradas (têmporas) ficam vazias. */
-const RESIDUAL_HAIRS = 32000;
+const RESIDUAL_HAIRS = 38000;
 /** Tamanho único padrão dos fios (sem variação). */
 const HAIR_LEN = 0.11;
 const HAIR_THICK = 0.01;

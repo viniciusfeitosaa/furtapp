@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { FollicleFallback } from "@/components/follicle/FollicleFallback";
 import { FollicleErrorBoundary } from "@/components/follicle/FollicleErrorBoundary";
+import type { GraftCount } from "@/components/follicle/FollicleModel";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const FollicleCanvas = dynamic(
@@ -14,6 +15,13 @@ const FollicleCanvas = dynamic(
     loading: () => <FollicleFallback />,
   },
 );
+
+const DENSITY_OPTIONS: { label: string; value: GraftCount; hint: string }[] = [
+  { label: "Calvo", value: 0, hint: "Área receptora sem enxertos" },
+  { label: "1.000", value: 1000, hint: "Sessão inicial / zona focal" },
+  { label: "5.000", value: 5000, hint: "Cobertura intermediária" },
+  { label: "Máximo", value: 8000, hint: "Até ~8.000 unidades foliculares" },
+];
 
 function canUseWebGL(): boolean {
   try {
@@ -30,6 +38,7 @@ export function FollicleSection() {
   const reduced = usePrefersReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
+  const [graftCount, setGraftCount] = useState<GraftCount>(0);
   const [webgl] = useState(() =>
     typeof window === "undefined" ? true : canUseWebGL(),
   );
@@ -51,6 +60,7 @@ export function FollicleSection() {
   }, []);
 
   const show3d = inView && webgl && !reduced;
+  const active = DENSITY_OPTIONS.find((o) => o.value === graftCount);
 
   return (
     <section
@@ -61,23 +71,50 @@ export function FollicleSection() {
     >
       <div className="mx-auto max-w-6xl">
         <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
-          Ciência
+          Planejamento
         </p>
         <h2
           id="foliculo-title"
-          className="font-display max-w-xl text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl"
+          className="font-display max-w-2xl text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl"
         >
-          Do folículo ao resultado
+          Da área calva à densidade
         </h2>
         <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Cada unidade folicular é planejada com critério técnico — densidade,
-          direção e naturalidade da linha anterior.
+          Exemplificação visual do planejamento: comece pela cabeça sem enxertos
+          e avance a cobertura — 1.000, 5.000 ou até cerca de 8.000 unidades
+          foliculares.
         </p>
 
-        <div className="mt-10 overflow-hidden border border-white/10">
+        <div
+          className="mt-8 flex flex-wrap gap-2"
+          role="group"
+          aria-label="Densidade de enxertos"
+        >
+          {DENSITY_OPTIONS.map((opt) => {
+            const on = opt.value === graftCount;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setGraftCount(opt.value)}
+                className={`min-h-11 px-4 py-2.5 text-xs font-semibold tracking-wide transition-colors ${
+                  on
+                    ? "bg-brand-gold text-brand-charcoal"
+                    : "border border-white/25 text-white/85 hover:border-white hover:bg-white/5"
+                }`}
+                aria-pressed={on}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-sm text-white/55">{active?.hint}</p>
+
+        <div className="mt-8 overflow-hidden border border-white/10">
           {show3d ? (
             <FollicleErrorBoundary>
-              <FollicleCanvas autoRotate />
+              <FollicleCanvas autoRotate graftCount={graftCount} />
             </FollicleErrorBoundary>
           ) : (
             <FollicleFallback />
@@ -85,8 +122,8 @@ export function FollicleSection() {
         </div>
         <p className="mt-4 text-center text-xs tracking-wide text-white/45">
           {show3d
-            ? "Arraste para girar o modelo"
-            : "Representação estilizada do folículo"}
+            ? "Arraste para girar · use os botões para simular a densidade"
+            : "Representação estilizada do planejamento capilar"}
         </p>
       </div>
     </section>

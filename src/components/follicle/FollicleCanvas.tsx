@@ -3,17 +3,26 @@
 import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
-import { FollicleModel } from "@/components/follicle/FollicleModel";
+import {
+  FollicleModel,
+  type GraftCount,
+} from "@/components/follicle/FollicleModel";
 
-export function FollicleCanvas({ autoRotate = true }: { autoRotate?: boolean }) {
+export function FollicleCanvas({
+  autoRotate = true,
+  graftCount = 0,
+}: {
+  autoRotate?: boolean;
+  graftCount?: GraftCount;
+}) {
   const [dragging, setDragging] = useState(false);
 
   return (
     <div className="aspect-[16/10] w-full bg-[#0c1018] md:aspect-[21/9]">
       <Canvas
         shadows
-        camera={{ position: [0.35, 0.55, 3.4], fov: 32 }}
-        dpr={[1, 1.75]}
+        camera={{ position: [0.15, 0.35, 3.6], fov: 32 }}
+        dpr={[1, 1.5]}
         gl={{
           antialias: true,
           alpha: false,
@@ -23,31 +32,33 @@ export function FollicleCanvas({ autoRotate = true }: { autoRotate?: boolean }) 
       >
         <color attach="background" args={["#0c1018"]} />
 
-        <ambientLight intensity={0.4} color="#dcdfe6" />
+        <ambientLight intensity={0.42} color="#dcdfe6" />
         <directionalLight
           castShadow
-          position={[3.2, 5, 2.4]}
+          position={[3.2, 4.5, 2.6]}
           intensity={1.35}
           color="#f7f1e4"
           shadow-mapSize={[1024, 1024]}
         />
         <directionalLight
-          position={[-2.8, 1.2, -1.8]}
-          intensity={0.5}
+          position={[-2.6, 1.4, -2]}
+          intensity={0.45}
           color="#96a4c9"
         />
-        {/* Rim / highlights do bulbo */}
-        <pointLight position={[0.6, 0.2, 1.4]} intensity={0.55} color="#b6a46e" />
-        <pointLight position={[-1.2, -0.4, -1]} intensity={0.3} color="#c7ccdb" />
+        <pointLight position={[0.8, 1.2, 1.6]} intensity={0.35} color="#b6a46e" />
 
-        <FollicleModel autoRotate={autoRotate} userDragging={dragging} />
+        <FollicleModel
+          graftCount={graftCount}
+          autoRotate={autoRotate}
+          userDragging={dragging}
+        />
 
         <ContactShadows
-          position={[0, -0.95, 0]}
-          opacity={0.48}
-          scale={8}
-          blur={2.8}
-          far={3}
+          position={[0, -1.35, 0]}
+          opacity={0.42}
+          scale={10}
+          blur={2.6}
+          far={4}
         />
 
         <OrbitControls
@@ -55,11 +66,11 @@ export function FollicleCanvas({ autoRotate = true }: { autoRotate?: boolean }) 
           enablePan={false}
           enableDamping
           dampingFactor={0.06}
-          rotateSpeed={0.55}
-          minPolarAngle={Math.PI / 3.2}
-          maxPolarAngle={Math.PI / 1.65}
-          minAzimuthAngle={-Math.PI / 1.4}
-          maxAzimuthAngle={Math.PI / 1.4}
+          rotateSpeed={0.5}
+          minPolarAngle={Math.PI / 3.4}
+          maxPolarAngle={Math.PI / 1.7}
+          minAzimuthAngle={-Math.PI / 1.35}
+          maxAzimuthAngle={Math.PI / 1.35}
           onStart={() => setDragging(true)}
           onEnd={() => setDragging(false)}
         />

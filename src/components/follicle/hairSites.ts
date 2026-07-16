@@ -86,13 +86,45 @@ function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
 }
 
 /**
- * Cabelo remanescente: todo o couro cabeludo EXCETO a zona dos enxertos
- * (1.000 / 5.000 / Máximo). No “Calvo” essas áreas ficam vazias.
+ * Cabelo remanescente no Calvo: laterais + nuca + coroa,
+ * EXCETO a zona dos enxertos (1.000 / 5.000 / Máximo), que fica vazia.
+ * Mais permissivo que isOnScalp para cobrir lados e occipital.
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
-  if (!isOnScalp(p, n, b)) return false;
   if (isReceptorPoint(p, n, b)) return false;
-  return true;
+
+  const y = normY(p.y, b);
+  const z = normZ(p.z, b);
+  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
+
+  // Exclusões: pescoço, rosto, orelhas
+  if (y < 0.52) return false;
+  if (z > 0.62 && y < 0.88) return false; // rosto / testa
+  if (x > 0.7) return false; // ponta das orelhas
+  if (x > 0.5 && y < 0.72 && z > 0.3 && z < 0.58) return false; // faixa auricular
+  if (n.y < -0.15) return false; // pescoço invertido
+
+  // Coroa (acima das orelhas)
+  const crown = y >= 0.68 && n.y > 0.22 && x <= 0.62;
+  // Laterais do crânio (acima da orelha, até a têmpora)
+  const sides =
+    x > 0.22 &&
+    x <= 0.68 &&
+    y > 0.55 &&
+    y < 0.86 &&
+    z < 0.55 &&
+    n.y > -0.05 &&
+    Math.abs(n.x) < 0.92;
+  // Nuca / occipital
+  const nape =
+    z < 0.4 &&
+    y > 0.52 &&
+    y < 0.82 &&
+    x < 0.58 &&
+    n.z < 0.2 &&
+    n.y > -0.08;
+
+  return crown || sides || nape;
 }
 
 function regionTest(region: ScalpRegion) {

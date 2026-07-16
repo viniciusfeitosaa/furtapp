@@ -167,18 +167,44 @@ export function receptorDensity(
 }
 
 /**
+ * Pescoço / base da nuca — sem fios.
+ * Na malha Lee Perry-Smith, y < ~0.25 no occipital já é pele do pescoço.
+ */
+function isNeck(p: Vector3, n: Vector3): boolean {
+  // Superfície virada para baixo (embaixo da mandíbula / cilindro do pescoço)
+  if (p.y < 0.7 && n.y < -0.2) return true;
+  // Faixa baixa atrás e nas laterais (abaixo da linha da nuca)
+  if (p.y < 0.2 && p.z < 0.55) return true;
+  if (p.y < 0.05) return true;
+  return false;
+}
+
+/** 0 no pescoço, 1 na nuca/crânio — corte limpo na linha da nuca. */
+function napeKeep(p: Vector3): number {
+  // Atrás: sobe o corte (sem cabelo no pescoço)
+  const back = 1 - smoothstep(-0.2, 0.55, p.z); // 1 = mais atrás
+  const yCut = mix(0.12, 0.38, back); // nuca mais alta que as laterais
+  return smoothstep(yCut - 0.12, yCut + 0.18, p.y);
+}
+
+function mix(a: number, b: number, t: number) {
+  return a + (b - a) * clamp01(t);
+}
+
+/**
  * Couro cabeludo completo (corte máquina): cobertura SÓLIDA em
  * topo, laterais, occipital, costeletas — sem falhas.
- * Exclui apenas orelha, rosto, pescoço e as entradas.
+ * Exclui orelha, rosto, pescoço e as entradas.
  */
 export function residualDensity(
   p: Vector3,
   n: Vector3,
   m: HeadMetrics,
 ): number {
-  // Pescoço/nuca baixa: fade suave (nuca desce, sem entrar no pescoço)
-  const napeFade = smoothstep(-0.85, -0.35, p.y);
-  if (napeFade <= 0) return 0;
+  if (isNeck(p, n)) return 0;
+
+  const keepNape = napeKeep(p);
+  if (keepNape <= 0) return 0;
 
   const keepEar = earKeep(p);
   if (keepEar <= 0) return 0;
@@ -186,15 +212,15 @@ export function residualDensity(
   const keepFace = faceKeep(p, n);
 
   // Cobertura base sólida sobre todo o crânio
-  let d = napeFade * keepEar * keepFace;
+  let d = keepNape * keepEar * keepFace;
 
-  // Costeleta: faixa na frente da orelha, desce até o lóbulo
+  // Costeleta: faixa na frente da orelha, desce até o lóbulo (nunca no pescoço)
   const sideburn =
     band(Math.abs(p.x), 1.3, 1.78, 0.14) *
     band(p.y, 0.62, 1.6, 0.16) *
     band(p.z, 0.3, 0.95, 0.16) *
     keepEar;
-  d = Math.max(d, clamp01(sideburn) * napeFade);
+  d = Math.max(d, clamp01(sideburn) * keepNape);
 
   // Entradas vazias
   d *= 1 - receptorDensity(p, n, m);
@@ -208,8 +234,8 @@ export function scalpSurfaceMask(
   m: HeadMetrics,
 ): number {
   void m;
-  const napeFade = smoothstep(-0.85, -0.35, p.y);
-  return clamp01(napeFade * earKeep(p) * faceKeep(p, n));
+  if (isNeck(p, n)) return 0;
+  return clamp01(napeKeep(p) * earKeep(p) * faceKeep(p, n));
 }
 
 function regionDensity(region: ScalpRegion) {
@@ -284,7 +310,7 @@ export function buildHairSites(
     nrm.normalize();
     const d = dens(p, nrm, m);
     if (d < 0.04) continue;
-    if (isEar(p) || isFace(p, nrm)) continue;
+    if (isEar(p) || isFace(p, nrm) || isNeck(p, nrm)) continue;
 
     if (!clump) {
       pushHair(p, nrm);
@@ -308,7 +334,7 @@ export function buildHairSites(
         .addScaledVector(t1, (Math.random() - 0.5) * 0.15)
         .addScaledVector(t2, (Math.random() - 0.5) * 0.15)
         .normalize();
-      if (isEar(hp) || isFace(hp, hn)) continue;
+      if (isEar(hp) || isFace(hp, hn) || isNeck(hp, hn)) continue;
       pushHair(hp, hn);
     }
   }

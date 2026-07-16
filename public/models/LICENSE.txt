@@ -1,0 +1,5 @@
+cabeca-masculina.glb
+Source: https://github.com/BoQsc/Godot-3D-Male-Base-Mesh
+Original: https://orange-juice-games.itch.io/male-base-mesh
+License: CC0 1.0 Universal (Public Domain)
+Note: kept for future swap; current UI uses a procedural PBR bust for better clinical framing.

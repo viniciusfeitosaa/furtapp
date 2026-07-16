@@ -80,9 +80,9 @@ export function FollicleSection() {
           Da área calva à densidade
         </h2>
         <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Exemplificação visual do planejamento: comece pela cabeça sem enxertos
-          e avance a cobertura — 1.000, 5.000 ou até cerca de 8.000 unidades
-          foliculares.
+          Simulação do planejamento: cabeça com área doadora (laterais/nuca) e
+          área receptora no topo. Do calvo ao pontilhado cirúrgico e à densidade
+          de 1.000, 5.000 ou até cerca de 8.000 unidades foliculares.
         </p>
 
         <div

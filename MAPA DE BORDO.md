@@ -344,6 +344,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Pacote A (motion) entregue. Pacote C: spec + plano do folículo 3D em Tratamentos (`docs/superpowers/...pacote-c-follicle-3d*`). |
 | 2026-07-15 | Pacote C entregue: folículo 3D procedural (R3F) na seção Tratamentos, lazy load + fallback PNG. |
 | 2026-07-16 | Simulador de densidade: cabeça calva + 0 / 1.000 / 5.000 / máx. ~8.000 enxertos (instanced). |
+| 2026-07-16 | Realismo PBR: pele MeshPhysical (SSS leve), sombra área doadora, pontilhado cirúrgico, texturas canvas. |
 
 ---
 

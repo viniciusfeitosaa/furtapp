@@ -20,7 +20,7 @@ const DENSITY_OPTIONS: { label: string; value: GraftCount; hint: string }[] = [
   {
     label: "Calvo",
     value: 0,
-    hint: "Calvo — laterais e nuca preenchidas; zona do transplante vazia",
+    hint: "Calvo — laterais e acima da nuca preenchidos; zona do transplante vazia",
   },
   { label: "1.000", value: 1000, hint: "Preenche a linha frontal (1.000 unidades)" },
   { label: "5.000", value: 5000, hint: "Amplia cobertura do topo e frontal" },

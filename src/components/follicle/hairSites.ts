@@ -86,8 +86,8 @@ function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
 }
 
 /**
- * Cabelo remanescente no Calvo: laterais densas + nuca + coroa,
- * EXCETO zona dos enxertos. Sem orelha, sem pescoço, sem rosto.
+ * Cabelo remanescente no Calvo: laterais densas + occipital alto + coroa,
+ * EXCETO zona dos enxertos. Sem orelha, sem nuca, sem pescoço, sem rosto.
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   if (isReceptorPoint(p, n, b)) return false;

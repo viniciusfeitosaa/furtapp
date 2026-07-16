@@ -86,8 +86,8 @@ function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
 }
 
 /**
- * Cabelo remanescente no Calvo: laterais densas + occipital alto + coroa,
- * EXCETO zona dos enxertos. Sem orelha, sem nuca, sem pescoço, sem rosto.
+ * Cabelo remanescente no Calvo: laterais inteiras + occipital alto + coroa,
+ * EXCETO zona dos enxertos. Sem orelha (só a saliência), sem nuca baixa, sem rosto.
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   if (isReceptorPoint(p, n, b)) return false;
@@ -96,36 +96,41 @@ function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  // Bloqueios duros
-  if (y < 0.62) return false; // exclui nuca e pescoço
-  if (z > 0.6 && y < 0.9) return false; // rosto
-  if (x > 0.6) return false; // ponta das orelhas
-  if (n.y < -0.05) return false;
-  // Orelha: saliência lateral na faixa auricular
-  if (x > 0.4 && y < 0.76 && z > 0.3 && z < 0.58) return false;
-  if (x > 0.48 && Math.abs(n.x) > 0.7 && y < 0.8) return false;
+  // Nuca baixa / pescoço
+  if (y < 0.64) return false;
+  // Rosto / testa
+  if (z > 0.62 && y < 0.9) return false;
+  if (n.z > 0.45 && z > 0.58) return false;
+  // Orelha: só a saliência (não a lateral do crânio)
+  if (x > 0.68) return false;
+  if (
+    x > 0.56 &&
+    y > 0.58 &&
+    y < 0.74 &&
+    z > 0.34 &&
+    z < 0.56 &&
+    Math.abs(n.x) > 0.72
+  ) {
+    return false;
+  }
+
+  // Lateral completa do crânio (parietal / temporal alto)
+  const fullSide =
+    x > 0.08 &&
+    x <= 0.66 &&
+    y >= 0.64 &&
+    y <= 0.94 &&
+    z < 0.58 &&
+    n.y > -0.12;
 
   // Coroa residual (fora do receptor)
-  const crown = y >= 0.68 && n.y > 0.2 && x <= 0.58 && z < 0.55;
-  // Laterais / parietais — acima da orelha (não na nuca)
-  const sides =
-    x > 0.12 &&
-    x <= 0.58 &&
-    y >= 0.66 &&
-    y < 0.92 &&
-    z < 0.55 &&
-    n.y > -0.02 &&
-    !(x > 0.38 && z > 0.32 && z < 0.56 && y < 0.76);
-  // Occipital ALTO — acima da nuca (sem descer para a nuca)
-  const aboveNape =
-    z < 0.48 &&
-    y >= 0.68 &&
-    y < 0.9 &&
-    x < 0.55 &&
-    n.z < 0.28 &&
-    n.y > 0.08;
+  const crown = y >= 0.7 && n.y > 0.18 && x <= 0.6 && z < 0.56;
 
-  return crown || sides || aboveNape;
+  // Occipital alto (acima da nuca)
+  const aboveNape =
+    z < 0.5 && y >= 0.66 && y <= 0.92 && x < 0.58 && n.y > 0.0;
+
+  return fullSide || crown || aboveNape;
 }
 
 function regionTest(region: ScalpRegion) {
@@ -174,7 +179,7 @@ export function buildHairSites(
   const sites: HairSite[] = [];
   const p = new Vector3();
   const nrm = new Vector3();
-  const maxTries = count * 40;
+  const maxTries = count * 80;
 
   for (let tries = 0; sites.length < count && tries < maxTries; tries += 1) {
     sampler.sample(p, nrm);
@@ -204,17 +209,17 @@ export function buildHairSites(
       });
     }
     let guard = 0;
-    while (sites.length < count && eligible.length > 0 && guard < count * 20) {
+    while (sites.length < count && eligible.length > 0 && guard < count * 40) {
       guard += 1;
       const pick = eligible[Math.floor(Math.random() * eligible.length)]!;
       const jitterPos = pick.position
         .clone()
-        .addScaledVector(pick.normal, 0.008)
+        .addScaledVector(pick.normal, 0.004)
         .add(
           new Vector3(
-            (Math.random() - 0.5) * 0.02,
-            (Math.random() - 0.5) * 0.01,
-            (Math.random() - 0.5) * 0.02,
+            (Math.random() - 0.5) * 0.012,
+            (Math.random() - 0.5) * 0.008,
+            (Math.random() - 0.5) * 0.012,
           ),
         );
       if (!test(jitterPos, pick.normal, b)) continue;

@@ -20,10 +20,10 @@ export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
 /** Cabelo em laterais e acima da nuca (zona dos enxertos vazia no Calvo). */
-const RESIDUAL_HAIRS = 11000;
+const RESIDUAL_HAIRS = 22000;
 /** Tamanho único padrão dos fios (sem variação). */
-const HAIR_LEN = 0.12;
-const HAIR_THICK = 0.011;
+const HAIR_LEN = 0.1;
+const HAIR_THICK = 0.009;
 const HEAD_SCALE = 0.3;
 const dummy = new Object3D();
 const up = new Vector3(0, 1, 0);

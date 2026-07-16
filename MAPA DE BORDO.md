@@ -345,6 +345,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Pacote C entregue: folículo 3D procedural (R3F) na seção Tratamentos, lazy load + fallback PNG. |
 | 2026-07-16 | Simulador de densidade: cabeça calva + 0 / 1.000 / 5.000 / máx. ~8.000 enxertos (instanced). |
 | 2026-07-16 | Realismo PBR: pele MeshPhysical (SSS leve), sombra área doadora, pontilhado cirúrgico, texturas canvas. |
+| 2026-07-16 | Cabeça real GLB (Lee Perry-Smith, CC BY 3.0) + pele PBR/SSS; fios via MeshSurfaceSampler na superfície real (doador fixo + receptor por densidade). |
 
 ---
 

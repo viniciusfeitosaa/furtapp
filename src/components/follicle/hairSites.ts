@@ -96,7 +96,7 @@ export function residualDensity(p: Vector3, n: Vector3, b: Bounds): number {
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
   // Bloqueios anatômicos
-  if (y < 0.58) return 0; // pescoço / nuca baixa
+  if (y < 0.48) return 0; // nuca / pescoço — nunca preenche
   if (z > 0.7 && y < 0.86) return 0; // rosto / testa baixa
   if (x > 0.68) return 0; // ponta das orelhas
   if (
@@ -111,9 +111,14 @@ export function residualDensity(p: Vector3, n: Vector3, b: Bounds): number {
   }
   if (n.y < -0.2) return 0;
 
+  // Na parte de trás, desce até a borda da nuca (sem preenchê-la)
+  const back = 1 - smoothstep(0.38, 0.52, z);
+  const yLo = 0.58 - 0.08 * back; // ~0.50 atrás, ~0.58 nas laterais
+  const yHi = 0.66 - 0.06 * back;
+
   // Cobertura base com bordas suaves (gradiente, sem recorte quadrado)
   let d = 1;
-  d *= smoothstep(0.58, 0.66, y); // sobe da nuca
+  d *= smoothstep(yLo, yHi, y);
   d *= 1 - smoothstep(0.62, 0.72, z); // afina em direção ao rosto
   d *= 1 - smoothstep(0.58, 0.68, x); // afina em direção às orelhas
   // Leve rarefação no alto-frontal (AGA), sem esvaziar

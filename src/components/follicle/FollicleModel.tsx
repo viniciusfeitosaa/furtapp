@@ -169,10 +169,10 @@ varying float vScalpMask;`,
           "#include <map_fragment>",
           `#include <map_fragment>
 {
-  // Rosto: tom uniforme. Couro: albedo suave (sem falhas faciais).
-  vec3 flatSkin = vec3(0.843, 0.643, 0.529); // #d7a487
+  // Rosto: tom uniforme mais quente (menos pálido sob ACES/luz de estúdio).
+  vec3 flatSkin = vec3(0.753, 0.490, 0.337); // #c07d56
   float scalp = clamp(vScalpMask, 0.0, 1.0);
-  diffuseColor.rgb = mix(flatSkin, diffuseColor.rgb, scalp * 0.5);
+  diffuseColor.rgb = mix(flatSkin, diffuseColor.rgb, scalp * 0.45);
 
   // Sombra de suporte sob cabelo; entradas limpas no Calvo (uGraftFill=0)
   float shade = vResidualShade;
@@ -306,9 +306,9 @@ varying float vScalpMask;`,
           clearcoatRoughness={0.55}
           sheen={0.22}
           sheenRoughness={0.55}
-          sheenColor="#c9967d"
+          sheenColor="#b8734f"
           onBeforeCompile={onBeforeCompile}
-          customProgramCacheKey={() => "scalp-pbr-mask-v1"}
+          customProgramCacheKey={() => "scalp-pbr-skin-warm-v2"}
         />
       </mesh>
 

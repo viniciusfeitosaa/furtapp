@@ -14,11 +14,10 @@ export type HairSite = {
 };
 
 /**
- * - residual: cabelo remanescente (ferradura) — “calvo” com entradas severas
- * - receptor: zona a preencher (entradas + frontal + vértex)
- * - donor: laterais/nuca raspadas
+ * - residual: cabelo remanescente (ferradura na coroa) — calvície avançada
+ * - receptor: zona calva a preencher (frontal + topo + vértex)
  */
-export type ScalpRegion = "receptor" | "donor" | "residual";
+export type ScalpRegion = "receptor" | "residual";
 
 type Bounds = {
   minY: number;
@@ -54,92 +53,53 @@ function normZ(z: number, b: Bounds) {
   return (z - b.minZ) / b.spanZ;
 }
 
-/** Base: só crânio (sem face, orelha, pescoço). */
+/**
+ * Couro cabeludo (calota superior): só a coroa da cabeça.
+ * Fica ACIMA das orelhas e da nuca, e ignora o rosto e o pescoço.
+ * A chave para excluir orelhas/pescoço/rosto é exigir normal apontando
+ * para cima (n.y alto): só a superfície superior do crânio passa.
+ */
 function isOnScalp(p: Vector3, n: Vector3, b: Bounds): boolean {
   const y = normY(p.y, b);
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  if (y < 0.5) return false;
-  if (x > 0.7) return false; // orelhas
-  if (n.y < -0.05) return false; // pescoço
-  if (n.z > 0.32 && y < 0.8) return false; // face
-  if (z > 0.72 && y < 0.76) return false;
+  if (y < 0.6) return false; // abaixo disso: orelhas, rosto, pescoço
+  if (n.y < 0.22) return false; // só superfícies voltadas para cima
+  if (x > 0.9) return false; // extremidades laterais
+  if (z > 0.62 && y < 0.9) return false; // testa / rosto
   return true;
 }
 
 /**
- * Zona das entradas / frontal / vértex — o que o procedimento preenche.
- * Norwood avançado: M frontal bem aberto + rarefação no topo.
+ * Zona calva a preencher: topo/vértex + linha frontal recuada.
+ * É a área grande e brilhante do alto da cabeça (calvície avançada).
  */
 function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   if (!isOnScalp(p, n, b)) return false;
-  const y = normY(p.y, b);
   const z = normZ(p.z, b);
-  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  if (y < 0.64) return false;
-  if (n.y < 0.18) return false;
-
-  // Entradas profundas (têmporas frontais) — M bem aberto
-  const temples = z > 0.5 && y > 0.66 && y < 0.86 && x > 0.18 && x < 0.55;
-  // Linha anterior / frontal central
-  const frontal = z > 0.5 && y > 0.66 && y < 0.9 && x < 0.42;
-  // Vértex / meio do topo
-  const vertex = y > 0.76 && z > 0.3 && z < 0.7 && x < 0.5;
-  // Ponte mid-scalp rarefeita
-  const midFront = z > 0.4 && y > 0.7 && x < 0.4;
-
-  return temples || frontal || vertex || midFront;
+  const top = n.y > 0.55; // calota superior (vértex + topo)
+  const front = z > 0.52; // linha anterior recuada (frontal)
+  return top || front;
 }
 
 /**
- * Cabelo remanescente em ferradura (padrão de calvície avançada).
- * Tem cabelo — mas com entradas severas bem evidentes.
+ * Cabelo remanescente em ferradura: anel das laterais + nuca da coroa,
+ * sempre acima das orelhas. Tem cabelo — mas com calvície acentuada no topo.
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   if (!isOnScalp(p, n, b)) return false;
-  const y = normY(p.y, b);
   const z = normZ(p.z, b);
-  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  if (y < 0.56 || y > 0.88) return false;
-  if (n.y < 0.1) return false;
-
-  // Zona das entradas / frontal / vértex fica vazia no “Calvo”
-  if (z > 0.48 && x < 0.52) return false; // M frontal + entradas
-  if (z > 0.55) return false; // nada na linha anterior
-  if (y > 0.78 && z > 0.34 && z < 0.68 && x < 0.36) return false; // vértex
-
-  // Ferradura: pilares laterais + corona posterior
-  const sidePillar = x > 0.32 && x <= 0.68 && z < 0.5 && y > 0.58;
-  const backHorseshoe = z < 0.42 && y > 0.58 && x < 0.62;
-  return sidePillar || backHorseshoe;
-}
-
-/**
- * Área doadora (laterais + nuca do crânio — sem pescoço/orelha).
- */
-function isDonorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
-  const y = normY(p.y, b);
-  const z = normZ(p.z, b);
-  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
-
-  if (y < 0.5 || y > 0.66) return false;
-  if (n.z > 0.12) return false;
-  if (z > 0.55) return false;
-  if (x > 0.7) return false;
-  if (n.y < -0.05) return false;
-
-  const lateral = x > 0.38 && x <= 0.7 && n.y < 0.4 && y >= 0.52;
-  const nape = z < 0.38 && n.z < 0.0 && n.y < 0.5 && x < 0.55 && y >= 0.52;
-  return lateral || nape;
+  if (n.y > 0.52) return false; // topo fica calvo
+  if (z > 0.52) return false; // frente fica calva (entrada)
+  return true; // anel lateral + posterior
 }
 
 function regionTest(region: ScalpRegion) {
   if (region === "receptor") return isReceptorPoint;
-  if (region === "residual") return isResidualPoint;
-  return isDonorPoint;
+  return isResidualPoint;
 }
 
 function paintBinaryWeight(

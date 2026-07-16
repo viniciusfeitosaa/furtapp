@@ -8,9 +8,6 @@ import {
   MathUtils,
   Matrix4,
   Object3D,
-  RepeatWrapping,
-  SRGBColorSpace,
-  TextureLoader,
   Vector3,
   type BufferGeometry,
   type Group,
@@ -22,7 +19,6 @@ import { buildHairSites, type HairSite } from "@/components/follicle/hairSites";
 export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
-const DONOR_HAIRS = 1800;
 const RESIDUAL_HAIRS = 5200;
 const HEAD_SCALE = 0.3;
 const dummy = new Object3D();
@@ -90,40 +86,15 @@ export function FollicleModel({
 }: Props) {
   const root = useRef<Group>(null);
   const receptor = useRef<InstancedMesh>(null);
-  const donor = useRef<InstancedMesh>(null);
   const residual = useRef<InstancedMesh>(null);
   const phase = useRef(0);
   const displayCount = useRef(0);
   const targetCount = useRef<number>(graftCount);
 
   const geometry = useHeadGeometry();
-  const { albedo, normalMap } = useMemo(() => {
-    const loader = new TextureLoader();
-    const a = loader.load("/models/head-albedo.jpg");
-    a.flipY = false;
-    a.colorSpace = SRGBColorSpace;
-    a.wrapS = a.wrapT = RepeatWrapping;
-    a.anisotropy = 8;
-    const n = loader.load("/models/head-normal.jpg");
-    n.flipY = false;
-    n.wrapS = n.wrapT = RepeatWrapping;
-    n.anisotropy = 8;
-    return { albedo: a, normalMap: n };
-  }, []);
-
-  useLayoutEffect(() => {
-    return () => {
-      albedo.dispose();
-      normalMap.dispose();
-    };
-  }, [albedo, normalMap]);
 
   const receptorSites = useMemo(
     () => (geometry ? buildHairSites(geometry, MAX_GRAFTS, "receptor") : []),
-    [geometry],
-  );
-  const donorSites = useMemo(
-    () => (geometry ? buildHairSites(geometry, DONOR_HAIRS, "donor") : []),
     [geometry],
   );
   const residualSites = useMemo(
@@ -135,12 +106,7 @@ export function FollicleModel({
     targetCount.current = graftCount;
   }, [graftCount]);
 
-  // Doador: raspado curto (laterais/nuca)
-  useLayoutEffect(() => {
-    fillStaticHair(donor.current, donorSites, 0.12, 0.06, 0.022);
-  }, [donorSites]);
-
-  // Remanescente: cabelo visível em ferradura (entradas abertas)
+  // Remanescente: ferradura de cabelo nas laterais/nuca da coroa
   useLayoutEffect(() => {
     fillStaticHair(residual.current, residualSites, 0.46, 0.26, 0.03);
   }, [residualSites]);
@@ -208,35 +174,16 @@ export function FollicleModel({
     >
       <mesh geometry={geometry} castShadow receiveShadow>
         <meshPhysicalMaterial
-          map={albedo}
-          normalMap={normalMap}
-          normalScale={[0.6, 0.6]}
-          color="#e6b9a6"
-          roughness={0.62}
+          color="#d7a487"
+          roughness={0.78}
           metalness={0.0}
-          clearcoat={0.18}
-          clearcoatRoughness={0.55}
-          sheen={0.4}
-          sheenRoughness={0.5}
-          sheenColor="#c67a63"
-          transmission={0.16}
-          thickness={0.9}
-          attenuationColor="#a83a2e"
-          attenuationDistance={0.7}
-          ior={1.4}
+          clearcoat={0.06}
+          clearcoatRoughness={0.6}
+          sheen={0.18}
+          sheenRoughness={0.6}
+          sheenColor="#c9967d"
         />
       </mesh>
-
-      {/* Doador permanente */}
-      <instancedMesh
-        ref={donor}
-        args={[undefined, undefined, DONOR_HAIRS]}
-        castShadow
-        frustumCulled={false}
-      >
-        <cylinderGeometry args={[1, 0.7, 1, 5]} />
-        <meshStandardMaterial color="#242220" roughness={0.55} metalness={0.1} />
-      </instancedMesh>
 
       {/* Cabelo remanescente (ferradura) — visível já no “Calvo” */}
       <instancedMesh

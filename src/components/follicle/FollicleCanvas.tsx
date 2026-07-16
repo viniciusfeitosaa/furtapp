@@ -33,40 +33,40 @@ export function FollicleCanvas({
           alpha: false,
           powerPreference: "high-performance",
           toneMapping: ACESFilmicToneMapping,
-          toneMappingExposure: 0.92,
+          toneMappingExposure: 0.78,
         }}
         style={{ width: "100%", height: "100%" }}
       >
         <color attach="background" args={["#0c1018"]} />
 
         {/* Ambiente de estúdio — reflexos suaves na pele */}
-        <Environment preset="studio" environmentIntensity={0.38} />
+        <Environment preset="studio" environmentIntensity={0.22} />
 
         <hemisphereLight
-          intensity={0.48}
-          color="#f5e6d6"
-          groundColor="#2a3038"
+          intensity={0.38}
+          color="#e8d0b8"
+          groundColor="#1e242c"
         />
         {/* Key quente */}
         <directionalLight
           castShadow
           position={[2.8, 4.2, 3.2]}
-          intensity={1.02}
-          color="#f3e0ce"
+          intensity={0.82}
+          color="#e8c9a8"
           shadow-mapSize={[2048, 2048]}
           shadow-bias={-0.0002}
         />
         {/* Fill frio */}
         <directionalLight
           position={[-3.2, 1.8, -1.6]}
-          intensity={0.28}
-          color="#a8b4d0"
+          intensity={0.2}
+          color="#8a96b0"
         />
         {/* Rim dourado */}
-        <pointLight position={[1.2, 1.6, 2.0]} intensity={0.3} color="#c4b07a" />
+        <pointLight position={[1.2, 1.6, 2.0]} intensity={0.22} color="#c4b07a" />
         {/* SSS hint nas orelhas / laterais */}
-        <pointLight position={[-1.2, 0.15, 0.5]} intensity={0.36} color="#d46858" />
-        <pointLight position={[1.2, 0.15, 0.5]} intensity={0.32} color="#d46858" />
+        <pointLight position={[-1.2, 0.15, 0.5]} intensity={0.28} color="#c45a48" />
+        <pointLight position={[1.2, 0.15, 0.5]} intensity={0.24} color="#c45a48" />
 
         <FollicleModel
           graftCount={graftCount}

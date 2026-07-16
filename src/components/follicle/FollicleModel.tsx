@@ -169,10 +169,11 @@ varying float vScalpMask;`,
           "#include <map_fragment>",
           `#include <map_fragment>
 {
-  // Rosto: tom uniforme mais quente (menos pálido sob ACES/luz de estúdio).
-  vec3 flatSkin = vec3(0.753, 0.490, 0.337); // #c07d56
+  // Rosto: tom bronzeado (ACES + luz de estúdio sobem muito o midtone).
+  vec3 flatSkin = vec3(0.561, 0.322, 0.196); // #8f5232
   float scalp = clamp(vScalpMask, 0.0, 1.0);
-  diffuseColor.rgb = mix(flatSkin, diffuseColor.rgb, scalp * 0.45);
+  // Couro também puxado para o mesmo tom — albedo original é clara demais.
+  diffuseColor.rgb = mix(flatSkin, diffuseColor.rgb * flatSkin * 1.35, scalp * 0.55);
 
   // Sombra de suporte sob cabelo; entradas limpas no Calvo (uGraftFill=0)
   float shade = vResidualShade;
@@ -298,17 +299,17 @@ varying float vScalpMask;`,
         <meshPhysicalMaterial
           map={albedo}
           normalMap={normalMap}
-          normalScale={new Vector2(0.28, 0.28)}
-          color="#ffffff"
-          roughness={0.78}
+          normalScale={new Vector2(0.22, 0.22)}
+          color="#a3623d"
+          roughness={0.86}
           metalness={0.0}
-          clearcoat={0.08}
-          clearcoatRoughness={0.55}
-          sheen={0.22}
-          sheenRoughness={0.55}
-          sheenColor="#b8734f"
+          clearcoat={0.03}
+          clearcoatRoughness={0.7}
+          sheen={0.12}
+          sheenRoughness={0.7}
+          sheenColor="#8f5232"
           onBeforeCompile={onBeforeCompile}
-          customProgramCacheKey={() => "scalp-pbr-skin-warm-v2"}
+          customProgramCacheKey={() => "scalp-pbr-skin-tan-v3"}
         />
       </mesh>
 

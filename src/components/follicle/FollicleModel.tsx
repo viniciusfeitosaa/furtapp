@@ -1,10 +1,11 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import {
   DynamicDrawUsage,
+  Float32BufferAttribute,
   MathUtils,
   Matrix4,
   Object3D,
@@ -13,17 +14,22 @@ import {
   type Group,
   type InstancedMesh,
   type Mesh,
+  type WebGLProgramParametersWithUniforms,
 } from "three";
-import { buildHairSites, type HairSite } from "@/components/follicle/hairSites";
+import {
+  buildHairSites,
+  buildScalpShades,
+  type HairSite,
+} from "@/components/follicle/hairSites";
 
 export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
 /** Cabeça inteira no Calvo; só as entradas (têmporas) ficam vazias. */
-const RESIDUAL_HAIRS = 25000;
+const RESIDUAL_HAIRS = 26000;
 /** Tamanho único padrão dos fios (sem variação). */
-const HAIR_LEN = 0.1;
-const HAIR_THICK = 0.009;
+const HAIR_LEN = 0.09;
+const HAIR_THICK = 0.008;
 const HEAD_SCALE = 0.3;
 const dummy = new Object3D();
 const up = new Vector3(0, 1, 0);
@@ -85,8 +91,60 @@ export function FollicleModel({
   const phase = useRef(0);
   const displayCount = useRef(0);
   const targetCount = useRef<number>(graftCount);
+  const skinShader = useRef<WebGLProgramParametersWithUniforms | null>(null);
+  const graftFill = useRef(0);
 
   const geometry = useHeadGeometry();
+
+  // Sombra de suporte do couro cabeludo (preenche vãos entre os fios)
+  useMemo(() => {
+    if (!geometry) return;
+    const { residual: rs, receptor: rc } = buildScalpShades(geometry);
+    geometry.setAttribute("aResidualShade", new Float32BufferAttribute(rs, 1));
+    geometry.setAttribute("aReceptorShade", new Float32BufferAttribute(rc, 1));
+  }, [geometry]);
+
+  const onBeforeCompile = useCallback(
+    (shader: WebGLProgramParametersWithUniforms) => {
+      shader.uniforms.uGraftFill = { value: graftFill.current };
+      skinShader.current = shader;
+
+      shader.vertexShader = shader.vertexShader
+        .replace(
+          "#include <common>",
+          `#include <common>
+attribute float aResidualShade;
+attribute float aReceptorShade;
+varying float vResidualShade;
+varying float vReceptorShade;`,
+        )
+        .replace(
+          "#include <begin_vertex>",
+          `#include <begin_vertex>
+vResidualShade = aResidualShade;
+vReceptorShade = aReceptorShade;`,
+        );
+
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          "#include <common>",
+          `#include <common>
+uniform float uGraftFill;
+varying float vResidualShade;
+varying float vReceptorShade;`,
+        )
+        .replace(
+          "#include <map_fragment>",
+          `#include <map_fragment>
+{
+  float shade = vResidualShade;
+  shade = mix(shade, min(shade, vReceptorShade), clamp(uGraftFill, 0.0, 1.0));
+  diffuseColor.rgb *= shade;
+}`,
+        );
+    },
+    [],
+  );
 
   const receptorSites = useMemo(
     () => (geometry ? buildHairSites(geometry, MAX_GRAFTS, "receptor") : []),
@@ -156,6 +214,12 @@ export function FollicleModel({
       mesh.setMatrixAt(i, dummy.matrix);
     }
     mesh.instanceMatrix.needsUpdate = true;
+
+    // Sombra de suporte das entradas acompanha o preenchimento dos enxertos
+    graftFill.current = visible / MAX_GRAFTS;
+    if (skinShader.current) {
+      skinShader.current.uniforms.uGraftFill.value = graftFill.current;
+    }
   });
 
   if (!geometry) return null;
@@ -168,15 +232,18 @@ export function FollicleModel({
       rotation={[0, 0, 0]}
     >
       <mesh geometry={geometry} castShadow receiveShadow>
+        {/* Couro cabeludo PBR; sombra de suporte injetada via onBeforeCompile */}
         <meshPhysicalMaterial
           color="#d7a487"
-          roughness={0.78}
+          roughness={0.82}
           metalness={0.0}
-          clearcoat={0.06}
-          clearcoatRoughness={0.6}
-          sheen={0.18}
-          sheenRoughness={0.6}
+          clearcoat={0.05}
+          clearcoatRoughness={0.65}
+          sheen={0.16}
+          sheenRoughness={0.62}
           sheenColor="#c9967d"
+          onBeforeCompile={onBeforeCompile}
+          customProgramCacheKey={() => "scalp-shade-v1"}
         />
       </mesh>
 

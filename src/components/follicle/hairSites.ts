@@ -86,19 +86,12 @@ function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
 }
 
 /**
- * Cabelo remanescente em ferradura: anel das laterais + nuca da coroa,
- * sempre acima das orelhas. Tem cabelo — mas com calvície acentuada no topo.
+ * Cabelo remanescente: todo o couro cabeludo EXCETO a zona dos enxertos
+ * (1.000 / 5.000 / Máximo). No “Calvo” essas áreas ficam vazias.
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   if (!isOnScalp(p, n, b)) return false;
-  const y = normY(p.y, b);
-  const z = normZ(p.z, b);
-  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
-
-  if (n.y > 0.52) return false; // topo fica calvo
-  if (z > 0.5) return false; // frente fica calva (entrada)
-  if (x > 0.58) return false; // sem orelha
-  if (y < 0.72) return false; // bem acima das orelhas
+  if (isReceptorPoint(p, n, b)) return false;
   return true;
 }
 

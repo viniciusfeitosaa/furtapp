@@ -18,12 +18,12 @@ const FollicleCanvas = dynamic(
 
 const DENSITY_OPTIONS: { label: string; value: GraftCount; hint: string }[] = [
   {
-    label: "Antes",
+    label: "Calvo",
     value: 0,
-    hint: "Antes — cabelo remanescente no topo/frontal, com necessidade de densificação",
+    hint: "Calvo — cabeça com cabelo, zona do transplante vazia",
   },
-  { label: "1.000", value: 1000, hint: "Densificação inicial da linha frontal" },
-  { label: "5.000", value: 5000, hint: "Cobertura intermediária do topo e frontal" },
+  { label: "1.000", value: 1000, hint: "Preenche a linha frontal (1.000 unidades)" },
+  { label: "5.000", value: 5000, hint: "Amplia cobertura do topo e frontal" },
   { label: "Máximo", value: 8000, hint: "Cobertura plena (~8.000 unidades)" },
 ];
 
@@ -84,9 +84,9 @@ export function FollicleSection() {
           Da área calva à densidade
         </h2>
         <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Simulação do planejamento: no estado inicial já há cabelo nas laterais e
-          no topo/frontal (área que o plano de ~5.000 unidades cobre). Os enxertos
-          densificam essa região — 1.000, 5.000 ou até cerca de 8.000 unidades.
+          Simulação do planejamento: no Calvo a cabeça já tem cabelo, mas a zona
+          do transplante fica vazia. Ao escolher 1.000, 5.000 ou Máximo, essa área
+          vai sendo preenchida progressivamente.
         </p>
 
         <div

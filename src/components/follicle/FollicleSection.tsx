@@ -17,10 +17,14 @@ const FollicleCanvas = dynamic(
 );
 
 const DENSITY_OPTIONS: { label: string; value: GraftCount; hint: string }[] = [
-  { label: "Calvo", value: 0, hint: "Área receptora sem enxertos" },
-  { label: "1.000", value: 1000, hint: "Sessão inicial / zona focal" },
-  { label: "5.000", value: 5000, hint: "Cobertura intermediária" },
-  { label: "Máximo", value: 8000, hint: "Até ~8.000 unidades foliculares" },
+  {
+    label: "Calvo",
+    value: 0,
+    hint: "Antes — entradas severas (padrão Norwood avançado)",
+  },
+  { label: "1.000", value: 1000, hint: "Recuperação inicial da linha anterior" },
+  { label: "5.000", value: 5000, hint: "Cobertura intermediária das entradas/topo" },
+  { label: "Máximo", value: 8000, hint: "Cobertura plena (~8.000 unidades)" },
 ];
 
 function canUseWebGL(): boolean {
@@ -80,9 +84,9 @@ export function FollicleSection() {
           Da área calva à densidade
         </h2>
         <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Simulação do planejamento: cabeça com área doadora (laterais/nuca) e
-          área receptora no topo. Do calvo ao pontilhado cirúrgico e à densidade
-          de 1.000, 5.000 ou até cerca de 8.000 unidades foliculares.
+          Simulação do planejamento: no “Calvo” ainda há cabelo nas laterais e na
+          nuca, com entradas severas no frontal. Os enxertos preenchem essa zona —
+          1.000, 5.000 ou até cerca de 8.000 unidades foliculares.
         </p>
 
         <div

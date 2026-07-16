@@ -13,7 +13,12 @@ export type HairSite = {
   jitter: number;
 };
 
-export type ScalpRegion = "receptor" | "donor";
+/**
+ * - residual: cabelo remanescente (ferradura) — “calvo” com entradas severas
+ * - receptor: zona a preencher (entradas + frontal + vértex)
+ * - donor: laterais/nuca raspadas
+ */
+export type ScalpRegion = "receptor" | "donor" | "residual";
 
 type Bounds = {
   minY: number;
@@ -42,59 +47,99 @@ function normY(y: number, b: Bounds) {
 }
 
 function normX(x: number, b: Bounds) {
-  return (x - b.minX) / b.spanX; // 0..1
+  return (x - b.minX) / b.spanX;
 }
 
 function normZ(z: number, b: Bounds) {
-  return (z - b.minZ) / b.spanZ; // 0..1 (frente ≈ 1 no Lee Perry-Smith)
+  return (z - b.minZ) / b.spanZ;
 }
 
-/**
- * Máscara dura da área receptora (topo + linha anterior + vértex).
- * Lee Perry-Smith: +Z = face, -Z = nuca, +Y = topo.
- */
-function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
+/** Base: só crânio (sem face, orelha, pescoço). */
+function isOnScalp(p: Vector3, n: Vector3, b: Bounds): boolean {
   const y = normY(p.y, b);
   const z = normZ(p.z, b);
-  const x = Math.abs(normX(p.x, b) - 0.5) * 2; // 0 centro → 1 orelha
+  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  // Só o cap (bem acima do pescoço)
-  if (y < 0.66) return false;
-  // Normal para cima (couro cabeludo)
-  if (n.y < 0.28) return false;
-  // Remove face
-  if (n.z > 0.28 && y < 0.8) return false;
-  if (z > 0.7 && y < 0.76) return false;
-  // Remove orelhas (laterais externas)
-  if (x > 0.72) return false;
-  // Nuca profunda fica para o doador
-  if (z < 0.26 && n.y < 0.6) return false;
-
+  if (y < 0.5) return false;
+  if (x > 0.7) return false; // orelhas
+  if (n.y < -0.05) return false; // pescoço
+  if (n.z > 0.32 && y < 0.8) return false; // face
+  if (z > 0.72 && y < 0.76) return false;
   return true;
 }
 
 /**
- * Máscara dura da área doadora (laterais + nuca do crânio — sem pescoço/orelha).
+ * Zona das entradas / frontal / vértex — o que o procedimento preenche.
+ * Norwood avançado: M frontal bem aberto + rarefação no topo.
+ */
+function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
+  if (!isOnScalp(p, n, b)) return false;
+  const y = normY(p.y, b);
+  const z = normZ(p.z, b);
+  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
+
+  if (y < 0.64) return false;
+  if (n.y < 0.18) return false;
+
+  // Entradas profundas (têmporas frontais) — M bem aberto
+  const temples = z > 0.5 && y > 0.66 && y < 0.86 && x > 0.18 && x < 0.55;
+  // Linha anterior / frontal central
+  const frontal = z > 0.5 && y > 0.66 && y < 0.9 && x < 0.42;
+  // Vértex / meio do topo
+  const vertex = y > 0.76 && z > 0.3 && z < 0.7 && x < 0.5;
+  // Ponte mid-scalp rarefeita
+  const midFront = z > 0.4 && y > 0.7 && x < 0.4;
+
+  return temples || frontal || vertex || midFront;
+}
+
+/**
+ * Cabelo remanescente em ferradura (padrão de calvície avançada).
+ * Tem cabelo — mas com entradas severas bem evidentes.
+ */
+function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
+  if (!isOnScalp(p, n, b)) return false;
+  const y = normY(p.y, b);
+  const z = normZ(p.z, b);
+  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
+
+  if (y < 0.56 || y > 0.88) return false;
+  if (n.y < 0.1) return false;
+
+  // Zona das entradas / frontal / vértex fica vazia no “Calvo”
+  if (z > 0.48 && x < 0.52) return false; // M frontal + entradas
+  if (z > 0.55) return false; // nada na linha anterior
+  if (y > 0.78 && z > 0.34 && z < 0.68 && x < 0.36) return false; // vértex
+
+  // Ferradura: pilares laterais + corona posterior
+  const sidePillar = x > 0.32 && x <= 0.68 && z < 0.5 && y > 0.58;
+  const backHorseshoe = z < 0.42 && y > 0.58 && x < 0.62;
+  return sidePillar || backHorseshoe;
+}
+
+/**
+ * Área doadora (laterais + nuca do crânio — sem pescoço/orelha).
  */
 function isDonorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const y = normY(p.y, b);
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  // Faixa do crânio (sobe o mínimo p/ sair do pescoço; desce o máximo p/ não invadir o topo calvo)
   if (y < 0.5 || y > 0.66) return false;
-  // Sem face
   if (n.z > 0.12) return false;
   if (z > 0.55) return false;
-  // Sem orelhas (muito laterais)
   if (x > 0.7) return false;
-  // Sem pescoço (normais para baixo)
   if (n.y < -0.05) return false;
 
-  // Laterais do crânio (não extremo) ou nuca
   const lateral = x > 0.38 && x <= 0.7 && n.y < 0.4 && y >= 0.52;
   const nape = z < 0.38 && n.z < 0.0 && n.y < 0.5 && x < 0.55 && y >= 0.52;
   return lateral || nape;
+}
+
+function regionTest(region: ScalpRegion) {
+  if (region === "receptor") return isReceptorPoint;
+  if (region === "residual") return isResidualPoint;
+  return isDonorPoint;
 }
 
 function paintBinaryWeight(
@@ -106,27 +151,19 @@ function paintBinaryWeight(
   const nor = geometry.attributes.normal;
   const count = pos.count;
   const weights = new Float32Array(count);
+  const test = regionTest(region);
   const n = new Vector3();
   const p = new Vector3();
 
   for (let i = 0; i < count; i += 1) {
     p.set(pos.getX(i), pos.getY(i), pos.getZ(i));
     n.set(nor.getX(i), nor.getY(i), nor.getZ(i)).normalize();
-    const ok =
-      region === "receptor"
-        ? isReceptorPoint(p, n, b)
-        : isDonorPoint(p, n, b);
-    // Peso binário: evita vazamento para a face
-    weights[i] = ok ? 1 : 0;
+    weights[i] = test(p, n, b) ? 1 : 0;
   }
 
   geometry.setAttribute("hairWeight", new Float32BufferAttribute(weights, 1));
 }
 
-/**
- * Semeia folículos só na região anatômica correta.
- * Usa sampler + rejeição dura (garante zero fios na face/orelha).
- */
 export function buildHairSites(
   geometry: BufferGeometry,
   count: number,
@@ -135,6 +172,7 @@ export function buildHairSites(
   const geo = geometry.clone();
   if (!geo.attributes.normal) geo.computeVertexNormals();
   const b = getBounds(geo);
+  const test = regionTest(region);
   paintBinaryWeight(geo, region, b);
 
   const mesh = new Mesh(geo, new MeshBasicMaterial());
@@ -150,12 +188,7 @@ export function buildHairSites(
   for (let tries = 0; sites.length < count && tries < maxTries; tries += 1) {
     sampler.sample(p, nrm);
     nrm.normalize();
-    const ok =
-      region === "receptor"
-        ? isReceptorPoint(p, nrm, b)
-        : isDonorPoint(p, nrm, b);
-    if (!ok) continue;
-
+    if (!test(p, nrm, b)) continue;
     sites.push({
       position: p.clone(),
       normal: nrm.clone(),
@@ -163,7 +196,6 @@ export function buildHairSites(
     });
   }
 
-  // Fallback: se o sampler não encheu, usa vértices elegíveis
   if (sites.length < count) {
     const pos = geo.attributes.position;
     const nor = geo.attributes.normal;
@@ -173,11 +205,7 @@ export function buildHairSites(
     for (let i = 0; i < pos.count; i += 1) {
       tp.set(pos.getX(i), pos.getY(i), pos.getZ(i));
       tn.set(nor.getX(i), nor.getY(i), nor.getZ(i)).normalize();
-      const ok =
-        region === "receptor"
-          ? isReceptorPoint(tp, tn, b)
-          : isDonorPoint(tp, tn, b);
-      if (!ok) continue;
+      if (!test(tp, tn, b)) continue;
       eligible.push({
         position: tp.clone(),
         normal: tn.clone(),
@@ -188,7 +216,6 @@ export function buildHairSites(
     while (sites.length < count && eligible.length > 0 && guard < count * 20) {
       guard += 1;
       const pick = eligible[Math.floor(Math.random() * eligible.length)]!;
-      // Pequeno jitter tangencial para não empilhar no mesmo vértice
       const jitterPos = pick.position
         .clone()
         .addScaledVector(pick.normal, 0.008)
@@ -199,14 +226,7 @@ export function buildHairSites(
             (Math.random() - 0.5) * 0.02,
           ),
         );
-      // Revalida após jitter (evita cair em orelha/pescoço)
-      if (
-        !(region === "receptor"
-          ? isReceptorPoint(jitterPos, pick.normal, b)
-          : isDonorPoint(jitterPos, pick.normal, b))
-      ) {
-        continue;
-      }
+      if (!test(jitterPos, pick.normal, b)) continue;
       sites.push({
         position: jitterPos,
         normal: pick.normal.clone(),
@@ -216,10 +236,10 @@ export function buildHairSites(
   }
 
   if (region === "receptor") {
-    // Preenche da linha anterior (frente-topo) para trás
+    // Preenche entradas → frontal → vértex
     sites.sort((a, c) => {
-      const pa = a.position.z * 0.7 + a.position.y * 0.3;
-      const pb = c.position.z * 0.7 + c.position.y * 0.3;
+      const pa = a.position.z * 0.75 + a.position.y * 0.25;
+      const pb = c.position.z * 0.75 + c.position.y * 0.25;
       return pb - pa;
     });
   }

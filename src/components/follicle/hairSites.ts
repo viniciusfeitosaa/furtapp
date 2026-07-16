@@ -58,39 +58,42 @@ function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2; // 0 centro → 1 orelha
 
-  // Fora do topo do crânio
-  if (y < 0.62) return false;
-  // Normal deve apontar para cima (couro, não face/pescoço)
-  if (n.y < 0.22) return false;
-  // Remove face (frente + abaixo da linha do cabelo)
-  if (n.z > 0.35 && y < 0.78) return false;
-  // Remove sobrancelha / testa baixa
-  if (z > 0.72 && y < 0.72) return false;
-  // Remove orelhas
-  if (x > 0.82 && y < 0.78) return false;
-  // Faixa útil: do mid-front até a coroa
-  // (z muito baixo = nuca profunda → doador, não receptor)
-  if (z < 0.22 && n.y < 0.55) return false;
+  // Só o cap (bem acima do pescoço)
+  if (y < 0.66) return false;
+  // Normal para cima (couro cabeludo)
+  if (n.y < 0.28) return false;
+  // Remove face
+  if (n.z > 0.28 && y < 0.8) return false;
+  if (z > 0.7 && y < 0.76) return false;
+  // Remove orelhas (laterais externas)
+  if (x > 0.72) return false;
+  // Nuca profunda fica para o doador
+  if (z < 0.26 && n.y < 0.6) return false;
 
   return true;
 }
 
 /**
- * Máscara dura da área doadora (laterais + nuca, cabelo raspado).
+ * Máscara dura da área doadora (laterais + nuca do crânio — sem pescoço/orelha).
  */
 function isDonorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const y = normY(p.y, b);
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  // Faixa média (abaixo do topo calvo, acima do pescoço)
-  if (y < 0.38 || y > 0.68) return false;
+  // Faixa do crânio (sobe o mínimo p/ sair do pescoço; desce o máximo p/ não invadir o topo calvo)
+  if (y < 0.5 || y > 0.66) return false;
   // Sem face
-  if (n.z > 0.25) return false;
-  if (z > 0.62) return false;
-  // Laterais ou nuca
-  const lateral = x > 0.35 && n.y < 0.45;
-  const nape = z < 0.4 && n.z < 0.05 && n.y < 0.55;
+  if (n.z > 0.12) return false;
+  if (z > 0.55) return false;
+  // Sem orelhas (muito laterais)
+  if (x > 0.7) return false;
+  // Sem pescoço (normais para baixo)
+  if (n.y < -0.05) return false;
+
+  // Laterais do crânio (não extremo) ou nuca
+  const lateral = x > 0.38 && x <= 0.7 && n.y < 0.4 && y >= 0.52;
+  const nape = z < 0.38 && n.z < 0.0 && n.y < 0.5 && x < 0.55 && y >= 0.52;
   return lateral || nape;
 }
 
@@ -181,19 +184,29 @@ export function buildHairSites(
         jitter: Math.random(),
       });
     }
-    while (sites.length < count && eligible.length > 0) {
+    let guard = 0;
+    while (sites.length < count && eligible.length > 0 && guard < count * 20) {
+      guard += 1;
       const pick = eligible[Math.floor(Math.random() * eligible.length)]!;
       // Pequeno jitter tangencial para não empilhar no mesmo vértice
       const jitterPos = pick.position
         .clone()
-        .addScaledVector(pick.normal, 0.01)
+        .addScaledVector(pick.normal, 0.008)
         .add(
           new Vector3(
-            (Math.random() - 0.5) * 0.04,
             (Math.random() - 0.5) * 0.02,
-            (Math.random() - 0.5) * 0.04,
+            (Math.random() - 0.5) * 0.01,
+            (Math.random() - 0.5) * 0.02,
           ),
         );
+      // Revalida após jitter (evita cair em orelha/pescoço)
+      if (
+        !(region === "receptor"
+          ? isReceptorPoint(jitterPos, pick.normal, b)
+          : isDonorPoint(jitterPos, pick.normal, b))
+      ) {
+        continue;
+      }
       sites.push({
         position: jitterPos,
         normal: pick.normal.clone(),

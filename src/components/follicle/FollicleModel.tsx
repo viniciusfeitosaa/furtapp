@@ -22,7 +22,7 @@ import { buildHairSites, type HairSite } from "@/components/follicle/hairSites";
 export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
-const DONOR_HAIRS = 2600;
+const DONOR_HAIRS = 1800;
 const HEAD_SCALE = 0.3;
 const dummy = new Object3D();
 const up = new Vector3(0, 1, 0);
@@ -120,7 +120,7 @@ export function FollicleModel({
     if (!mesh || donorSites.length === 0) return;
     mesh.instanceMatrix.setUsage(DynamicDrawUsage);
     for (let i = 0; i < donorSites.length; i += 1) {
-      writeHair(mesh, donorSites[i]!, 1, 0.16, 0.1, 0.026, i);
+      writeHair(mesh, donorSites[i]!, 1, 0.12, 0.06, 0.022, i);
     }
     mesh.count = donorSites.length;
     mesh.instanceMatrix.needsUpdate = true;

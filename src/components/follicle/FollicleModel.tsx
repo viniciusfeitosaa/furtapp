@@ -4,6 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import {
+  Color,
   DynamicDrawUsage,
   MathUtils,
   Matrix4,
@@ -11,13 +12,18 @@ import {
   RepeatWrapping,
   SRGBColorSpace,
   TextureLoader,
+  Vector2,
   Vector3,
   type BufferGeometry,
   type Group,
   type InstancedMesh,
   type Mesh,
+  type WebGLProgramParametersWithUniforms,
 } from "three";
 import { buildHairSites, type HairSite } from "@/components/follicle/hairSites";
+
+/** Tom uniforme da pele (estado anterior, fora das bochechas). */
+const FLAT_SKIN = new Color("#d7a487");
 
 export type GraftCount = 0 | 1000 | 5000 | 8000;
 
@@ -109,6 +115,79 @@ export function FollicleModel({
     return { albedo: a, normalMap: n };
   }, []);
 
+  const skinBounds = useMemo(() => {
+    if (!geometry) return null;
+    geometry.computeBoundingBox();
+    const bb = geometry.boundingBox!;
+    return {
+      min: bb.min.clone(),
+      size: new Vector3(
+        bb.max.x - bb.min.x || 1,
+        bb.max.y - bb.min.y || 1,
+        bb.max.z - bb.min.z || 1,
+      ),
+    };
+  }, [geometry]);
+
+  const onBeforeCompile = useMemo(() => {
+    return (shader: WebGLProgramParametersWithUniforms) => {
+      if (!skinBounds) return;
+      shader.uniforms.uFlatSkin = { value: FLAT_SKIN };
+      shader.uniforms.uBMin = { value: skinBounds.min };
+      shader.uniforms.uBSize = { value: skinBounds.size };
+
+      shader.vertexShader = shader.vertexShader
+        .replace(
+          "#include <common>",
+          `#include <common>
+varying vec3 vSkinLocal;`,
+        )
+        .replace(
+          "#include <begin_vertex>",
+          `#include <begin_vertex>
+vSkinLocal = position;`,
+        );
+
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          "#include <common>",
+          `#include <common>
+uniform vec3 uFlatSkin;
+uniform vec3 uBMin;
+uniform vec3 uBSize;
+varying vec3 vSkinLocal;
+
+float cheekMask(vec3 lp) {
+  vec3 np = (lp - uBMin) / uBSize;
+  float ax = abs(np.x - 0.5) * 2.0;
+  float ny = np.y;
+  float nz = np.z;
+  // Bochechas: laterais do rosto, altura média, frente
+  float lateral = smoothstep(0.10, 0.20, ax) * (1.0 - smoothstep(0.42, 0.55, ax));
+  float height = smoothstep(0.44, 0.52, ny) * (1.0 - smoothstep(0.66, 0.74, ny));
+  float front = smoothstep(0.58, 0.70, nz);
+  return clamp(lateral * height * front, 0.0, 1.0);
+}`,
+        )
+        .replace(
+          "#include <map_fragment>",
+          `#include <map_fragment>
+{
+  float cheek = cheekMask(vSkinLocal);
+  diffuseColor.rgb = mix(uFlatSkin, diffuseColor.rgb, cheek);
+}`,
+        )
+        .replace(
+          "#include <normal_fragment_maps>",
+          `#include <normal_fragment_maps>
+{
+  float cheek = cheekMask(vSkinLocal);
+  normal = normalize(mix(nonPerturbedNormal, normal, cheek));
+}`,
+        );
+    };
+  }, [skinBounds]);
+
   useLayoutEffect(() => {
     return () => {
       albedo.dispose();
@@ -197,23 +276,23 @@ export function FollicleModel({
     >
       <mesh geometry={geometry} castShadow receiveShadow>
         {/*
-          Pele PBR com albedo/normal do Lee Perry-Smith.
-          Sem transmission (causava manchas); SSS aproximado via sheen + luzes.
+          Detalhe (albedo/normal) só nas bochechas; resto no tom uniforme anterior.
         */}
         <meshPhysicalMaterial
+          key="skin-cheeks-v1"
           map={albedo}
           normalMap={normalMap}
-          normalScale={[0.38, 0.38]}
-          color="#f2c9b0"
-          roughness={0.58}
+          normalScale={new Vector2(0.45, 0.45)}
+          color="#ffffff"
+          roughness={0.78}
           metalness={0.0}
-          clearcoat={0.12}
-          clearcoatRoughness={0.48}
-          sheen={0.55}
-          sheenRoughness={0.42}
-          sheenColor="#e8a088"
-          specularIntensity={0.35}
-          ior={1.4}
+          clearcoat={0.06}
+          clearcoatRoughness={0.6}
+          sheen={0.18}
+          sheenRoughness={0.6}
+          sheenColor="#c9967d"
+          onBeforeCompile={onBeforeCompile}
+          customProgramCacheKey={() => "skin-cheeks-v1"}
         />
       </mesh>
 

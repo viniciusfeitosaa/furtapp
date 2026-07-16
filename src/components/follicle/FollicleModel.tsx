@@ -27,9 +27,10 @@ import {
   type HairSite,
 } from "@/components/follicle/hairSites";
 
-export type GraftCount = 0 | 1000 | 5000 | 8000;
+/** Quantidade de enxertos na zona receptora (0 = Calvo, até MAX_GRAFTS). */
+export type GraftCount = number;
 
-const MAX_GRAFTS = 8000;
+export const MAX_GRAFTS = 8000;
 /** Cabeça inteira no Calvo; só as entradas (têmporas) ficam vazias. */
 const RESIDUAL_HAIRS = 38000;
 /** Tamanho único padrão dos fios (sem variação). */

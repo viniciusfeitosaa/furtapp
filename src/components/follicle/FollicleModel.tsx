@@ -20,7 +20,10 @@ export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
 /** Cabelo em laterais, nuca e coroa (zona dos enxertos vazia no Calvo). */
-const RESIDUAL_HAIRS = 8500;
+const RESIDUAL_HAIRS = 9000;
+/** Tamanho único padrão dos fios (sem variação). */
+const HAIR_LEN = 0.12;
+const HAIR_THICK = 0.011;
 const HEAD_SCALE = 0.3;
 const dummy = new Object3D();
 const up = new Vector3(0, 1, 0);
@@ -48,13 +51,10 @@ function writeHair(
   mesh: InstancedMesh,
   site: HairSite,
   grow: number,
-  baseLen: number,
-  lenJitter: number,
-  thick: number,
   index: number,
 ) {
-  const len = (baseLen + site.jitter * lenJitter) * grow;
-  const t = thick * Math.max(grow, 0.001);
+  const len = HAIR_LEN * grow;
+  const t = HAIR_THICK * Math.max(grow, 0.001);
   dummy.position.copy(site.position);
   dummy.quaternion.setFromUnitVectors(up, site.normal);
   dummy.scale.set(t, len, t);
@@ -64,17 +64,11 @@ function writeHair(
   mesh.setMatrixAt(index, dummy.matrix);
 }
 
-function fillStaticHair(
-  mesh: InstancedMesh | null,
-  sites: HairSite[],
-  baseLen: number,
-  lenJitter: number,
-  thick: number,
-) {
+function fillStaticHair(mesh: InstancedMesh | null, sites: HairSite[]) {
   if (!mesh || sites.length === 0) return;
   mesh.instanceMatrix.setUsage(DynamicDrawUsage);
   for (let i = 0; i < sites.length; i += 1) {
-    writeHair(mesh, sites[i]!, 1, baseLen, lenJitter, thick, i);
+    writeHair(mesh, sites[i]!, 1, i);
   }
   mesh.count = sites.length;
   mesh.instanceMatrix.needsUpdate = true;
@@ -109,7 +103,7 @@ export function FollicleModel({
 
   // Cabeça preenchida — zona dos enxertos fica vazia no Calvo
   useLayoutEffect(() => {
-    fillStaticHair(residual.current, residualSites, 0.46, 0.26, 0.03);
+    fillStaticHair(residual.current, residualSites);
   }, [residualSites]);
 
   useLayoutEffect(() => {
@@ -153,7 +147,7 @@ export function FollicleModel({
       const site = receptorSites[i]!;
       const t = MathUtils.clamp((visible - i) / band, 0, 1);
       const grow = MathUtils.smootherstep(t, 0, 1);
-      writeHair(mesh, site, grow, 0.34, 0.24, 0.029, i);
+      writeHair(mesh, site, grow, i);
     }
     for (let i = visible; i < Math.min(visible + 40, MAX_GRAFTS); i += 1) {
       dummy.position.set(0, -50, 0);
@@ -193,7 +187,7 @@ export function FollicleModel({
         castShadow
         frustumCulled={false}
       >
-        <cylinderGeometry args={[1, 0.7, 1, 5]} />
+        <cylinderGeometry args={[1, 0.85, 1, 5]} />
         <meshStandardMaterial color="#2a2724" roughness={0.42} metalness={0.12} />
       </instancedMesh>
 
@@ -204,7 +198,7 @@ export function FollicleModel({
         castShadow
         frustumCulled={false}
       >
-        <cylinderGeometry args={[1, 0.7, 1, 5]} />
+        <cylinderGeometry args={[1, 0.85, 1, 5]} />
         <meshStandardMaterial color="#282523" roughness={0.4} metalness={0.16} />
       </instancedMesh>
     </group>

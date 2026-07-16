@@ -86,9 +86,8 @@ function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
 }
 
 /**
- * Cabelo remanescente no Calvo: laterais + nuca + coroa,
- * EXCETO a zona dos enxertos (1.000 / 5.000 / Máximo), que fica vazia.
- * Mais permissivo que isOnScalp para cobrir lados e occipital.
+ * Cabelo remanescente no Calvo: laterais (acima da orelha) + nuca + coroa,
+ * EXCETO zona dos enxertos. Sem orelha, sem pescoço, sem rosto.
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   if (isReceptorPoint(p, n, b)) return false;
@@ -97,32 +96,33 @@ function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  // Exclusões: pescoço, rosto, orelhas
-  if (y < 0.52) return false;
-  if (z > 0.62 && y < 0.88) return false; // rosto / testa
-  if (x > 0.7) return false; // ponta das orelhas
-  if (x > 0.5 && y < 0.72 && z > 0.3 && z < 0.58) return false; // faixa auricular
-  if (n.y < -0.15) return false; // pescoço invertido
+  // Bloqueios duros
+  if (y < 0.58) return false; // pescoço
+  if (z > 0.6 && y < 0.9) return false; // rosto
+  if (x > 0.58) return false; // orelhas / laterais salientes
+  if (Math.abs(n.x) > 0.62) return false; // faces laterais = orelha
+  if (n.y < -0.05) return false;
+  // Faixa auricular completa
+  if (x > 0.38 && y < 0.74 && z > 0.28 && z < 0.6) return false;
 
-  // Coroa (acima das orelhas)
-  const crown = y >= 0.68 && n.y > 0.22 && x <= 0.62;
-  // Laterais do crânio (acima da orelha, até a têmpora)
+  // Coroa residual (fora do receptor)
+  const crown = y >= 0.7 && n.y > 0.25 && x <= 0.55 && z < 0.55;
+  // Laterais — só ACIMA da orelha
   const sides =
-    x > 0.22 &&
-    x <= 0.68 &&
-    y > 0.55 &&
-    y < 0.86 &&
-    z < 0.55 &&
-    n.y > -0.05 &&
-    Math.abs(n.x) < 0.92;
-  // Nuca / occipital
+    x > 0.2 &&
+    x <= 0.55 &&
+    y >= 0.74 &&
+    y < 0.9 &&
+    z < 0.52 &&
+    n.y > 0.05;
+  // Nuca / occipital contínuo (liga coroa → nuca)
   const nape =
-    z < 0.4 &&
-    y > 0.52 &&
-    y < 0.82 &&
-    x < 0.58 &&
-    n.z < 0.2 &&
-    n.y > -0.08;
+    z < 0.46 &&
+    y >= 0.6 &&
+    y < 0.88 &&
+    x < 0.5 &&
+    n.z < 0.28 &&
+    n.y > 0.0;
 
   return crown || sides || nape;
 }

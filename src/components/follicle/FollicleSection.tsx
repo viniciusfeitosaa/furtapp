@@ -18,18 +18,18 @@ const FollicleCanvas = dynamic(
 
 function densityHint(count: number): string {
   if (count <= 0) {
-    return "Calvo — cabeça preenchida; só as entradas (têmporas) vazias";
+    return "Calvo: ponto de partida — cabeça já preenchida, restam apenas as entradas (têmporas)";
   }
   if (count < 1000) {
-    return "Preenchimento inicial das entradas";
+    return "1.000: primeiro preenchimento das entradas";
   }
   if (count < 5000) {
-    return "Cobertura intermediária das têmporas";
+    return "5.000: densidade intermediária — linha anterior mais definida";
   }
   if (count < MAX_GRAFTS) {
-    return "Ampliação da densidade nas entradas";
+    return "Ampliação da densidade até o máximo tecnicamente indicado";
   }
-  return "Entradas totalmente preenchidas";
+  return "Máximo: densidade máxima tecnicamente indicada para este planejamento";
 }
 
 function formatGrafts(count: number): string {
@@ -88,14 +88,15 @@ export function FollicleSection() {
         </p>
         <h2
           id="foliculo-title"
-          className="font-display max-w-2xl text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl"
+          className="font-display max-w-3xl text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl"
         >
-          Da área calva à densidade
+          Da área calva à densidade — veja o planejamento antes de decidir
         </h2>
         <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Simulação do planejamento: no Calvo a cabeça já está preenchida — só as
-          entradas (têmporas) ficam vazias. Arraste o controle para preencher
-          progressivamente até cerca de {formatGrafts(MAX_GRAFTS)} unidades.
+          Cada transplante começa com um número: a quantidade de fios necessária
+          para preencher as entradas e devolver a linha anterior. Ajuste a
+          simulação abaixo e veja como a densidade evolui — do ponto de partida
+          ao resultado máximo tecnicamente indicado para o seu caso.
         </p>
 
         <div className="mt-8 max-w-xl">
@@ -134,6 +135,8 @@ export function FollicleSection() {
 
           <div className="mt-2 flex justify-between text-[0.65rem] tracking-wide text-white/40 uppercase">
             <span>Calvo</span>
+            <span>1.000</span>
+            <span>5.000</span>
             <span>Máximo</span>
           </div>
           <p className="mt-3 text-sm text-white/55">{densityHint(graftCount)}</p>
@@ -148,10 +151,9 @@ export function FollicleSection() {
             <FollicleFallback />
           )}
         </div>
-        <p className="mt-4 text-center text-xs tracking-wide text-white/45">
-          {show3d
-            ? "Arraste para girar · use o controle para simular a densidade"
-            : "Representação estilizada do planejamento capilar"}
+        <p className="mt-4 text-center text-xs leading-relaxed tracking-wide text-white/45">
+          Simulação ilustrativa. O número real de enxertos é definido apenas após
+          avaliação presencial, de acordo com a área doadora disponível.
         </p>
       </div>
     </section>

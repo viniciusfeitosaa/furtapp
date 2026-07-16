@@ -1,8 +1,10 @@
 import { FollicleSection } from "@/components/follicle/FollicleSection";
-import { PHOTO_REGIONS } from "@/lib/site";
+import { FaqJsonLd } from "@/components/JsonLd";
 import { JourneyTrack } from "@/components/JourneyTrack";
 import { Reveal } from "@/components/Reveal";
 import { ScrollZoomImage } from "@/components/ScrollZoomImage";
+import { FAQ_ITEMS } from "@/lib/faq";
+import { PHOTO_REGIONS } from "@/lib/site";
 
 export function SectionShell({
   id,
@@ -44,16 +46,52 @@ export function SectionShell({
   );
 }
 
+const TREATMENTS = [
+  {
+    t: "Avaliação tricológica completa",
+    d: "Diagnóstico da causa da queda ou da calvície, mapeamento da área doadora e da área receptora, e definição do plano de tratamento antes de qualquer decisão cirúrgica.",
+  },
+  {
+    t: "Transplante capilar",
+    d: "Indicação individualizada da técnica, planejamento de linha anterior e densidade, e execução com foco em resultado natural — nunca em série.",
+  },
+  {
+    t: "Cuidados pós-operatórios",
+    d: "Protocolo de recuperação com acompanhamento clínico, incluindo, quando indicada, câmara hiperbárica para otimizar a cicatrização. Acompanhamento fotográfico padronizado a cada 3 meses, por 12 meses.",
+  },
+] as const;
+
+const PILLARS = [
+  {
+    t: "Ciência",
+    d: "Cada protocolo é definido com base em critério médico — não em modelo padrão. Diagnóstico tricológico, indicação da técnica certa e acompanhamento clínico em todas as etapas.",
+  },
+  {
+    t: "Arte",
+    d: "Linha anterior e densidade são desenhadas para o formato do seu rosto, não copiadas de um padrão. O objetivo nunca é \"mais cabelo\" — é o resultado que ninguém nota como transplante.",
+  },
+  {
+    t: "Cuidado",
+    d: "Acompanhamento real, do primeiro contato ao 12º mês pós-operatório. Você não desaparece da agenda depois da cirurgia.",
+  },
+] as const;
+
 export function HomeSections() {
   return (
     <>
-      <SectionShell id="sobre" eyebrow="Sobre" title="O médico atrás do resultado natural">
+      <FaqJsonLd items={[...FAQ_ITEMS]} />
+
+      <SectionShell
+        id="sobre"
+        eyebrow="Sobre"
+        title="O médico por trás do resultado natural"
+      >
         <div className="grid gap-10 md:grid-cols-2 md:gap-16">
           <p className="font-serif-body text-lg leading-relaxed text-brand-charcoal">
-            Atendimento técnico, criterioso e acolhedor — com foco em
-            transplantes capilares de excelência. Conteúdo completo da bio,
-            formação e CRM será inserido assim que o material oficial for
-            enviado (ver MAPA DE BORDO).
+            Cada avaliação começa com uma pergunta simples: o que vai parecer
+            natural nesse rosto, daqui a 10 anos? É esse critério — técnico,
+            individualizado e sem pressa — que guia o trabalho do Dr. Francisco
+            Furtado em cada etapa, da avaliação ao acompanhamento pós-operatório.
           </p>
           <p className="font-signature text-3xl text-brand-gold-dark md:self-end">
             Dr. Francisco Furtado
@@ -61,7 +99,6 @@ export function HomeSections() {
         </div>
       </SectionShell>
 
-      {/* Pilares no estilo do hero: texto + foto fundidos no degradê */}
       <section
         id="tratamentos"
         className="text-white"
@@ -78,7 +115,6 @@ export function HomeSections() {
               "linear-gradient(180deg, #3a4152 0%, #1a2030 35%, #0c1018 70%, #060810 100%)",
           }}
         >
-          {/* Fundo desktop: azul escuro → cinza (esq. → dir.) */}
           <div
             className="pointer-events-none absolute inset-0 hidden md:block"
             aria-hidden
@@ -88,7 +124,6 @@ export function HomeSections() {
             }}
           />
 
-          {/* Mobile: foto colada no topo com máscara nas bordas */}
           <div
             className="pointer-events-none absolute top-0 left-1/2 h-[48svh] max-w-[92vw] -translate-x-1/2 overflow-hidden md:hidden"
             style={{
@@ -115,7 +150,6 @@ export function HomeSections() {
             />
           </div>
 
-          {/* Desktop: foto colada no topo à direita */}
           <div
             className="pointer-events-none absolute top-0 right-0 hidden w-[min(48%,64svh)] max-w-[48%] overflow-hidden md:block"
             style={{
@@ -143,7 +177,6 @@ export function HomeSections() {
             />
           </div>
 
-          {/* Overlay desktop — texto legível à esquerda */}
           <div
             className="pointer-events-none absolute inset-0 hidden md:block"
             aria-hidden
@@ -153,7 +186,6 @@ export function HomeSections() {
             }}
           />
 
-          {/* Overlay mobile — foto → texto */}
           <div
             className="pointer-events-none absolute inset-0 md:hidden"
             aria-hidden
@@ -171,20 +203,7 @@ export function HomeSections() {
               Ciência · Arte · Cuidado
             </h2>
             <div className="mt-8 grid max-w-md gap-7 md:max-w-lg">
-              {[
-                {
-                  t: "Ciência",
-                  d: "Critério médico, personalização e protocolos seguros em cada etapa.",
-                },
-                {
-                  t: "Arte",
-                  d: "Linha anterior e densidade pensadas para um resultado natural e harmônico.",
-                },
-                {
-                  t: "Cuidado",
-                  d: "Acolhimento real — da avaliação ao pós-operatório e ao acompanhamento de 12 meses.",
-                },
-              ].map((item, i) => (
+              {PILLARS.map((item, i) => (
                 <Reveal key={item.t} delayMs={i * 120}>
                   <h3 className="text-lg font-semibold tracking-wide text-brand-gold">
                     {item.t}
@@ -204,23 +223,25 @@ export function HomeSections() {
               Procedimentos
             </p>
             <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
-              Tratamentos
+              Avaliação criteriosa. Técnica sob medida. Acompanhamento até o fim.
             </h2>
             <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-brand-charcoal">
-              Avaliação criteriosa, técnica individualizada e acompanhamento —
-              do procedimento ao pós-operatório.
+              Nenhum protocolo começa pela cirurgia. Começa pela avaliação
+              tricológica — é ela que define se, quando e como o transplante deve
+              ser feito, sempre com a técnica mais indicada para cada caso.
             </p>
-            <ul className="mt-10 grid gap-6 md:grid-cols-3">
-              {[
-                "Transplante capilar (técnicas e indicação individualizada)",
-                "Avaliação tricológica completa",
-                "Cuidados pós-operatórios (incl. menção à câmara hiperbárica)",
-              ].map((item) => (
+            <ul className="mt-10 grid gap-8 md:grid-cols-3">
+              {TREATMENTS.map((item) => (
                 <li
-                  key={item}
-                  className="border-t border-brand-gray-mid pt-4 text-sm leading-relaxed text-brand-charcoal"
+                  key={item.t}
+                  className="border-t border-brand-gray-mid pt-4"
                 >
-                  {item}
+                  <h3 className="text-base font-semibold tracking-wide text-black">
+                    {item.t}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-brand-charcoal">
+                    {item.d}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -232,37 +253,57 @@ export function HomeSections() {
       <SectionShell
         id="resultados"
         eyebrow="Prova visual"
-        title="Resultados / Antes e depois"
+        title="Resultados reais, com o consentimento de quem viveu"
       >
         <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-          Galeria com fotos reais (com consentimento). Placeholders até o envio
-          dos casos — lazy loading e WebP na implementação final.
+          Estamos organizando os primeiros casos autorizados para publicação. Se
+          quiser ver o critério de acompanhamento usado em cada caso, veja como
+          funciona o{" "}
+          <a
+            href="#jornada"
+            className="text-black underline decoration-brand-gold underline-offset-4"
+          >
+            protocolo de 12 meses pós-operatório
+          </a>
+          .
         </p>
       </SectionShell>
 
       <SectionShell
         id="depoimentos"
         eyebrow="Pacientes"
-        title="Depoimentos"
+        title="O que dizem os pacientes"
         tone="soft"
       >
-        <p className="max-w-2xl text-brand-charcoal">
-          Espaço para relatos reais. Tom humano, sem exagero promocional.
+        <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
+          Estamos reunindo os relatos dos pacientes que já concluíram o
+          acompanhamento de 12 meses. Em breve, você vai poder ler a experiência
+          de quem passou por cada etapa — da avaliação ao resultado final.
         </p>
       </SectionShell>
 
       <SectionShell
         id="jornada"
         eyebrow="Pós-operatório"
-        title="Cuidado contínuo — inclusive por 12 meses"
+        title="Cuidado contínuo — inclusive depois que você já esqueceu que fez a cirurgia"
       >
         <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-          Da janela crítica das primeiras 48 horas ao acompanhamento fotográfico
-          padronizado a cada 3 meses até completar 1 ano — disponível na{" "}
-          <a href="/paciente/login" className="text-black underline decoration-brand-gold underline-offset-4">
+          As primeiras 48 horas são a janela mais delicada da recuperação — e é
+          nelas que o acompanhamento é mais próximo. Depois, o protocolo
+          continua: fotos padronizadas a cada 3 meses, por 12 meses, disponíveis
+          na{" "}
+          <a
+            href="/paciente/login"
+            className="text-black underline decoration-brand-gold underline-offset-4"
+          >
             área do paciente
           </a>
           .
+        </p>
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-brand-gray">
+          M0 → M3 → M6 → M9 → M12 — cinco registros fotográficos padronizados
+          (frontal, superior, coroa, e ambos os perfis temporais), para acompanhar
+          a evolução real da densidade, não só a memória de como era antes.
         </p>
         <JourneyTrack />
         <ul className="mt-8 grid gap-2 text-sm text-brand-gray md:grid-cols-2">
@@ -274,20 +315,7 @@ export function HomeSections() {
 
       <SectionShell id="faq" eyebrow="Dúvidas" title="Perguntas frequentes">
         <div className="space-y-6">
-          {[
-            {
-              q: "O resultado fica natural?",
-              a: "O planejamento da linha e da densidade busca harmonia com o seu rosto — naturalidade é prioridade clínica.",
-            },
-            {
-              q: "Quanto tempo dura o acompanhamento?",
-              a: "O protocolo digital prevê fotos padronizadas em M0, M3, M6, M9 e M12 para o Dr. avaliar a evolução com você.",
-            },
-            {
-              q: "Atendem fora de Fortaleza?",
-              a: "Sim — Fortaleza e toda a região do Ceará. Detalhes de deslocamento na avaliação.",
-            },
-          ].map((item) => (
+          {FAQ_ITEMS.map((item) => (
             <details
               key={item.q}
               className="group border-b border-brand-gray-light pb-4"

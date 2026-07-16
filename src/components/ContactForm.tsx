@@ -6,7 +6,7 @@ import { SITE, whatsappUrl } from "@/lib/site";
 export function ContactForm() {
   const [nome, setNome] = useState("");
   const [tel, setTel] = useState("");
-  const [msg, setMsg] = useState("Gostaria de agendar uma avaliação.");
+  const [msg, setMsg] = useState("Gostaria de agendar minha avaliação.");
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();

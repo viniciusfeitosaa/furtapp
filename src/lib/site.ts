@@ -9,7 +9,7 @@ export const SITE = {
   instagramHandle: "@dr.franciscofurtado",
   region: "Fortaleza e todo o Ceará",
   whatsappMessage:
-    "Olá! Gostaria de agendar uma avaliação de tricologia/transplante capilar.",
+    "Olá! Gostaria de agendar minha avaliação de tricologia/transplante capilar.",
 } as const;
 
 export function whatsappUrl(message: string = SITE.whatsappMessage) {

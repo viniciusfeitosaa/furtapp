@@ -40,9 +40,15 @@ export function HeroCopy() {
         </h1>
       ))}
       {item(240, "", (
-        <p className="font-serif-body mt-5 max-w-md text-base leading-relaxed text-white/80 sm:mt-8 sm:text-lg md:max-w-lg md:text-xl">
-          Transplante capilar seguro, ético e natural — devolver autoestima com
-          ciência, arte e cuidado humano em Fortaleza e em todo o Ceará.
+        <p className="font-serif-body mt-5 max-w-lg text-xl leading-snug text-white sm:mt-8 sm:text-2xl md:max-w-xl md:text-[1.65rem]">
+          Transplante capilar natural, sem parecer transplante.
+        </p>
+      ))}
+      {item(280, "", (
+        <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:max-w-lg sm:text-base">
+          Avaliação individualizada, técnica personalizada e acompanhamento por
+          12 meses — do planejamento ao resultado final, com ética e cuidado
+          humano.
         </p>
       ))}
       {item(320, "mt-8 flex flex-col gap-3 sm:mt-12 sm:flex-row sm:items-center", (
@@ -53,7 +59,7 @@ export function HeroCopy() {
             rel="noopener noreferrer"
             className="inline-flex min-h-12 items-center justify-center bg-brand-gold px-8 py-3.5 text-sm font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft"
           >
-            Agende sua avaliação
+            Agendar minha avaliação
           </a>
           <a
             href="#sobre"

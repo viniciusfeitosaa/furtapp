@@ -78,7 +78,7 @@ export function Header() {
             rel="noopener noreferrer"
             className="inline-flex items-center bg-brand-gold px-4 py-2.5 text-xs font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft"
           >
-            Agende sua avaliação
+            Agendar minha avaliação
           </a>
         </nav>
 
@@ -132,7 +132,7 @@ export function Header() {
               className="mt-2 inline-flex items-center justify-center bg-brand-gold px-4 py-3 text-sm font-semibold text-black"
               onClick={() => setOpen(false)}
             >
-              Agende sua avaliação
+              Agendar minha avaliação
             </a>
           </nav>
         </div>

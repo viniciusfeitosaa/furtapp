@@ -13,10 +13,6 @@ export type HairSite = {
   jitter: number;
 };
 
-/**
- * - residual: cabelo remanescente (cabeça inteira, exceto entradas)
- * - receptor: zona a preencher com enxertos (entradas / têmporas)
- */
 export type ScalpRegion = "receptor" | "residual";
 
 type Bounds = {
@@ -62,65 +58,61 @@ function smoothstep(edge0: number, edge1: number, x: number) {
   return t * t * (3 - 2 * t);
 }
 
-/** Banda suave: ~1 dentro de [lo, hi], com transição de largura `e`. */
 function band(v: number, lo: number, hi: number, e: number) {
   return smoothstep(lo - e, lo, v) * (1 - smoothstep(hi, hi + e, v));
 }
 
 /**
- * Densidade da zona receptora (entradas / têmporas), 0..1 com bordas suaves.
- * É o que os enxertos preenchem — e o que fica vazio no Calvo.
+ * Densidade da zona receptora (entradas).
+ * Controla onde as entradas entram "para dentro" da linha capilar de forma suave.
  */
 export function receptorDensity(p: Vector3, n: Vector3, b: Bounds): number {
   const y = normY(p.y, b);
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  if (n.y < 0.05) return 0;
-  if (Math.abs(n.x) > 0.78 && x > 0.45) return 0; // orelha
+  // Evita cabelo no rosto/orelhas usando atenuações suaves em vez de cortes absolutos
+  const earFactor = 1 - smoothstep(0.40, 0.48, x) * smoothstep(0.70, 0.85, Math.abs(n.x));
+  if (n.y < 0.02) return 0;
 
   let m = 1;
-  m *= band(y, 0.7, 0.9, 0.05); // altura das entradas
-  m *= band(z, 0.5, 0.7, 0.06); // frontal / têmporas
-  m *= band(x, 0.16, 0.5, 0.06); // laterais frontais (M), fora do centro
-  return clamp01(m);
+  m *= band(y, 0.72, 0.89, 0.06);   // Ajustado para focar na faixa de altura das entradas
+  m *= band(z, 0.52, 0.72, 0.08);   // Profundidade das têmporas frontais
+  m *= band(x, 0.20, 0.55, 0.08);   // Afastamento lateral em relação ao centro (formato de M)
+  
+  return clamp01(m * earFactor);
 }
 
 /**
- * Densidade do cabelo remanescente (Calvo): cabeça inteira em gradiente,
- * exceto as entradas (têmporas). Sem orelha, nuca baixa, rosto.
+ * Densidade do cabelo remanescente (estado calvo natural).
+ * Mantém as laterais e a nuca cheias, enquanto gera um fade suave na transição das entradas.
  */
 export function residualDensity(p: Vector3, n: Vector3, b: Bounds): number {
   const y = normY(p.y, b);
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  // Bloqueios anatômicos
-  if (y < 0.58) return 0; // pescoço / nuca baixa
-  if (z > 0.7 && y < 0.86) return 0; // rosto / testa baixa
-  if (x > 0.68) return 0; // ponta das orelhas
-  if (
-    x > 0.56 &&
-    y > 0.56 &&
-    y < 0.74 &&
-    z > 0.32 &&
-    z < 0.58 &&
-    Math.abs(n.x) > 0.72
-  ) {
-    return 0; // saliência da orelha
-  }
-  if (n.y < -0.2) return 0;
+  // Atenuações anatômicas orgânicas (substitui os retornos '0' rígidos)
+  const neckFade = smoothstep(0.55, 0.62, y);       // Suaviza cabelo descendo para o pescoço
+  const faceFade = 1 - smoothstep(0.68, 0.78, z);   // Suaviza aproximação da testa/rosto
+  const earFade = 1 - smoothstep(0.52, 0.65, x);    // Suaviza sobre as orelhas
 
-  // Cobertura base com bordas suaves (gradiente, sem recorte quadrado)
+  if (n.y < -0.1) return 0;
+
   let d = 1;
-  d *= smoothstep(0.58, 0.66, y); // sobe da nuca
-  d *= 1 - smoothstep(0.62, 0.72, z); // afina em direção ao rosto
-  d *= 1 - smoothstep(0.58, 0.68, x); // afina em direção às orelhas
-  // Leve rarefação no alto-frontal (AGA), sem esvaziar
-  d *= 1 - 0.25 * smoothstep(0.55, 0.72, z) * smoothstep(0.72, 0.9, y);
+  d *= neckFade;
+  d *= faceFade;
+  d *= earFade;
 
-  // Retira as entradas
-  d *= 1 - receptorDensity(p, n, b);
+  // Leve rarefação no topo-coroa (Padrão de calvície leve/androgenética natural)
+  // Reduz levemente a densidade na coroa (vértice) sem deixar um buraco limpo
+  const crownRarefaction = 1 - 0.3 * smoothstep(0.45, 0.65, z) * smoothstep(0.75, 0.88, y);
+  d *= crownRarefaction;
+
+  // Retira de forma suave a área das entradas/receptor
+  const recDensity = receptorDensity(p, n, b);
+  d *= (1 - recDensity * 0.95); // 0.95 garante uma microlinha de transição sutil
+
   return clamp01(d);
 }
 
@@ -150,7 +142,6 @@ function paintWeight(
   geometry.setAttribute("hairWeight", new Float32BufferAttribute(weights, 1));
 }
 
-/** Base tangente ortonormal à normal (para deslocar a unidade folicular). */
 function tangentBasis(n: Vector3, t1: Vector3, t2: Vector3) {
   const ref = Math.abs(n.y) < 0.9 ? UP_REF : X_REF;
   t1.crossVectors(n, ref).normalize();
@@ -159,14 +150,10 @@ function tangentBasis(n: Vector3, t1: Vector3, t2: Vector3) {
 const UP_REF = new Vector3(0, 1, 0);
 const X_REF = new Vector3(1, 0, 0);
 
-/** Raio do agrupamento (unidade folicular) em unidades locais da malha. */
-const CLUMP_RADIUS = 0.006;
+// Diminuído o raio de agrupamento para garantir que os fios de 2 e 3 saiam extremamente juntos
+// simulando perfeitamente um único folículo piloso natural
+const CLUMP_RADIUS = 0.0028; 
 
-/**
- * Gera os folículos. Para `residual`, agrupa em unidades foliculares
- * (clumping de 1–3 fios) conforme a densidade local, evitando o aspecto
- * de fios isolados igualmente espaçados.
- */
 export function buildHairSites(
   geometry: BufferGeometry,
   count: number,
@@ -210,31 +197,33 @@ export function buildHairSites(
       continue;
     }
 
-    // Unidade folicular: 1–3 fios conforme densidade
+    // Unidades Foliculares baseadas em probabilidade de densidade local
     let unit = 1;
-    if (d > 0.5 && Math.random() < d) unit = 2;
-    if (d > 0.78 && Math.random() < d - 0.35) unit = 3;
+    if (d > 0.4 && Math.random() < d) unit = 2;
+    if (d > 0.75 && Math.random() < d - 0.25) unit = 3;
 
     tangentBasis(nrm, t1, t2);
     for (let h = 0; h < unit && sites.length < count; h += 1) {
       const ang = Math.random() * Math.PI * 2;
+      // h === 0 fica exatamente na raiz do poro, h > 0 se espalha muito perto
       const r = h === 0 ? 0 : Math.random() * CLUMP_RADIUS;
       const hp = p
         .clone()
         .addScaledVector(t1, Math.cos(ang) * r)
         .addScaledVector(t2, Math.sin(ang) * r);
-      // Leve inclinação para dispersão natural
+      
+      // Inclinação muito sutil (ajustado de 0.28 para 0.12 para manter os fios paralelos e organizados)
       const hn = nrm
         .clone()
-        .addScaledVector(t1, (Math.random() - 0.5) * 0.28)
-        .addScaledVector(t2, (Math.random() - 0.5) * 0.28)
+        .addScaledVector(t1, (Math.random() - 0.5) * 0.12)
+        .addScaledVector(t2, (Math.random() - 0.5) * 0.12)
         .normalize();
       pushHair(hp, hn);
     }
   }
 
   if (region === "receptor") {
-    // Preenche entradas de fora para dentro (têmpora → centro)
+    // Ordenação suave para o crescimento do transplante (de trás para a linha frontal)
     sites.sort((a, c) => {
       const pa = a.position.z * 0.7 + a.position.y * 0.3;
       const pb = c.position.z * 0.7 + c.position.y * 0.3;
@@ -246,13 +235,6 @@ export function buildHairSites(
   return sites.slice(0, count);
 }
 
-/**
- * Sombra de suporte do couro cabeludo: por vértice, um multiplicador de cor
- * (1 = pele limpa, <1 = sombra de cabelo denso). Preenche os vãos entre as
- * instâncias 3D, eliminando o efeito de “grama falhada”.
- * - residual: estático (cabelo do Calvo)
- * - receptor: alvo quando os enxertos estão cheios (dinâmico via uniform)
- */
 export function buildScalpShades(geometry: BufferGeometry): {
   residual: Float32Array;
   receptor: Float32Array;
@@ -266,7 +248,7 @@ export function buildScalpShades(geometry: BufferGeometry): {
   const receptor = new Float32Array(n);
   const p = new Vector3();
   const nv = new Vector3();
-  const SHADE = 0.55; // escurecimento máximo sob cabelo denso
+  const SHADE = 0.50; // Ajustado para não escurecer demais a cabeça nas transições
 
   for (let i = 0; i < n; i += 1) {
     p.set(pos.getX(i), pos.getY(i), pos.getZ(i));

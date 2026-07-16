@@ -86,18 +86,29 @@ export function receptorDensity(p: Vector3, n: Vector3, b: Bounds): number {
   return clamp01(m);
 }
 
-/** Região da orelha — nunca deve receber fios. */
+/** Região da orelha (pinna) — bloqueio preciso, sem matar o parietal. */
 function isEarRegion(
   x: number,
   y: number,
   z: number,
   n: Vector3,
 ): boolean {
-  if (x > 0.62) return true; // saliência lateral
-  // Faixa auricular (altura/profundidade típicas da orelha)
-  if (x > 0.45 && y > 0.52 && y < 0.78 && z > 0.28 && z < 0.62) {
-    if (Math.abs(n.x) > 0.5) return true;
-    if (x > 0.5) return true;
+  // Ponta da orelha (máxima saliência lateral)
+  if (x > 0.68) return true;
+  // Corpo da pinna: lateral + altura da orelha + profundidade média + normal lateral
+  if (
+    x > 0.56 &&
+    y > 0.54 &&
+    y < 0.74 &&
+    z > 0.34 &&
+    z < 0.58 &&
+    Math.abs(n.x) > 0.42
+  ) {
+    return true;
+  }
+  // Lobulo / raiz da orelha (um pouco mais baixo)
+  if (x > 0.58 && y > 0.5 && y < 0.58 && z > 0.36 && z < 0.56) {
+    return true;
   }
   return false;
 }
@@ -143,11 +154,28 @@ export function residualDensity(p: Vector3, n: Vector3, b: Bounds): number {
   const yLo = 0.58 - 0.08 * back; // ~0.50 atrás, ~0.58 nas laterais
   const yHi = 0.66 - 0.06 * back;
 
-  // Cobertura base com bordas suaves (gradiente, sem recorte quadrado)
+  // Cobertura base com bordas suaves
   let d = 1;
   d *= smoothstep(yLo, yHi, y);
   d *= 1 - smoothstep(0.62, 0.72, z); // afina em direção ao rosto
-  d *= 1 - smoothstep(0.58, 0.68, x); // afina em direção às orelhas
+
+  // Laterais: preenche bem o parietal ACIMA e ATRÁS da orelha.
+  // Só atenua na aproximação da pinna (não cria buraco na lateral).
+  const aboveEar = smoothstep(0.72, 0.8, y);
+  const behindEar = 1 - smoothstep(0.3, 0.4, z);
+  const sideSafe = Math.max(aboveEar, behindEar);
+  // Em zona segura (acima/atrás), permite x até ~0.64; na altura da orelha, corta antes
+  const xCutLo = 0.54 + 0.1 * sideSafe;
+  const xCutHi = 0.62 + 0.08 * sideSafe;
+  d *= 1 - smoothstep(xCutLo, xCutHi, x);
+
+  // Reforço da lateral parietal (a região que costumava “faltar”)
+  const parietalBoost =
+    band(x, 0.22, 0.58, 0.08) *
+    band(y, 0.7, 0.92, 0.05) *
+    (1 - smoothstep(0.5, 0.6, z));
+  d = clamp01(d + 0.35 * parietalBoost * (1 - d));
+
   // Leve rarefação no alto-frontal (AGA), sem esvaziar
   d *= 1 - 0.25 * smoothstep(0.55, 0.72, z) * smoothstep(0.72, 0.9, y);
 

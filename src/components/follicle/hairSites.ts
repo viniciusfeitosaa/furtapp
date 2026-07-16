@@ -97,10 +97,10 @@ function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
   // Bloqueios duros
-  if (y < 0.56) return false; // pescoço
+  if (y < 0.42) return false; // só corta pescoço bem baixo
   if (z > 0.6 && y < 0.9) return false; // rosto
   if (x > 0.6) return false; // ponta das orelhas
-  if (n.y < -0.08) return false;
+  if (n.y < -0.2) return false; // superfície invertida do pescoço
   // Orelha: saliência lateral na faixa auricular
   if (x > 0.4 && y < 0.76 && z > 0.3 && z < 0.58) return false;
   if (x > 0.48 && Math.abs(n.x) > 0.7 && y < 0.8) return false;
@@ -116,14 +116,15 @@ function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
     z < 0.55 &&
     n.y > -0.02 &&
     !(x > 0.38 && z > 0.32 && z < 0.56 && y < 0.76);
-  // Nuca / occipital contínuo
+  // Nuca / occipital — desce bem (preenchimento generoso)
   const nape =
-    z < 0.48 &&
-    y >= 0.58 &&
+    z < 0.5 &&
+    y >= 0.44 &&
     y < 0.9 &&
-    x < 0.55 &&
-    n.z < 0.3 &&
-    n.y > -0.05;
+    x < 0.56 &&
+    n.z < 0.35 &&
+    n.y > -0.18 &&
+    !(z > 0.35 && y < 0.55); // evita garganta/lateral do pescoço
 
   return crown || sides || nape;
 }

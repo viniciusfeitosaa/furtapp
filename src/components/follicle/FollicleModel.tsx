@@ -20,7 +20,7 @@ export type GraftCount = 0 | 1000 | 5000 | 8000;
 
 const MAX_GRAFTS = 8000;
 /** Cabelo em laterais, nuca e coroa (zona dos enxertos vazia no Calvo). */
-const RESIDUAL_HAIRS = 12000;
+const RESIDUAL_HAIRS = 14000;
 /** Tamanho único padrão dos fios (sem variação). */
 const HAIR_LEN = 0.12;
 const HAIR_THICK = 0.011;

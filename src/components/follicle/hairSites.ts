@@ -55,19 +55,20 @@ function normZ(z: number, b: Bounds) {
 
 /**
  * Couro cabeludo (calota superior): só a coroa da cabeça.
- * Fica ACIMA das orelhas e da nuca, e ignora o rosto e o pescoço.
- * A chave para excluir orelhas/pescoço/rosto é exigir normal apontando
- * para cima (n.y alto): só a superfície superior do crânio passa.
+ * Exclui orelhas (laterais salientes + normal lateral), rosto e pescoço.
  */
 function isOnScalp(p: Vector3, n: Vector3, b: Bounds): boolean {
   const y = normY(p.y, b);
   const z = normZ(p.z, b);
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
-  if (y < 0.6) return false; // abaixo disso: orelhas, rosto, pescoço
-  if (n.y < 0.22) return false; // só superfícies voltadas para cima
-  if (x > 0.9) return false; // extremidades laterais
-  if (z > 0.62 && y < 0.9) return false; // testa / rosto
+  if (y < 0.7) return false; // acima da linha das orelhas
+  if (n.y < 0.28) return false; // só calota voltada para cima
+  if (x > 0.62) return false; // corta saliência das orelhas
+  if (Math.abs(n.x) > 0.55 && n.y < 0.5) return false; // faces laterais = orelha/têmpora baixa
+  if (z > 0.58 && y < 0.9) return false; // testa / rosto
+  // Faixa das orelhas: mid-Z + lateral + altura típica
+  if (x > 0.48 && y < 0.78 && z > 0.28 && z < 0.62) return false;
   return true;
 }
 
@@ -90,11 +91,15 @@ function isReceptorPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
  */
 function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   if (!isOnScalp(p, n, b)) return false;
+  const y = normY(p.y, b);
   const z = normZ(p.z, b);
+  const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
   if (n.y > 0.52) return false; // topo fica calvo
-  if (z > 0.52) return false; // frente fica calva (entrada)
-  return true; // anel lateral + posterior
+  if (z > 0.5) return false; // frente fica calva (entrada)
+  if (x > 0.58) return false; // sem orelha
+  if (y < 0.72) return false; // bem acima das orelhas
+  return true;
 }
 
 function regionTest(region: ScalpRegion) {

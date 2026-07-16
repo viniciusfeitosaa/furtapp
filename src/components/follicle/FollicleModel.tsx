@@ -8,6 +8,9 @@ import {
   MathUtils,
   Matrix4,
   Object3D,
+  RepeatWrapping,
+  SRGBColorSpace,
+  TextureLoader,
   Vector3,
   type BufferGeometry,
   type Group,
@@ -92,6 +95,26 @@ export function FollicleModel({
   const targetCount = useRef<number>(graftCount);
 
   const geometry = useHeadGeometry();
+  const { albedo, normalMap } = useMemo(() => {
+    const loader = new TextureLoader();
+    const a = loader.load("/models/head-albedo.jpg");
+    a.flipY = false;
+    a.colorSpace = SRGBColorSpace;
+    a.wrapS = a.wrapT = RepeatWrapping;
+    a.anisotropy = 8;
+    const n = loader.load("/models/head-normal.jpg");
+    n.flipY = false;
+    n.wrapS = n.wrapT = RepeatWrapping;
+    n.anisotropy = 8;
+    return { albedo: a, normalMap: n };
+  }, []);
+
+  useLayoutEffect(() => {
+    return () => {
+      albedo.dispose();
+      normalMap.dispose();
+    };
+  }, [albedo, normalMap]);
 
   const receptorSites = useMemo(
     () => (geometry ? buildHairSites(geometry, MAX_GRAFTS, "receptor") : []),
@@ -173,19 +196,28 @@ export function FollicleModel({
       rotation={[0, 0, 0]}
     >
       <mesh geometry={geometry} castShadow receiveShadow>
+        {/*
+          Pele PBR com albedo/normal do Lee Perry-Smith.
+          Sem transmission (causava manchas); SSS aproximado via sheen + luzes.
+        */}
         <meshPhysicalMaterial
-          color="#d7a487"
-          roughness={0.78}
+          map={albedo}
+          normalMap={normalMap}
+          normalScale={[0.38, 0.38]}
+          color="#f2c9b0"
+          roughness={0.58}
           metalness={0.0}
-          clearcoat={0.06}
-          clearcoatRoughness={0.6}
-          sheen={0.18}
-          sheenRoughness={0.6}
-          sheenColor="#c9967d"
+          clearcoat={0.12}
+          clearcoatRoughness={0.48}
+          sheen={0.55}
+          sheenRoughness={0.42}
+          sheenColor="#e8a088"
+          specularIntensity={0.35}
+          ior={1.4}
         />
       </mesh>
 
-      {/* Cabelo remanescente (ferradura) — visível já no “Calvo” */}
+      {/* Cabelo remanescente (ferradura) — visível já no “Antes” */}
       <instancedMesh
         ref={residual}
         args={[undefined, undefined, RESIDUAL_HAIRS]}

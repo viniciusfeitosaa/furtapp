@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { ContactShadows, OrbitControls } from "@react-three/drei";
+import {
+  ContactShadows,
+  Environment,
+  OrbitControls,
+} from "@react-three/drei";
+import { ACESFilmicToneMapping } from "three";
 import {
   FollicleModel,
   type GraftCount,
@@ -21,36 +26,47 @@ export function FollicleCanvas({
     <div className="aspect-[16/10] w-full bg-[#0c1018] md:aspect-[21/9]">
       <Canvas
         shadows
-        camera={{ position: [0.2, 0.25, 3.8], fov: 30 }}
-        dpr={[1, 1.5]}
+        camera={{ position: [0.15, 0.2, 3.6], fov: 28 }}
+        dpr={[1, 1.75]}
         gl={{
           antialias: true,
           alpha: false,
           powerPreference: "high-performance",
-          toneMappingExposure: 1.05,
+          toneMapping: ACESFilmicToneMapping,
+          toneMappingExposure: 1.0,
         }}
         style={{ width: "100%", height: "100%" }}
       >
         <color attach="background" args={["#0c1018"]} />
 
-        <ambientLight intensity={0.28} color="#dcdfe6" />
+        {/* Ambiente de estúdio — reflexos suaves na pele */}
+        <Environment preset="studio" environmentIntensity={0.45} />
+
+        <hemisphereLight
+          intensity={0.55}
+          color="#fff2e6"
+          groundColor="#2a3038"
+        />
+        {/* Key quente */}
         <directionalLight
           castShadow
-          position={[3.4, 4.8, 2.8]}
-          intensity={1.45}
-          color="#fff4e8"
-          shadow-mapSize={[1024, 1024]}
+          position={[2.8, 4.2, 3.2]}
+          intensity={1.15}
+          color="#fff6ea"
+          shadow-mapSize={[2048, 2048]}
+          shadow-bias={-0.0002}
         />
         {/* Fill frio */}
         <directionalLight
-          position={[-2.8, 1.6, -2.2]}
-          intensity={0.4}
-          color="#96a4c9"
+          position={[-3.2, 1.8, -1.6]}
+          intensity={0.35}
+          color="#a8b4d0"
         />
-        {/* Rim dourado de marca */}
-        <pointLight position={[0.9, 1.4, 1.8]} intensity={0.4} color="#b6a46e" />
-        {/* Luz de orelha / SSS hint */}
-        <pointLight position={[-1.1, 0.1, 0.4]} intensity={0.25} color="#e07060" />
+        {/* Rim dourado */}
+        <pointLight position={[1.2, 1.6, 2.0]} intensity={0.35} color="#c4b07a" />
+        {/* SSS hint nas orelhas / laterais */}
+        <pointLight position={[-1.2, 0.15, 0.5]} intensity={0.32} color="#e07868" />
+        <pointLight position={[1.2, 0.15, 0.5]} intensity={0.28} color="#e07868" />
 
         <FollicleModel
           graftCount={graftCount}
@@ -60,9 +76,9 @@ export function FollicleCanvas({
 
         <ContactShadows
           position={[0, -1.45, 0]}
-          opacity={0.45}
+          opacity={0.4}
           scale={10}
-          blur={2.8}
+          blur={3.2}
           far={4}
         />
 

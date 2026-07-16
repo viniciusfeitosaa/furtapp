@@ -97,36 +97,35 @@ function isResidualPoint(p: Vector3, n: Vector3, b: Bounds): boolean {
   const x = Math.abs(normX(p.x, b) - 0.5) * 2;
 
   // Bloqueios duros
-  if (y < 0.42) return false; // só corta pescoço bem baixo
+  if (y < 0.62) return false; // exclui nuca e pescoço
   if (z > 0.6 && y < 0.9) return false; // rosto
   if (x > 0.6) return false; // ponta das orelhas
-  if (n.y < -0.2) return false; // superfície invertida do pescoço
+  if (n.y < -0.05) return false;
   // Orelha: saliência lateral na faixa auricular
   if (x > 0.4 && y < 0.76 && z > 0.3 && z < 0.58) return false;
   if (x > 0.48 && Math.abs(n.x) > 0.7 && y < 0.8) return false;
 
-  // Coroa residual (fora do receptor) — um pouco mais larga nas bordas
+  // Coroa residual (fora do receptor)
   const crown = y >= 0.68 && n.y > 0.2 && x <= 0.58 && z < 0.55;
-  // Laterais / parietais — faixa ampla acima e atrás da orelha
+  // Laterais / parietais — acima da orelha (não na nuca)
   const sides =
     x > 0.12 &&
     x <= 0.58 &&
-    y >= 0.64 &&
+    y >= 0.66 &&
     y < 0.92 &&
     z < 0.55 &&
     n.y > -0.02 &&
     !(x > 0.38 && z > 0.32 && z < 0.56 && y < 0.76);
-  // Nuca / occipital — desce bem (preenchimento generoso)
-  const nape =
-    z < 0.5 &&
-    y >= 0.44 &&
+  // Occipital ALTO — acima da nuca (sem descer para a nuca)
+  const aboveNape =
+    z < 0.48 &&
+    y >= 0.68 &&
     y < 0.9 &&
-    x < 0.56 &&
-    n.z < 0.35 &&
-    n.y > -0.18 &&
-    !(z > 0.35 && y < 0.55); // evita garganta/lateral do pescoço
+    x < 0.55 &&
+    n.z < 0.28 &&
+    n.y > 0.08;
 
-  return crown || sides || nape;
+  return crown || sides || aboveNape;
 }
 
 function regionTest(region: ScalpRegion) {

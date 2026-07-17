@@ -10,38 +10,70 @@ export type PlanZoneId =
   | "mid"
   | "crown";
 
-export type ReceptorZoneId = Exclude<PlanZoneId, "donor">;
-
 export type PlanZone = {
   id: PlanZoneId;
   label: string;
-  /** Fração do plano ilustrativo nas receptoras (soma ≈ 1). */
+  /** Fração do plano ilustrativo (soma das receptoras ≈ 1). */
   weight: number;
+  /** Ordem de preenchimento (menor = primeiro). */
+  order: number;
   kind: "donor" | "receptor";
 };
 
 export const PLAN_ZONES: PlanZone[] = [
-  { id: "donor", label: "Área doadora", weight: 0, kind: "donor" },
-  { id: "templeL", label: "Entrada E", weight: 0.12, kind: "receptor" },
-  { id: "templeR", label: "Entrada D", weight: 0.12, kind: "receptor" },
-  { id: "frontal", label: "Linha anterior", weight: 0.28, kind: "receptor" },
-  { id: "mid", label: "Couro médio", weight: 0.28, kind: "receptor" },
-  { id: "crown", label: "Coroa", weight: 0.2, kind: "receptor" },
+  {
+    id: "donor",
+    label: "Área doadora",
+    weight: 0,
+    order: -1,
+    kind: "donor",
+  },
+  {
+    id: "templeL",
+    label: "Entrada esquerda",
+    weight: 0.12,
+    order: 0,
+    kind: "receptor",
+  },
+  {
+    id: "templeR",
+    label: "Entrada direita",
+    weight: 0.12,
+    order: 0,
+    kind: "receptor",
+  },
+  {
+    id: "frontal",
+    label: "Linha anterior",
+    weight: 0.28,
+    order: 1,
+    kind: "receptor",
+  },
+  {
+    id: "mid",
+    label: "Couro médio",
+    weight: 0.28,
+    order: 2,
+    kind: "receptor",
+  },
+  {
+    id: "crown",
+    label: "Coroa",
+    weight: 0.2,
+    order: 3,
+    kind: "receptor",
+  },
 ];
-
-export const RECEPTOR_ZONES = PLAN_ZONES.filter(
-  (z): z is PlanZone & { id: ReceptorZoneId; kind: "receptor" } =>
-    z.kind === "receptor",
-);
 
 /** Marcos da cascata: cortes no fill global (0..1). */
-const CASCADE: { id: ReceptorZoneId; start: number; end: number }[] = [
-  { id: "templeL", start: 0.0, end: 0.22 },
-  { id: "templeR", start: 0.0, end: 0.22 },
-  { id: "frontal", start: 0.18, end: 0.52 },
-  { id: "mid", start: 0.45, end: 0.78 },
-  { id: "crown", start: 0.72, end: 1.0 },
-];
+const CASCADE: { id: Exclude<PlanZoneId, "donor">; start: number; end: number }[] =
+  [
+    { id: "templeL", start: 0.0, end: 0.22 },
+    { id: "templeR", start: 0.0, end: 0.22 },
+    { id: "frontal", start: 0.18, end: 0.52 },
+    { id: "mid", start: 0.45, end: 0.78 },
+    { id: "crown", start: 0.72, end: 1.0 },
+  ];
 
 function clamp01(v: number) {
   return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -72,44 +104,6 @@ export function zoneFills(fill: number): Record<PlanZoneId, number> {
   return out;
 }
 
-/** UFs ilustrativas alocadas por zona (proporcional ao fill × peso). */
-export function zoneGrafts(fill: number): Record<ReceptorZoneId, number> {
-  const fills = zoneFills(fill);
-  const raw: Record<ReceptorZoneId, number> = {
-    templeL: 0,
-    templeR: 0,
-    frontal: 0,
-    mid: 0,
-    crown: 0,
-  };
-  let sum = 0;
-  for (const z of RECEPTOR_ZONES) {
-    const n = fills[z.id] * z.weight * PLAN_MAX_GRAFTS;
-    raw[z.id] = n;
-    sum += n;
-  }
-  // Normaliza para bater com o total arredondado do slider
-  const target = planGrafts(fill);
-  if (sum <= 0 || target <= 0) {
-    return { templeL: 0, templeR: 0, frontal: 0, mid: 0, crown: 0 };
-  }
-  const scale = target / sum;
-  const out = { ...raw };
-  let acc = 0;
-  const ids = RECEPTOR_ZONES.map((z) => z.id);
-  for (let i = 0; i < ids.length; i += 1) {
-    const id = ids[i]!;
-    if (i === ids.length - 1) {
-      out[id] = Math.max(0, target - acc);
-    } else {
-      const n = Math.round(raw[id] * scale);
-      out[id] = n;
-      acc += n;
-    }
-  }
-  return out;
-}
-
 export function planGrafts(fill: number): number {
   return Math.round(clamp01(fill) * PLAN_MAX_GRAFTS);
 }
@@ -117,7 +111,7 @@ export function planGrafts(fill: number): number {
 export function planStage(grafts: number): {
   title: string;
   detail: string;
-  focus: PlanZoneId | "temples" | "idle";
+  focus: PlanZoneId | "idle";
 } {
   if (grafts <= 0) {
     return {
@@ -130,7 +124,7 @@ export function planStage(grafts: number): {
     return {
       title: "Entradas",
       detail: "Primeiro preenchimento das têmporas — redesenho da moldura facial",
-      focus: "temples",
+      focus: "templeL",
     };
   }
   if (grafts < 3500) {
@@ -157,13 +151,4 @@ export function planStage(grafts: number): {
 
 export function formatGrafts(n: number): string {
   return n.toLocaleString("pt-BR");
-}
-
-export function isZoneFocused(
-  zone: PlanZoneId,
-  focus: PlanZoneId | "temples" | "idle",
-): boolean {
-  if (focus === "idle") return false;
-  if (focus === "temples") return zone === "templeL" || zone === "templeR";
-  return zone === focus;
 }

@@ -10,13 +10,11 @@
 2. Slider Calvo → Máximo como gesto de decisão  
 3. Diferencial memorável — prancheta cirúrgica, não cartoon  
 
-## UI — Surgical HUD
+## UI
 
-- Seção `#0F1115`, crânio `#1E2330`, receptoras ciano `#00D2FF`, doadora âmbar `#b6a46e`
-- Vista **axial** anatômica: occipital largo, testa mais estreita, nariz (frente), orelhas translúcidas
-- Estética blueprint/HUD (grade, cantos, scanlines leves) — não ilustração terrosa
-- Uma composição: título + SVG + leitura lateral + slider
-- Sem cards; 3D fora da home
+- Seção escura `#060810`, tipografia da marca, ouro `#b6a46e`
+- Uma composição: título + SVG do couro + leitura lateral + slider
+- Sem cards; sem 2.5D; 3D sai da home (código follicle permanece no repo)
 
 ## Zonas (SVG)
 

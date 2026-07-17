@@ -31,7 +31,7 @@ function CommentCard({
           rel="noopener noreferrer"
           className="truncate text-sm font-semibold text-black transition-opacity hover:opacity-70"
         >
-          {handle}
+          @{handle}
         </a>
       </footer>
       <p className="mt-2.5 text-sm leading-relaxed text-brand-charcoal">

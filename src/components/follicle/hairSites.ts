@@ -98,26 +98,9 @@ function earKeep(p: Vector3): number {
   return smoothstep(0.85, 1.15, earDist2(p));
 }
 
-/**
- * Interior profundo da pinna (cartilagem).
- * Apertado de propósito: a orelha E da malha é maior que a D;
- * um limiar alto apagava a costeleta esquerda.
- */
+/** Interior da pinna (corte duro). Mais apertado que o fade do earKeep. */
 function isEar(p: Vector3): boolean {
-  return earDist2(p) < 0.5;
-}
-
-/** Faixa da costeleta (ambos os lados via |x|). */
-function inSideburnCorridor(p: Vector3): boolean {
-  const ax = Math.abs(p.x);
-  return (
-    ax > 1.15 &&
-    ax < 1.88 &&
-    p.y > 0.45 &&
-    p.y < 2.3 &&
-    p.z > -0.3 &&
-    p.z < 1.15
-  );
+  return earDist2(p) < 0.72;
 }
 
 /**
@@ -261,16 +244,15 @@ export function residualDensity(
   m: HeadMetrics,
 ): number {
   if (isNeck(p, n)) return 0;
-  // Pinna profunda: sem fio (mas a costeleta ao redor continua)
-  if (isEar(p) && !inSideburnCorridor(p)) return 0;
 
   const keepNape = napeKeep(p);
   if (keepNape <= 0.05) return 0;
 
   const kEar = earKeep(p);
+  if (kEar <= 0) return 0;
+
   const keepFace = faceKeep(p, n);
-  // Base do crânio — pode ser 0 perto da orelha (earKeep); costeleta entra depois
-  let d = kEar > 0 ? keepNape * kEar * keepFace : 0;
+  let d = keepNape * kEar * keepFace;
 
   // Apaga o retângulo de cabelo de crânio na faixa da costeleta
   // (senão a cunha some por baixo da faixa reta).
@@ -289,16 +271,13 @@ export function residualDensity(
     smoothstep(-0.2, 0.15, p.z);
   d *= 1 - clamp01(belowTip);
 
-  // Vão acima da orelha (ambos os lados; não depende de earKeep=0)
-  d = Math.max(
-    d,
-    clamp01(aboveEarMask(p)) * keepNape * Math.max(kEar, 0.65),
-  );
+  // Vão acima da orelha
+  d = Math.max(d, clamp01(aboveEarMask(p)) * keepNape * kEar);
 
-  // Costeleta em cunha — ESPELHADA (|x|). Ignora earKeep e o elipsoide
-  // largo da orelha E, que apagava o lado esquerdo.
+  // Costeleta em cunha — ignora earKeep (raiz da orelha).
+  // Só bloqueia interior real da pinna (isEar apertado).
   const sb = sideburnMask(p, n);
-  if (sb.density > 0.02 && !isEar(p)) {
+  if (sb.density > 0.02 && earDist2(p) >= 0.72) {
     d = Math.max(d, sb.density * keepNape);
   }
 
@@ -410,11 +389,9 @@ export function buildHairSites(
     if (d < 0.04) continue;
     if (Math.random() > Math.min(1, d + 0.08)) continue;
 
-    // Hard rejects: pinna profunda e pescoço.
-    // Costeleta (corredor lateral) não é rejeitada por isEar — a orelha E
-    // da malha é maior e engolia o lado esquerdo.
-    if (isNeck(p, nrm)) continue;
-    if (isEar(p) && !inSideburnCorridor(p)) continue;
+    // Hard rejects: só pinna e pescoço.
+    // NÃO usar isFace nas laterais — era isso que mantinha a costeleta em bloco.
+    if (isEar(p) || isNeck(p, nrm)) continue;
     if (isDeepFace(p, nrm)) continue;
 
     if (!isResidual) {
@@ -441,8 +418,7 @@ export function buildHairSites(
         .addScaledVector(t1, (Math.random() - 0.5) * 0.18)
         .addScaledVector(t2, (Math.random() - 0.5) * 0.18)
         .normalize();
-      if (isNeck(hp, hn) || isDeepFace(hp, hn)) continue;
-      if (isEar(hp) && !inSideburnCorridor(hp)) continue;
+      if (isEar(hp) || isNeck(hp, hn) || isDeepFace(hp, hn)) continue;
       pushHair(hp, hn, grow);
     }
   }

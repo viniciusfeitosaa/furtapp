@@ -73,6 +73,14 @@ export function Header() {
             Área do paciente
           </Link>
           <a
+            href={SITE.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs tracking-wide text-white/60 transition-colors hover:text-brand-gold"
+          >
+            Instagram
+          </a>
+          <a
             href={whatsappUrl()}
             target="_blank"
             rel="noopener noreferrer"
@@ -118,6 +126,15 @@ export function Header() {
             >
               Área do paciente
             </Link>
+            <a
+              href={SITE.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-white/60"
+              onClick={() => setOpen(false)}
+            >
+              Instagram {SITE.instagramHandle}
+            </a>
             <Link
               href="/admin/login"
               className="text-sm text-white/40"

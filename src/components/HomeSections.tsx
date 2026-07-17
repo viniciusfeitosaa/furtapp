@@ -5,6 +5,11 @@ import { ResultsVideo } from "@/components/ResultsVideo";
 import { Reveal } from "@/components/Reveal";
 import { ScrollZoomImage } from "@/components/ScrollZoomImage";
 import { FAQ_ITEMS } from "@/lib/faq";
+import { SITE } from "@/lib/site";
+import {
+  TESTIMONIALS,
+  instagramProfileUrl,
+} from "@/lib/testimonials";
 
 export function SectionShell({
   id,
@@ -319,7 +324,7 @@ export function HomeSections() {
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(105deg, rgba(26,32,53,0.94) 0%, rgba(26,32,53,0.88) 32%, rgba(26,32,53,0.55) 55%, rgba(26,32,53,0.22) 75%, transparent 100%), linear-gradient(180deg, rgba(26,32,53,0.45) 0%, transparent 24%, transparent 76%, rgba(26,32,53,0.55) 100%)",
+                "linear-gradient(105deg, rgba(26,32,53,0.96) 0%, rgba(26,32,53,0.92) 36%, rgba(26,32,53,0.62) 58%, rgba(26,32,53,0.28) 78%, transparent 100%), linear-gradient(180deg, rgba(26,32,53,0.5) 0%, transparent 20%, transparent 80%, rgba(26,32,53,0.6) 100%)",
             }}
           />
         </div>
@@ -338,11 +343,50 @@ export function HomeSections() {
           <div className="mt-8">
             <Reveal delayMs={120}>
               <p className="font-serif-body max-w-xl text-lg text-white/85 md:max-w-2xl">
-                Estamos reunindo os relatos dos pacientes que já concluíram o
-                acompanhamento de 12 meses. Em breve, você vai poder ler a
-                experiência de quem passou por cada etapa — da avaliação ao
-                resultado final.
+                Comentários reais de quem acompanha o trabalho no Instagram —{" "}
+                <a
+                  href={SITE.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white underline decoration-brand-gold underline-offset-4 transition-colors hover:text-brand-gold"
+                >
+                  {SITE.instagramHandle}
+                </a>
+                .
               </p>
+            </Reveal>
+
+            <ul className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {TESTIMONIALS.map((item, i) => (
+                <Reveal key={item.handle} as="li" delayMs={Math.min(80 + i * 50, 320)}>
+                  <blockquote className="border-t border-white/20 pt-5">
+                    <p className="font-serif-body text-base leading-relaxed text-white/90">
+                      “{item.quote}”
+                    </p>
+                    <footer className="mt-4">
+                      <a
+                        href={instagramProfileUrl(item.handle)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm tracking-wide text-brand-gold transition-colors hover:text-brand-gold-soft"
+                      >
+                        @{item.handle}
+                      </a>
+                    </footer>
+                  </blockquote>
+                </Reveal>
+              ))}
+            </ul>
+
+            <Reveal delayMs={200}>
+              <a
+                href={SITE.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-12 inline-flex items-center border border-brand-gold/70 px-5 py-3 text-xs font-semibold tracking-[0.16em] uppercase text-brand-gold transition-colors hover:border-brand-gold hover:bg-brand-gold hover:text-brand-charcoal"
+              >
+                Ver no Instagram
+              </a>
             </Reveal>
           </div>
         </div>

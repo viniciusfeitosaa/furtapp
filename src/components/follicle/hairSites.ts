@@ -200,11 +200,15 @@ function sideburnMask(
   const densX = 1 - smoothstep(1.55, 1.82, ax);
   const density = clamp01(core * densY * densZ * densX);
 
-  // Comprimento: curto na ponta da costeleta (visualmente some o "bloco")
+  // Comprimento: bem curto na ponta (diferença visual clara vs bloco antigo)
   const grow = mix(
-    0.28,
+    0.12,
     1,
-    clamp01(smoothstep(0.45, 1.35, p.y) * (1 - smoothstep(0.85, 1.4, p.z))),
+    clamp01(
+      smoothstep(0.4, 1.45, p.y) *
+        (1 - smoothstep(0.65, 1.25, p.z)) *
+        (1 - smoothstep(1.5, 1.78, ax)),
+    ),
   );
 
   return { density, grow };

@@ -98,8 +98,9 @@ function earKeep(p: Vector3): number {
   return smoothstep(0.85, 1.15, earDist2(p));
 }
 
+/** Interior da pinna (corte duro). Mais apertado que o fade do earKeep. */
 function isEar(p: Vector3): boolean {
-  return earDist2(p) < 0.95;
+  return earDist2(p) < 0.72;
 }
 
 /**
@@ -267,10 +268,10 @@ export function residualDensity(
   // Vão acima da orelha
   d = Math.max(d, clamp01(aboveEarMask(p)) * keepNape * kEar);
 
-  // Costeleta em cunha — NÃO multiplicar por earKeep (a raiz da orelha
-  // fica dentro do fade da pinna e apagava o miolo da costeleta).
+  // Costeleta em cunha — ignora earKeep (raiz da orelha).
+  // Só bloqueia interior real da pinna (isEar apertado).
   const sb = sideburnMask(p, n);
-  if (sb.density > 0.02 && !isEar(p)) {
+  if (sb.density > 0.02 && earDist2(p) >= 0.72) {
     d = Math.max(d, sb.density * keepNape);
   }
 

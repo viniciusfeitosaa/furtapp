@@ -260,10 +260,16 @@ export function residualDensity(
   const sideRect =
     smoothstep(1.15, 1.38, ax) *
     (1 - smoothstep(1.7, 1.92, ax)) *
-    smoothstep(0.4, 0.65, p.y) *
+    smoothstep(0.3, 0.55, p.y) *
     (1 - smoothstep(2.05, 2.45, p.y)) *
-    smoothstep(-0.3, 0.05, p.z);
+    smoothstep(-0.35, 0.0, p.z);
   d *= 1 - clamp01(sideRect) * 0.97;
+  // Abaixo da ponta da costeleta: zero residual lateral (sem “barra” no maxilar)
+  const belowTip =
+    smoothstep(1.15, 1.38, ax) *
+    (1 - smoothstep(0.55, 0.75, p.y)) *
+    smoothstep(-0.2, 0.15, p.z);
+  d *= 1 - clamp01(belowTip);
 
   // Vão acima da orelha
   d = Math.max(d, clamp01(aboveEarMask(p)) * keepNape * kEar);

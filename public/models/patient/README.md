@@ -1,6 +1,11 @@
-# Assets do paciente — fotogrametria + density map
+# Assets do paciente — Modo A (fotogrametria 3D)
 
-Ative o modo realista colocando os três arquivos nesta pasta e mudando `manifest.json` → `"enabled": true`.
+O site tem dois simuladores na seção Planejamento:
+
+- **Foto 2.5D (B)** — já funciona no site (placeholder ilustrado)
+- **3D fotogrametria (A)** — ativa com os arquivos abaixo + `enabled: true`
+
+Ative o modo 3D colocando os três arquivos nesta pasta e mudando `manifest.json` → `"enabled": true`.
 
 ## Arquivos obrigatórios
 

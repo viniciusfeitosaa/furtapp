@@ -1,4 +1,4 @@
-import { FollicleSection } from "@/components/follicle/FollicleSection";
+import { PlanningSection } from "@/components/planner/PlanningSection";
 import { FaqJsonLd } from "@/components/JsonLd";
 import { JourneyTrack } from "@/components/JourneyTrack";
 import { Reveal } from "@/components/Reveal";
@@ -247,7 +247,7 @@ export function HomeSections() {
             </ul>
           </div>
         </div>
-        <FollicleSection />
+        <PlanningSection />
       </section>
 
       <SectionShell

@@ -8,6 +8,8 @@ import {
   zoneFills,
 } from "@/lib/planningMap";
 
+const HEAD_PHOTO = "/media/head-axial-scan.jpg";
+
 type Props = {
   /** 0..1 */
   fill: number;
@@ -18,92 +20,74 @@ type Props = {
 type Follicle = { x: number; y: number; a: number; len: number };
 
 /**
- * Silhueta de CABEÇA vista de cima (axial), não oval:
- * - testa estreita / quase reta
- * - reentrâncias temporais (entradas)
- * - máxima largura nas orelhas / parietal
- * - occipital largo e arredondado
- * viewBox 0 0 420 520 · frente = topo
+ * Máscara suave alinhada à foto axial (testa cima, nuca baixo, orelhas laterais).
+ * Um pouco mais “cabeça real” e menos esquemática — a foto carrega a anatomia.
  */
 const SCALP = [
-  "M210 68",
-  // testa direita (estreita)
-  "C238 68 258 74 268 92",
-  "C278 110 282 128 276 148",
-  // reentrância temporal D (entrada)
-  "C268 165 262 178 268 198",
-  // sai para a orelha / parietal D (bem largo)
-  "C278 225 302 250 318 285",
-  "C332 318 338 355 330 395",
-  // occipital D → nuca larga
-  "C320 435 285 468 210 474",
-  // occipital E
-  "C135 468 100 435 90 395",
-  "C82 355 88 318 102 285",
-  // parietal / orelha E
-  "C118 250 142 225 152 198",
-  // reentrância temporal E
-  "C158 178 152 165 145 148",
-  "C138 128 142 110 152 92",
-  "C162 74 182 68 210 68",
+  "M210 62",
+  "C248 62 275 78 288 108",
+  "C300 138 302 165 295 190",
+  "C308 215 328 245 338 285",
+  "C348 325 346 365 330 405",
+  "C310 450 265 478 210 482",
+  "C155 478 110 450 90 405",
+  "C74 365 72 325 82 285",
+  "C92 245 112 215 125 190",
+  "C118 165 120 138 132 108",
+  "C145 78 172 62 210 62",
   "Z",
 ].join(" ");
 
-/** Miolo receptor (vazio da ferradura). */
 const RECEPTOR_CORE = [
-  "M210 118",
-  "C242 118 265 140 272 182",
-  "C280 228 268 285 240 322",
-  "C225 340 195 340 180 322",
-  "C152 285 140 228 148 182",
-  "C155 140 178 118 210 118",
+  "M210 115",
+  "C248 115 272 140 278 185",
+  "C286 235 272 295 242 330",
+  "C225 348 195 348 178 330",
+  "C148 295 134 235 142 185",
+  "C148 140 172 115 210 115",
   "Z",
 ].join(" ");
 
 const DONOR = `${SCALP} ${RECEPTOR_CORE}`;
 
 const ZONE_PATH: Record<ReceptorZoneId, string> = {
-  // Cunhas nas reentrâncias temporais
   templeL: [
-    "M148 130",
-    "C138 148 136 172 145 200",
-    "C162 192 172 175 174 155",
-    "C172 140 162 128 148 130",
+    "M140 125",
+    "C128 148 126 178 138 208",
+    "C158 198 170 178 172 155",
+    "C170 138 158 124 140 125",
     "Z",
   ].join(" "),
   templeR: [
-    "M272 130",
-    "C286 128 276 140 274 155",
-    "C276 175 286 192 303 200",
-    "C312 172 310 148 300 130",
-    "C288 128 278 128 272 130",
+    "M280 125",
+    "C298 124 286 138 284 155",
+    "C286 178 298 198 318 208",
+    "C330 178 328 148 316 125",
+    "C300 124 288 124 280 125",
     "Z",
   ].join(" "),
-  // Faixa frontal estreita (testa)
   frontal: [
-    "M168 95",
-    "C188 82 232 82 252 95",
-    "C258 112 250 132 232 140",
-    "C218 132 202 130 188 140",
-    "C170 132 162 112 168 95",
+    "M162 92",
+    "C186 78 234 78 258 92",
+    "C264 110 254 132 234 140",
+    "C218 132 202 130 186 140",
+    "C166 132 156 110 162 92",
     "Z",
   ].join(" "),
-  // Escudo no meio
   mid: [
-    "M165 155",
-    "C190 142 230 142 255 155",
-    "C268 190 265 245 242 278",
-    "C220 266 200 264 178 278",
-    "C155 245 152 190 165 155",
+    "M160 152",
+    "C188 138 232 138 260 152",
+    "C274 190 270 248 246 282",
+    "C222 270 198 268 174 282",
+    "C150 248 146 190 160 152",
     "Z",
   ].join(" "),
-  // Coroa — mais atrás, sobre o vértice
   crown: [
-    "M210 288",
-    "C236 288 256 308 256 334",
-    "C256 360 236 380 210 380",
-    "C184 380 164 360 164 334",
-    "C164 308 184 288 210 288",
+    "M210 295",
+    "C238 295 258 315 258 342",
+    "C258 369 238 389 210 389",
+    "C182 389 162 369 162 342",
+    "C162 315 182 295 210 295",
     "Z",
   ].join(" "),
 };
@@ -123,44 +107,44 @@ const ZONE_META: Record<
   }
 > = {
   templeL: {
-    cx: 158,
-    cy: 162,
-    rx: 18,
-    ry: 32,
-    n: 34,
+    cx: 152,
+    cy: 160,
+    rx: 20,
+    ry: 34,
+    n: 32,
     bias: -0.9,
     label: "E",
-    lx: 118,
-    ly: 165,
+    lx: 112,
+    ly: 162,
   },
   templeR: {
-    cx: 262,
-    cy: 162,
-    rx: 18,
-    ry: 32,
-    n: 34,
+    cx: 268,
+    cy: 160,
+    rx: 20,
+    ry: 34,
+    n: 32,
     bias: 0.9,
     label: "D",
-    lx: 302,
-    ly: 165,
+    lx: 308,
+    ly: 162,
   },
   frontal: {
     cx: 210,
-    cy: 112,
-    rx: 42,
+    cy: 110,
+    rx: 44,
     ry: 22,
-    n: 48,
+    n: 44,
     bias: -0.1,
     label: "LINHA",
     lx: 210,
-    ly: 108,
+    ly: 105,
   },
   mid: {
     cx: 210,
     cy: 210,
-    rx: 48,
-    ry: 52,
-    n: 70,
+    rx: 50,
+    ry: 54,
+    n: 64,
     bias: 0.05,
     label: "MÉDIO",
     lx: 210,
@@ -168,14 +152,14 @@ const ZONE_META: Record<
   },
   crown: {
     cx: 210,
-    cy: 334,
+    cy: 342,
     rx: 36,
     ry: 34,
-    n: 46,
+    n: 42,
     bias: 0.25,
     label: "COROA",
     lx: 210,
-    ly: 338,
+    ly: 346,
   },
 };
 
@@ -199,49 +183,18 @@ function makeFollicles(
     tries += 1;
     const t = 2 * Math.PI * rnd();
     const r = Math.sqrt(rnd());
-    if (r > 0.96) continue;
+    if (r > 0.95) continue;
     const x = cx + Math.cos(t) * r * rx;
     const y = cy + Math.sin(t) * r * ry;
     const outward = Math.atan2(y - 260, x - 210);
     out.push({
       x,
       y,
-      a: angleBias + outward * 0.3 + (rnd() - 0.5) * 0.45,
-      len: 2.6 + rnd() * 3,
+      a: angleBias + outward * 0.3 + (rnd() - 0.5) * 0.4,
+      len: 2.4 + rnd() * 2.8,
     });
   }
   return out;
-}
-
-function makeDonorHair(): Follicle[] {
-  const pts: Follicle[] = [];
-  // Laterais largas (parietal → orelha)
-  for (let i = 0; i < 70; i += 1) {
-    const side = i % 2 === 0 ? -1 : 1;
-    const t = 0.35 + (Math.floor(i / 2) / 34) * 1.1;
-    const r = 135 + (i % 5) * 10;
-    const x = 210 + side * Math.sin(t) * r;
-    const y = 270 + Math.cos(t) * r * 0.72;
-    // só fora do miolo
-    if (Math.hypot((x - 210) / 70, (y - 230) / 95) < 1.02) continue;
-    if (y < 160) continue;
-    pts.push({
-      x,
-      y,
-      a: side * 0.7 + (i % 5) * 0.05,
-      len: 3.2 + (i % 4) * 0.7,
-    });
-  }
-  // Nuca larga
-  for (let i = 0; i < 42; i += 1) {
-    pts.push({
-      x: 130 + (i % 10) * 16 + (i % 3) * 2,
-      y: 400 + Math.floor(i / 10) * 14 + (i % 2) * 3,
-      a: (i % 6) * 0.08 - 0.2,
-      len: 3 + (i % 3) * 0.6,
-    });
-  }
-  return pts;
 }
 
 export function ScalpMapSvg({
@@ -255,51 +208,69 @@ export function ScalpMapSvg({
     const map = {} as Record<ReceptorZoneId, Follicle[]>;
     (Object.keys(ZONE_META) as ReceptorZoneId[]).forEach((id, i) => {
       const z = ZONE_META[id];
-      map[id] = makeFollicles(z.cx, z.cy, z.rx, z.ry, z.n, 14000 + i * 149, z.bias);
+      map[id] = makeFollicles(z.cx, z.cy, z.rx, z.ry, z.n, 16000 + i * 151, z.bias);
     });
     return map;
   }, []);
-  const donorHair = useMemo(() => makeDonorHair(), []);
 
   return (
     <svg
       viewBox="0 0 420 520"
       className={className}
       role="img"
-      aria-label="Mapa axial da cabeça — visão de cima do couro cabeludo"
+      aria-label="Scanner axial sobre foto real do couro cabeludo"
     >
       <defs>
-        <radialGradient id={`skull-${uid}`} cx="50%" cy="38%" r="65%">
-          <stop offset="0%" stopColor="#2c3448" />
-          <stop offset="50%" stopColor="#1e2330" />
-          <stop offset="100%" stopColor="#141820" />
-        </radialGradient>
-        <linearGradient id={`donor-${uid}`} x1="50%" y1="20%" x2="50%" y2="100%">
-          <stop offset="0%" stopColor="#c9a84c" stopOpacity="0.2" />
-          <stop offset="55%" stopColor="#b6a46e" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#8a7438" stopOpacity="0.58" />
-        </linearGradient>
-        <radialGradient id={`cyan-${uid}`} cx="50%" cy="40%" r="70%">
-          <stop offset="0%" stopColor="#5ee7ff" stopOpacity="0.55" />
-          <stop offset="100%" stopColor="#00d2ff" stopOpacity="0.28" />
-        </radialGradient>
         <clipPath id={`clip-${uid}`}>
           <path d={SCALP} />
         </clipPath>
+        <linearGradient id={`donor-${uid}`} x1="50%" y1="15%" x2="50%" y2="100%">
+          <stop offset="0%" stopColor="#c9a84c" stopOpacity="0.18" />
+          <stop offset="60%" stopColor="#b6a46e" stopOpacity="0.32" />
+          <stop offset="100%" stopColor="#8a7438" stopOpacity="0.45" />
+        </linearGradient>
+        <radialGradient id={`cyan-${uid}`} cx="50%" cy="40%" r="70%">
+          <stop offset="0%" stopColor="#5ee7ff" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#00d2ff" stopOpacity="0.22" />
+        </radialGradient>
+        {/* Tom de scanner clínico sobre a foto */}
+        <filter id={`scanTone-${uid}`} colorInterpolationFilters="sRGB">
+          <feColorMatrix
+            type="matrix"
+            values="
+              0.35 0.35 0.35 0 0.02
+              0.42 0.48 0.55 0 0.06
+              0.55 0.62 0.75 0 0.14
+              0    0    0    1 0"
+          />
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="1.05" intercept="0.02" />
+            <feFuncG type="linear" slope="1.08" intercept="0.03" />
+            <feFuncB type="linear" slope="1.15" intercept="0.06" />
+          </feComponentTransfer>
+        </filter>
+        <radialGradient id={`vignette-${uid}`} cx="50%" cy="45%" r="55%">
+          <stop offset="55%" stopColor="#0f1115" stopOpacity="0" />
+          <stop offset="100%" stopColor="#0f1115" stopOpacity="0.55" />
+        </radialGradient>
         <pattern
-          id={`scan-${uid}`}
-          width="4"
-          height="4"
+          id={`scanlines-${uid}`}
+          width="3"
+          height="3"
           patternUnits="userSpaceOnUse"
         >
-          <path d="M0 2 H4" stroke="rgba(0,210,255,0.05)" strokeWidth="1" />
+          <path d="M0 1.5 H3" stroke="rgba(0,210,255,0.07)" strokeWidth="1" />
         </pattern>
+        <linearGradient id={`hudTop-${uid}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0f1115" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#0f1115" stopOpacity="0" />
+        </linearGradient>
       </defs>
 
       <rect width="420" height="520" fill="#0f1115" />
 
-      {/* Grade HUD */}
-      <g opacity="0.12" stroke="#3d4a63" strokeWidth="0.6" fill="none">
+      {/* Grade HUD de fundo */}
+      <g opacity="0.1" stroke="#3d4a63" strokeWidth="0.6" fill="none">
         {Array.from({ length: 13 }, (_, i) => (
           <line key={`v${i}`} x1={30 + i * 30} y1={24} x2={30 + i * 30} y2={496} />
         ))}
@@ -307,13 +278,7 @@ export function ScalpMapSvg({
           <line key={`h${i}`} x1={30} y1={24 + i * 30} x2={390} y2={24 + i * 30} />
         ))}
       </g>
-      <g stroke="rgba(0,210,255,0.1)" strokeWidth="0.7" fill="none">
-        <ellipse cx="210" cy="270" rx="48" ry="58" />
-        <ellipse cx="210" cy="270" rx="95" ry="115" />
-        <line x1="210" y1="60" x2="210" y2="485" />
-      </g>
 
-      {/* Cantos */}
       <g stroke="rgba(0,210,255,0.45)" strokeWidth="1.2" fill="none">
         <path d="M20 20 H50 M20 20 V50" />
         <path d="M400 20 H370 M400 20 V50" />
@@ -321,89 +286,84 @@ export function ScalpMapSvg({
         <path d="M400 500 H370 M400 500 V470" />
       </g>
 
-      {/* NARIZ — saliência frontal clara */}
-      <g transform="translate(210 48)">
-        <path
-          d="M0 2 L-14 26 Q0 34 14 26 Z"
-          fill="rgba(0,210,255,0.1)"
-          stroke="rgba(0,210,255,0.75)"
-          strokeWidth="1.3"
-        />
-        <path
-          d="M-5 14 Q0 18 5 14"
-          fill="none"
-          stroke="rgba(0,210,255,0.45)"
-          strokeWidth="0.9"
-        />
-        <circle cx="0" cy="10" r="1.6" fill="rgba(94,231,255,0.9)" />
-      </g>
       <text
         x="210"
-        y="32"
+        y="30"
         textAnchor="middle"
-        fill="rgba(0,210,255,0.75)"
+        fill="rgba(0,210,255,0.7)"
         fontSize="9"
-        letterSpacing="0.34em"
+        letterSpacing="0.32em"
         style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
       >
-        FRENTE · NARIZ
+        FRENTE
       </text>
-
-      {/* ORELHAS — na máxima largura parietal */}
-      <Ear side="left" />
-      <Ear side="right" />
       <text
-        x="48"
-        y="310"
+        x="34"
+        y="64"
         fill="rgba(0,210,255,0.4)"
-        fontSize="7"
-        letterSpacing="0.1em"
+        fontSize="8"
+        letterSpacing="0.16em"
         style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
       >
-        ORELHA
+        LIVE SCAN
       </text>
       <text
-        x="372"
-        y="310"
+        x="386"
+        y="64"
         textAnchor="end"
         fill="rgba(0,210,255,0.4)"
-        fontSize="7"
-        letterSpacing="0.1em"
+        fontSize="8"
+        letterSpacing="0.16em"
         style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
       >
-        ORELHA
+        AXIAL CAM
       </text>
 
+      {/* === FOTO DA CABEÇA + overlay de scanner === */}
       <g clipPath={`url(#clip-${uid})`}>
-        <path d={SCALP} fill={`url(#skull-${uid})`} />
-        <path d={SCALP} fill={`url(#scan-${uid})`} />
+        <image
+          href={HEAD_PHOTO}
+          x="48"
+          y="48"
+          width="324"
+          height="424"
+          preserveAspectRatio="xMidYMid slice"
+          filter={`url(#scanTone-${uid})`}
+        />
+        {/* Tint ciano clínico */}
+        <rect
+          x="40"
+          y="40"
+          width="340"
+          height="440"
+          fill="rgba(0, 80, 120, 0.28)"
+        />
+        <rect
+          x="40"
+          y="40"
+          width="340"
+          height="440"
+          fill={`url(#scanlines-${uid})`}
+        />
+        <rect
+          x="40"
+          y="40"
+          width="340"
+          height="440"
+          fill={`url(#vignette-${uid})`}
+        />
 
-        {/* Sombra na testa (volume) */}
-        <ellipse cx="210" cy="100" rx="48" ry="22" fill="rgba(0,0,0,0.2)" />
-
-        {/* Doadora */}
+        {/* Doadora — âmbar translúcido sobre a ferradura real da foto */}
         <path d={DONOR} fill={`url(#donor-${uid})`} fillRule="evenodd" />
         <path
           d={DONOR}
           fill="none"
           fillRule="evenodd"
-          stroke="rgba(182,164,110,0.5)"
-          strokeWidth="1.15"
+          stroke="rgba(182,164,110,0.55)"
+          strokeWidth="1.2"
         />
 
-        <g stroke="rgba(226,211,160,0.38)" strokeLinecap="round">
-          {donorHair.map((f, i) => (
-            <line
-              key={i}
-              x1={f.x}
-              y1={f.y}
-              x2={f.x + Math.sin(f.a) * f.len}
-              y2={f.y - Math.cos(f.a) * f.len}
-              strokeWidth={0.85 + (i % 3) * 0.15}
-            />
-          ))}
-        </g>
-
+        {/* Zonas receptoras */}
         {(Object.keys(ZONE_PATH) as ReceptorZoneId[]).map((id) => (
           <ZonePath
             key={id}
@@ -414,6 +374,7 @@ export function ScalpMapSvg({
           />
         ))}
 
+        {/* Unidades foliculares do plano (só onde o slider preenche) */}
         {(Object.keys(follicles) as ReceptorZoneId[]).map((id) => {
           const level = fills[id];
           if (level <= 0.02) return null;
@@ -422,9 +383,9 @@ export function ScalpMapSvg({
           return (
             <g
               key={id}
-              stroke="rgba(8, 36, 48, 0.88)"
+              stroke="rgba(8, 30, 42, 0.75)"
               strokeLinecap="round"
-              opacity={0.55 + level * 0.4}
+              opacity={0.5 + level * 0.45}
             >
               {pts.slice(0, n).map((f, i) => (
                 <line
@@ -441,28 +402,35 @@ export function ScalpMapSvg({
         })}
       </g>
 
-      {/* Contorno da cabeça */}
+      {/* Contorno scanner */}
       <path
         d={SCALP}
         fill="none"
-        stroke="rgba(170,190,220,0.65)"
-        strokeWidth="1.7"
+        stroke="rgba(0,210,255,0.55)"
+        strokeWidth="1.6"
       />
       <path
         d={SCALP}
         fill="none"
-        stroke="rgba(0,210,255,0.22)"
-        strokeWidth="3.2"
+        stroke="rgba(0,210,255,0.18)"
+        strokeWidth="4"
       />
 
-      {/* Linha anterior — segue a testa estreita */}
+      {/* Mira / retícula */}
+      <g stroke="rgba(0,210,255,0.2)" strokeWidth="0.8" fill="none">
+        <ellipse cx="210" cy="250" rx="52" ry="62" />
+        <line x1="210" y1="90" x2="210" y2="455" />
+        <line x1="95" y1="250" x2="325" y2="250" />
+      </g>
+
+      {/* Linha anterior */}
       <path
-        d="M158 118 C180 100 200 108 210 104 C220 108 240 100 262 118"
+        d="M155 118 C180 98 200 106 210 102 C220 106 240 98 265 118"
         fill="none"
         stroke="#00d2ff"
         strokeWidth={1.2 + fills.frontal * 1.8}
         strokeLinecap="round"
-        opacity={0.22 + fills.frontal * 0.72}
+        opacity={0.25 + fills.frontal * 0.7}
       />
 
       {/* Fluxo doadora → receptora */}
@@ -472,20 +440,13 @@ export function ScalpMapSvg({
         strokeWidth="1.1"
         strokeLinecap="round"
         strokeDasharray="3 4"
-        opacity={0.18 + Math.min(fill, 0.4) * 0.75}
+        opacity={0.2 + Math.min(fill, 0.4) * 0.7}
       >
-        <path d="M148 400 C152 340 158 280 168 220" />
-        <path d="M272 400 C268 340 262 280 252 220" />
-      </g>
-      <g
-        fill="rgba(182,164,110,0.7)"
-        opacity={0.18 + Math.min(fill, 0.4) * 0.75}
-      >
-        <polygon points="168,214 174,226 162,224" />
-        <polygon points="252,214 258,224 246,226" />
+        <path d="M150 400 C154 340 160 280 170 220" />
+        <path d="M270 400 C266 340 260 280 250 220" />
       </g>
 
-      {/* Labels */}
+      {/* Labels de zona */}
       {(Object.keys(ZONE_META) as ReceptorZoneId[]).map((id) => {
         const level = fills[id];
         const m = ZONE_META[id];
@@ -501,11 +462,11 @@ export function ScalpMapSvg({
               active
                 ? "rgba(94,231,255,0.95)"
                 : level > 0.15
-                  ? "rgba(0,210,255,0.75)"
-                  : "rgba(160,180,210,0.4)"
+                  ? "rgba(0,210,255,0.8)"
+                  : "rgba(200,220,240,0.45)"
             }
             fontSize={id === "templeL" || id === "templeR" ? 13 : 9}
-            letterSpacing="0.16em"
+            letterSpacing="0.14em"
             style={{
               fontFamily: "var(--font-poppins), system-ui, sans-serif",
               fontWeight: 600,
@@ -522,63 +483,12 @@ export function ScalpMapSvg({
         textAnchor="middle"
         fill="rgba(182,164,110,0.55)"
         fontSize="9"
-        letterSpacing="0.26em"
+        letterSpacing="0.24em"
         style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
       >
         OCCIPITAL · DOADORA
       </text>
-
-      <text
-        x="34"
-        y="68"
-        fill="rgba(0,210,255,0.4)"
-        fontSize="8"
-        letterSpacing="0.18em"
-        style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
-      >
-        AXIAL
-      </text>
-      <text
-        x="386"
-        y="68"
-        textAnchor="end"
-        fill="rgba(0,210,255,0.4)"
-        fontSize="8"
-        letterSpacing="0.18em"
-        style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
-      >
-        HEAD MAP
-      </text>
     </svg>
-  );
-}
-
-/** Orelha no ponto de máxima largura da cabeça. */
-function Ear({ side }: { side: "left" | "right" }) {
-  const mirror = side === "right" ? "translate(420 0) scale(-1 1)" : undefined;
-  return (
-    <g transform={mirror}>
-      <path
-        d={[
-          "M96 255",
-          "C72 262 58 282 60 308",
-          "C62 332 78 350 98 354",
-          "C92 338 88 318 92 298",
-          "C96 280 108 268 118 262",
-          "C110 256 102 254 96 255",
-          "Z",
-        ].join(" ")}
-        fill="rgba(0,210,255,0.07)"
-        stroke="rgba(0,210,255,0.55)"
-        strokeWidth="1.25"
-      />
-      <path
-        d="M88 280 C78 290 76 312 84 330"
-        fill="none"
-        stroke="rgba(0,210,255,0.35)"
-        strokeWidth="1"
-      />
-    </g>
   );
 }
 
@@ -597,16 +507,16 @@ function ZonePath({
   return (
     <path
       d={d}
-      fill={empty ? "rgba(0,210,255,0.06)" : `url(#${gradId})`}
-      fillOpacity={empty ? 1 : 0.2 + fill * 0.75}
+      fill={empty ? "rgba(0,210,255,0.05)" : `url(#${gradId})`}
+      fillOpacity={empty ? 1 : 0.18 + fill * 0.62}
       stroke={
         active
           ? "rgba(94,231,255,0.95)"
           : empty
-            ? "rgba(0,210,255,0.28)"
-            : "rgba(0,210,255,0.65)"
+            ? "rgba(0,210,255,0.35)"
+            : "rgba(0,210,255,0.7)"
       }
-      strokeWidth={active ? 2 : 1.15}
+      strokeWidth={active ? 2 : 1.2}
       strokeDasharray={empty ? "4 3" : undefined}
       style={{
         transition:

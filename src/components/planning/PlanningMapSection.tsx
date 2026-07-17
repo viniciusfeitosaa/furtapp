@@ -41,7 +41,7 @@ export function PlanningMapSection() {
       <div className="mx-auto max-w-6xl">
         <Reveal>
           <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-[#5ee7ff] uppercase">
-            Planejamento · Scan axial
+            Planejamento · Scanner axial
           </p>
         </Reveal>
         <Reveal delayMs={80}>
@@ -160,17 +160,17 @@ export function PlanningMapSection() {
               <ul className="grid gap-2.5 text-sm text-white/45">
                 <Legend
                   color="#b6a46e"
-                  label="Doadora — âmbar (ferradura / nuca)"
+                  label="Doadora — overlay âmbar na ferradura"
                 />
                 <Legend
                   color="transparent"
                   border="#00d2ff"
                   dashed
-                  label="Receptora vazia — ciano tracejado"
+                  label="Receptora — zona de planejamento"
                 />
                 <Legend
                   color="#00d2ff"
-                  label="Plano ativo — densidade em unidades"
+                  label="Scan HUD — densidade do plano"
                 />
               </ul>
             </Reveal>

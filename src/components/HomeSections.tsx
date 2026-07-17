@@ -1,6 +1,7 @@
 import { PlanningMapSection } from "@/components/planning/PlanningMapSection";
 import { FaqJsonLd } from "@/components/JsonLd";
 import { JourneyTrack } from "@/components/JourneyTrack";
+import { ResultsVideo } from "@/components/ResultsVideo";
 import { Reveal } from "@/components/Reveal";
 import { ScrollZoomImage } from "@/components/ScrollZoomImage";
 import { FAQ_ITEMS } from "@/lib/faq";
@@ -276,20 +277,31 @@ export function HomeSections() {
       <SectionShell
         id="resultados"
         eyebrow="Prova visual"
-        title="Resultados reais, com o consentimento de quem viveu"
+        title="Acompanhamento real — do consultório ao resultado"
       >
-        <Reveal delayMs={120}>
-          <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-            Estamos organizando os primeiros casos autorizados para publicação. Se
-            quiser ver o critério de acompanhamento usado em cada caso, veja como
-            funciona o{" "}
+        <Reveal delayMs={80}>
+          <p className="font-serif-body max-w-2xl text-base leading-relaxed text-brand-charcoal sm:text-lg">
+            Um olhar sobre o acompanhamento de um paciente e o trabalho clínico
+            do Dr. Francisco Furtado — o mesmo critério que guia cada etapa do
+            protocolo de{" "}
             <a
               href="#jornada"
               className="text-black underline decoration-brand-gold underline-offset-4"
             >
-              protocolo de 12 meses pós-operatório
+              12 meses pós-operatório
             </a>
             .
+          </p>
+        </Reveal>
+
+        <Reveal delayMs={160} variant="scale" className="mt-8 sm:mt-10">
+          <ResultsVideo />
+        </Reveal>
+
+        <Reveal delayMs={220}>
+          <p className="mt-5 text-center text-xs leading-relaxed tracking-wide text-brand-gray sm:mt-6">
+            Conteúdo real, publicado com consentimento. O resultado individual
+            varia conforme avaliação, área doadora e aderência ao pós-operatório.
           </p>
         </Reveal>
       </SectionShell>

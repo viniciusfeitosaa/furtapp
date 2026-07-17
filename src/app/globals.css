@@ -71,19 +71,39 @@ body {
   font-family: var(--font-script), cursive;
 }
 
-/* --- Motion Pacote A --- */
+/* --- Motion Pacote A (scroll reveal) --- */
 .ff-reveal {
   opacity: 0;
-  transform: translateY(16px);
+  will-change: opacity, transform;
   transition:
-    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--ff-reveal-delay, 0ms);
+}
+
+.ff-reveal--up {
+  transform: translate3d(0, 28px, 0);
+}
+
+.ff-reveal--left {
+  transform: translate3d(-32px, 0, 0);
+}
+
+.ff-reveal--right {
+  transform: translate3d(32px, 0, 0);
+}
+
+.ff-reveal--fade {
+  transform: none;
+}
+
+.ff-reveal--scale {
+  transform: translate3d(0, 12px, 0) scale(0.97);
 }
 
 .ff-reveal.is-inview {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
 .ff-brand-stroke {

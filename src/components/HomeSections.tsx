@@ -29,17 +29,21 @@ export function SectionShell({
     <section id={id} className={`${tones[tone]} px-4 py-20 md:px-6 md:py-28`}>
       <div className="mx-auto max-w-6xl">
         {eyebrow ? (
-          <p
-            className={`mb-3 text-[0.7rem] tracking-[0.3em] uppercase ${
-              tone === "dark" ? "text-brand-gold" : "text-brand-charcoal"
-            }`}
-          >
-            {eyebrow}
-          </p>
+          <Reveal delayMs={0}>
+            <p
+              className={`mb-3 text-[0.7rem] tracking-[0.3em] uppercase ${
+                tone === "dark" ? "text-brand-gold" : "text-brand-charcoal"
+              }`}
+            >
+              {eyebrow}
+            </p>
+          </Reveal>
         ) : null}
-        <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
-          {title}
-        </h2>
+        <Reveal delayMs={80}>
+          <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+            {title}
+          </h2>
+        </Reveal>
         <div className="mt-8">{children}</div>
       </div>
     </section>
@@ -87,15 +91,19 @@ export function HomeSections() {
         title="O médico por trás do resultado natural"
       >
         <div className="grid gap-10 md:grid-cols-2 md:gap-16">
-          <p className="font-serif-body text-lg leading-relaxed text-brand-charcoal">
-            Cada avaliação começa com uma pergunta simples: o que vai parecer
-            natural nesse rosto, daqui a 10 anos? É esse critério — técnico,
-            individualizado e sem pressa — que guia o trabalho do Dr. Francisco
-            Furtado em cada etapa, da avaliação ao acompanhamento pós-operatório.
-          </p>
-          <p className="font-signature text-3xl text-brand-gold-dark md:self-end">
-            Dr. Francisco Furtado
-          </p>
+          <Reveal delayMs={120} variant="left">
+            <p className="font-serif-body text-lg leading-relaxed text-brand-charcoal">
+              Cada avaliação começa com uma pergunta simples: o que vai parecer
+              natural nesse rosto, daqui a 10 anos? É esse critério — técnico,
+              individualizado e sem pressa — que guia o trabalho do Dr. Francisco
+              Furtado em cada etapa, da avaliação ao acompanhamento pós-operatório.
+            </p>
+          </Reveal>
+          <Reveal delayMs={220} variant="right">
+            <p className="font-signature text-3xl text-brand-gold-dark md:self-end">
+              Dr. Francisco Furtado
+            </p>
+          </Reveal>
         </div>
       </SectionShell>
 
@@ -196,15 +204,19 @@ export function HomeSections() {
           />
 
           <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-12 pb-14 sm:px-5 md:absolute md:inset-x-0 md:bottom-0 md:px-6 md:pt-16 md:pb-20">
-            <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
-              Diferenciais
-            </p>
-            <h2 className="font-display max-w-xl text-[2.15rem] leading-[1.05] sm:text-4xl md:max-w-lg md:text-5xl">
-              Ciência · Arte · Cuidado
-            </h2>
+            <Reveal>
+              <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
+                Diferenciais
+              </p>
+            </Reveal>
+            <Reveal delayMs={80}>
+              <h2 className="font-display max-w-xl text-[2.15rem] leading-[1.05] sm:text-4xl md:max-w-lg md:text-5xl">
+                Ciência · Arte · Cuidado
+              </h2>
+            </Reveal>
             <div className="mt-8 grid max-w-md gap-7 md:max-w-lg">
               {PILLARS.map((item, i) => (
-                <Reveal key={item.t} delayMs={i * 120}>
+                <Reveal key={item.t} delayMs={160 + i * 140} variant="left">
                   <h3 className="text-lg font-semibold tracking-wide text-brand-gold">
                     {item.t}
                   </h3>
@@ -219,21 +231,32 @@ export function HomeSections() {
 
         <div className="bg-white px-4 py-20 text-brand-charcoal md:px-6 md:py-28">
           <div className="mx-auto max-w-6xl">
-            <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
-              Procedimentos
-            </p>
-            <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
-              Avaliação criteriosa. Técnica sob medida. Acompanhamento até o fim.
-            </h2>
-            <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-brand-charcoal">
-              Nenhum protocolo começa pela cirurgia. Começa pela avaliação
-              tricológica — é ela que define se, quando e como o transplante deve
-              ser feito, sempre com a técnica mais indicada para cada caso.
-            </p>
+            <Reveal>
+              <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
+                Procedimentos
+              </p>
+            </Reveal>
+            <Reveal delayMs={80}>
+              <h2 className="font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+                Avaliação criteriosa. Técnica sob medida. Acompanhamento até o
+                fim.
+              </h2>
+            </Reveal>
+            <Reveal delayMs={160}>
+              <p className="font-serif-body mt-6 max-w-2xl text-lg leading-relaxed text-brand-charcoal">
+                Nenhum protocolo começa pela cirurgia. Começa pela avaliação
+                tricológica — é ela que define se, quando e como o transplante
+                deve ser feito, sempre com a técnica mais indicada para cada
+                caso.
+              </p>
+            </Reveal>
             <ul className="mt-10 grid gap-8 md:grid-cols-3">
-              {TREATMENTS.map((item) => (
-                <li
+              {TREATMENTS.map((item, i) => (
+                <Reveal
                   key={item.t}
+                  as="li"
+                  delayMs={i * 120}
+                  variant="up"
                   className="border-t border-brand-gray-mid pt-4"
                 >
                   <h3 className="text-base font-semibold tracking-wide text-black">
@@ -242,7 +265,7 @@ export function HomeSections() {
                   <p className="mt-3 text-sm leading-relaxed text-brand-charcoal">
                     {item.d}
                   </p>
-                </li>
+                </Reveal>
               ))}
             </ul>
           </div>
@@ -255,18 +278,20 @@ export function HomeSections() {
         eyebrow="Prova visual"
         title="Resultados reais, com o consentimento de quem viveu"
       >
-        <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-          Estamos organizando os primeiros casos autorizados para publicação. Se
-          quiser ver o critério de acompanhamento usado em cada caso, veja como
-          funciona o{" "}
-          <a
-            href="#jornada"
-            className="text-black underline decoration-brand-gold underline-offset-4"
-          >
-            protocolo de 12 meses pós-operatório
-          </a>
-          .
-        </p>
+        <Reveal delayMs={120}>
+          <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
+            Estamos organizando os primeiros casos autorizados para publicação. Se
+            quiser ver o critério de acompanhamento usado em cada caso, veja como
+            funciona o{" "}
+            <a
+              href="#jornada"
+              className="text-black underline decoration-brand-gold underline-offset-4"
+            >
+              protocolo de 12 meses pós-operatório
+            </a>
+            .
+          </p>
+        </Reveal>
       </SectionShell>
 
       <SectionShell
@@ -275,11 +300,13 @@ export function HomeSections() {
         title="O que dizem os pacientes"
         tone="soft"
       >
-        <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-          Estamos reunindo os relatos dos pacientes que já concluíram o
-          acompanhamento de 12 meses. Em breve, você vai poder ler a experiência
-          de quem passou por cada etapa — da avaliação ao resultado final.
-        </p>
+        <Reveal delayMs={120}>
+          <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
+            Estamos reunindo os relatos dos pacientes que já concluíram o
+            acompanhamento de 12 meses. Em breve, você vai poder ler a experiência
+            de quem passou por cada etapa — da avaliação ao resultado final.
+          </p>
+        </Reveal>
       </SectionShell>
 
       <SectionShell
@@ -287,44 +314,54 @@ export function HomeSections() {
         eyebrow="Pós-operatório"
         title="Cuidado contínuo — inclusive depois que você já esqueceu que fez a cirurgia"
       >
-        <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-          As primeiras 48 horas são a janela mais delicada da recuperação — e é
-          nelas que o acompanhamento é mais próximo. Depois, o protocolo
-          continua: fotos padronizadas a cada 3 meses, por 12 meses, disponíveis
-          na{" "}
-          <a
-            href="/paciente/login"
-            className="text-black underline decoration-brand-gold underline-offset-4"
-          >
-            área do paciente
-          </a>
-          .
-        </p>
-        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-brand-gray">
-          M0 → M3 → M6 → M9 → M12 — cinco registros fotográficos padronizados
-          (frontal, superior, coroa, e ambos os perfis temporais), para acompanhar
-          a evolução real da densidade, não só a memória de como era antes.
-        </p>
-        <JourneyTrack />
+        <Reveal delayMs={120}>
+          <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
+            As primeiras 48 horas são a janela mais delicada da recuperação — e é
+            nelas que o acompanhamento é mais próximo. Depois, o protocolo
+            continua: fotos padronizadas a cada 3 meses, por 12 meses, disponíveis
+            na{" "}
+            <a
+              href="/paciente/login"
+              className="text-black underline decoration-brand-gold underline-offset-4"
+            >
+              área do paciente
+            </a>
+            .
+          </p>
+        </Reveal>
+        <Reveal delayMs={200}>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-brand-gray">
+            M0 → M3 → M6 → M9 → M12 — cinco registros fotográficos padronizados
+            (frontal, superior, coroa, e ambos os perfis temporais), para
+            acompanhar a evolução real da densidade, não só a memória de como era
+            antes.
+          </p>
+        </Reveal>
+        <Reveal delayMs={280} variant="scale">
+          <JourneyTrack />
+        </Reveal>
         <ul className="mt-8 grid gap-2 text-sm text-brand-gray md:grid-cols-2">
-          {PHOTO_REGIONS.map((r) => (
-            <li key={r.id}>• {r.label}</li>
+          {PHOTO_REGIONS.map((r, i) => (
+            <Reveal key={r.id} as="li" delayMs={80 + i * 60}>
+              • {r.label}
+            </Reveal>
           ))}
         </ul>
       </SectionShell>
 
       <SectionShell id="faq" eyebrow="Dúvidas" title="Perguntas frequentes">
         <div className="space-y-6">
-          {FAQ_ITEMS.map((item) => (
-            <details
-              key={item.q}
-              className="group border-b border-brand-gray-light pb-4"
-            >
-              <summary className="cursor-pointer list-none text-base font-medium">
-                {item.q}
-              </summary>
-              <p className="font-serif-body mt-3 text-brand-charcoal">{item.a}</p>
-            </details>
+          {FAQ_ITEMS.map((item, i) => (
+            <Reveal key={item.q} delayMs={Math.min(i * 70, 350)} variant="up">
+              <details className="group border-b border-brand-gray-light pb-4">
+                <summary className="cursor-pointer list-none text-base font-medium">
+                  {item.q}
+                </summary>
+                <p className="font-serif-body mt-3 text-brand-charcoal">
+                  {item.a}
+                </p>
+              </details>
+            </Reveal>
           ))}
         </div>
       </SectionShell>

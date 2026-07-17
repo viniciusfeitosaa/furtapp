@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { FollicleFallback } from "@/components/follicle/FollicleFallback";
 import { FollicleErrorBoundary } from "@/components/follicle/FollicleErrorBoundary";
 import { MAX_GRAFTS } from "@/components/follicle/FollicleModel";
+import { Reveal } from "@/components/Reveal";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const FollicleCanvas = dynamic(
@@ -83,23 +84,29 @@ export function FollicleSection() {
       aria-labelledby="foliculo-title"
     >
       <div className="mx-auto max-w-6xl">
-        <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
-          Planejamento
-        </p>
-        <h2
-          id="foliculo-title"
-          className="font-display max-w-3xl text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl"
-        >
-          Da área calva à densidade — veja o planejamento antes de decidir
-        </h2>
-        <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Cada transplante começa com um número: a quantidade de fios necessária
-          para preencher as entradas e devolver a linha anterior. Ajuste a
-          simulação abaixo e veja como a densidade evolui — do ponto de partida
-          ao resultado máximo tecnicamente indicado para o seu caso.
-        </p>
+        <Reveal>
+          <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
+            Planejamento
+          </p>
+        </Reveal>
+        <Reveal delayMs={80}>
+          <h2
+            id="foliculo-title"
+            className="font-display max-w-3xl text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl"
+          >
+            Da área calva à densidade — veja o planejamento antes de decidir
+          </h2>
+        </Reveal>
+        <Reveal delayMs={160}>
+          <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+            Cada transplante começa com um número: a quantidade de fios necessária
+            para preencher as entradas e devolver a linha anterior. Ajuste a
+            simulação abaixo e veja como a densidade evolui — do ponto de partida
+            ao resultado máximo tecnicamente indicado para o seu caso.
+          </p>
+        </Reveal>
 
-        <div className="mt-8 max-w-xl">
+        <Reveal delayMs={220} className="mt-8 max-w-xl">
           <div className="mb-3 flex items-end justify-between gap-4">
             <label
               htmlFor="graft-density"
@@ -140,26 +147,30 @@ export function FollicleSection() {
             <span>Máximo</span>
           </div>
           <p className="mt-3 text-sm text-white/55">{densityHint(graftCount)}</p>
-        </div>
+        </Reveal>
 
-        <div className="mt-8 overflow-hidden border border-white/10">
-          {show3d ? (
-            <FollicleErrorBoundary>
-              <FollicleCanvas autoRotate graftCount={graftCount} />
-            </FollicleErrorBoundary>
-          ) : (
-            <FollicleFallback />
-          )}
-        </div>
-        <p className="mt-4 text-center text-xs leading-relaxed tracking-wide text-white/45">
-          Simulação ilustrativa. O número real de enxertos é definido apenas após
-          avaliação presencial, de acordo com a área doadora disponível.
-        </p>
-        <p className="mt-2 text-center text-[0.65rem] tracking-wide text-white/30">
-          Modo 3D com density map (assets demo). Troque por fotogrametria real em{" "}
-          <code className="text-white/40">public/models/patient/</code> quando
-          tiver.
-        </p>
+        <Reveal delayMs={300} variant="scale" className="mt-8">
+          <div className="overflow-hidden border border-white/10">
+            {show3d ? (
+              <FollicleErrorBoundary>
+                <FollicleCanvas autoRotate graftCount={graftCount} />
+              </FollicleErrorBoundary>
+            ) : (
+              <FollicleFallback />
+            )}
+          </div>
+        </Reveal>
+        <Reveal delayMs={380} variant="fade">
+          <p className="mt-4 text-center text-xs leading-relaxed tracking-wide text-white/45">
+            Simulação ilustrativa. O número real de enxertos é definido apenas após
+            avaliação presencial, de acordo com a área doadora disponível.
+          </p>
+          <p className="mt-2 text-center text-[0.65rem] tracking-wide text-white/30">
+            Modo 3D com density map (assets demo). Troque por fotogrametria real
+            em <code className="text-white/40">public/models/patient/</code>{" "}
+            quando tiver.
+          </p>
+        </Reveal>
       </div>
     </section>
   );

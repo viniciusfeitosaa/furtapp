@@ -305,20 +305,48 @@ export function HomeSections() {
         </Reveal>
       </SectionShell>
 
-      <SectionShell
+      <section
         id="depoimentos"
-        eyebrow="Pacientes"
-        title="O que dizem os pacientes"
-        tone="soft"
+        className="relative overflow-hidden bg-brand-navy px-4 py-20 text-white md:px-6 md:py-28"
       >
-        <Reveal delayMs={120}>
-          <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-            Estamos reunindo os relatos dos pacientes que já concluíram o
-            acompanhamento de 12 meses. Em breve, você vai poder ler a experiência
-            de quem passou por cada etapa — da avaliação ao resultado final.
-          </p>
-        </Reveal>
-      </SectionShell>
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <img
+            src="/media/depoimentos-bg.jpg"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[70%_30%] opacity-55 sm:object-[75%_28%] sm:opacity-65 md:object-right md:opacity-80"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(105deg, rgba(26,32,53,0.94) 0%, rgba(26,32,53,0.88) 32%, rgba(26,32,53,0.55) 55%, rgba(26,32,53,0.22) 75%, transparent 100%), linear-gradient(180deg, rgba(26,32,53,0.45) 0%, transparent 24%, transparent 76%, rgba(26,32,53,0.55) 100%)",
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-6xl">
+          <Reveal delayMs={0}>
+            <p className="mb-3 text-[0.7rem] tracking-[0.3em] uppercase text-brand-gold">
+              Pacientes
+            </p>
+          </Reveal>
+          <Reveal delayMs={80}>
+            <h2 className="max-w-3xl font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+              O que dizem os pacientes
+            </h2>
+          </Reveal>
+          <div className="mt-8">
+            <Reveal delayMs={120}>
+              <p className="font-serif-body max-w-xl text-lg text-white/85 md:max-w-2xl">
+                Estamos reunindo os relatos dos pacientes que já concluíram o
+                acompanhamento de 12 meses. Em breve, você vai poder ler a
+                experiência de quem passou por cada etapa — da avaliação ao
+                resultado final.
+              </p>
+            </Reveal>
+          </div>
+        </div>
+      </section>
 
       <section
         id="jornada"

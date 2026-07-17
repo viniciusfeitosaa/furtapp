@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "glb": "head.glb",
+  "color": "head_color.jpg",
+  "density": "head_density.jpg",
+  "normal": "head_normal.jpg",
+  "thresholds": {
+    "blackMax": 0.12,
+    "grayPeak": 0.38,
+    "whiteMin": 0.55
+  },
+  "notes": "DEMO: assets gerados a partir da cabeça Lee Perry-Smith + density bake UV (não é fotogrametria de paciente real). Troque pelos arquivos reais quando tiver."
+}

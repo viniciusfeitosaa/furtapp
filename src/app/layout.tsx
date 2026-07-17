@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Arapey,
   Bebas_Neue,
@@ -7,6 +7,7 @@ import {
 } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { PhysicianJsonLd } from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -34,18 +35,25 @@ const script = Great_Vibes({
   weight: "400",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#000000",
+};
+
 export const metadata: Metadata = {
   title: {
-    default: `${SITE.name} | Transplante Capilar em Fortaleza e Ceará`,
-    template: `%s | ${SITE.name}`,
+    default: "Transplante Capilar em Fortaleza | Dr. Francisco Furtado",
+    template: `%s | Dr. Francisco Furtado`,
   },
   description:
-    "Dr. Francisco Furtado — tricologia e transplante capilar com resultado natural, ética e acompanhamento humanizado em Fortaleza e em todo o Ceará.",
+    "Transplante capilar natural e seguro em Fortaleza e no Ceará. Avaliação individualizada, técnica e acompanhamento de 12 meses com o Dr. Francisco Furtado. Agende sua avaliação.",
   metadataBase: new URL(SITE.url),
   openGraph: {
-    title: `${SITE.name} | Transplante Capilar`,
+    title: "Transplante Capilar em Fortaleza | Dr. Francisco Furtado",
     description:
-      "Ciência, arte e cuidado humano. Avaliação e acompanhamento em Fortaleza e no Ceará.",
+      "Transplante capilar natural e seguro em Fortaleza e no Ceará. Avaliação individualizada e acompanhamento de 12 meses.",
     locale: "pt_BR",
     type: "website",
     images: [
@@ -78,6 +86,7 @@ export default function RootLayout({
       className={`${poppins.variable} ${bebas.variable} ${arapey.variable} ${script.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white text-black">
+        <PhysicianJsonLd />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

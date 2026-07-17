@@ -3,9 +3,9 @@ import { ContactForm } from "@/components/ContactForm";
 import { SITE, whatsappUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Contato e agendamento",
+  title: "Agende sua Avaliação | Fortaleza",
   description:
-    "Agende sua avaliação de tricologia e transplante capilar com o Dr. Francisco Furtado em Fortaleza e no Ceará.",
+    "Fale pelo WhatsApp ou agende sua avaliação para transplante capilar com o Dr. Francisco Furtado. Atendimento em Fortaleza e todo o Ceará.",
 };
 
 export default function ContatoPage() {
@@ -15,10 +15,13 @@ export default function ContatoPage() {
         <p className="text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
           Contato
         </p>
-        <h1 className="font-display mt-3 text-5xl text-black">Agende sua avaliação</h1>
+        <h1 className="font-display mt-3 text-5xl text-black">
+          Vamos conversar sobre o seu caso
+        </h1>
         <p className="font-serif-body mt-6 text-lg text-brand-charcoal">
-          Atendimento em {SITE.region}. Prefere WhatsApp? Use o botão abaixo ou
-          envie os dados pelo formulário.
+          Toda avaliação começa com uma conversa. Fale pelo WhatsApp, envie um
+          e-mail ou agende diretamente sua avaliação — atendimento em{" "}
+          {SITE.region}.
         </p>
 
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">

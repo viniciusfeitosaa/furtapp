@@ -70,3 +70,123 @@ body {
 .font-signature {
   font-family: var(--font-script), cursive;
 }
+
+/* --- Motion Pacote A (scroll reveal) --- */
+.ff-reveal {
+  opacity: 0;
+  will-change: opacity, transform;
+  transition:
+    opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--ff-reveal-delay, 0ms);
+}
+
+.ff-reveal--up {
+  transform: translate3d(0, 28px, 0);
+}
+
+.ff-reveal--left {
+  transform: translate3d(-32px, 0, 0);
+}
+
+.ff-reveal--right {
+  transform: translate3d(32px, 0, 0);
+}
+
+.ff-reveal--fade {
+  transform: none;
+}
+
+.ff-reveal--scale {
+  transform: translate3d(0, 12px, 0) scale(0.97);
+}
+
+.ff-reveal.is-inview {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.ff-brand-stroke {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  transition: stroke-dashoffset 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ff-brand-stroke.is-drawn {
+  stroke-dashoffset: 0;
+}
+
+.ff-brand-dot {
+  opacity: 0;
+  transition: opacity 400ms ease 700ms;
+}
+
+.ff-brand-dot.is-drawn {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-reveal,
+  .ff-brand-stroke,
+  .ff-brand-dot {
+    transition: none !important;
+  }
+  .ff-reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .ff-brand-stroke {
+    stroke-dashoffset: 0;
+  }
+  .ff-brand-dot {
+    opacity: 1;
+  }
+}
+
+/* Slider do mapa — alvo de toque maior no mobile */
+.plan-range {
+  touch-action: pan-y;
+  accent-color: #b6a46e;
+}
+
+.plan-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  background: #b6a46e;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  margin-top: -7px;
+}
+
+.plan-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: #b6a46e;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.plan-range::-webkit-slider-runnable-track {
+  height: 8px;
+}
+
+.plan-range::-moz-range-track {
+  height: 8px;
+  background: transparent;
+}
+
+@media (min-width: 768px) {
+  .plan-range::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+    margin-top: -5px;
+  }
+  .plan-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+  }
+}

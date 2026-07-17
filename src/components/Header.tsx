@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -33,25 +32,25 @@ export function Header() {
         solid ? "bg-black text-white" : "bg-transparent text-white"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-2 py-3 sm:gap-3 sm:px-3 md:px-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-4 md:px-4">
         <Link
           href="/"
-          className="group flex shrink-0 items-center gap-2 sm:gap-3"
+          className="group flex min-w-0 items-center gap-2 sm:gap-3"
           onClick={() => setOpen(false)}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/brand/simbolo-pincelada.png"
             alt=""
             width={40}
             height={40}
-            className="h-9 w-9 shrink-0 rounded-sm md:h-10 md:w-10"
-            priority
+            className="h-8 w-8 shrink-0 rounded-sm sm:h-9 sm:w-9 md:h-10 md:w-10"
           />
-          <span className="whitespace-nowrap">
-            <span className="block text-sm font-semibold tracking-[0.12em] uppercase sm:tracking-[0.18em] md:text-base">
+          <span className="min-w-0">
+            <span className="block truncate text-[0.8rem] font-semibold tracking-[0.1em] uppercase sm:text-sm sm:tracking-[0.18em] md:text-base">
               {SITE.name}
             </span>
-            <span className="mt-0.5 block text-[0.55rem] tracking-[0.12em] text-white/75 uppercase sm:text-[0.625rem] sm:tracking-[0.2em]">
+            <span className="mt-0.5 block truncate text-[0.55rem] tracking-[0.1em] text-white/75 uppercase sm:text-[0.625rem] sm:tracking-[0.2em]">
               {SITE.tagline}
             </span>
           </span>
@@ -74,12 +73,20 @@ export function Header() {
             Área do paciente
           </Link>
           <a
+            href={SITE.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs tracking-wide text-white/60 transition-colors hover:text-brand-gold"
+          >
+            Instagram
+          </a>
+          <a
             href={whatsappUrl()}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center bg-brand-gold px-4 py-2.5 text-xs font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft"
           >
-            Agende sua avaliação
+            Agendar minha avaliação
           </a>
         </nav>
 
@@ -119,6 +126,15 @@ export function Header() {
             >
               Área do paciente
             </Link>
+            <a
+              href={SITE.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-white/60"
+              onClick={() => setOpen(false)}
+            >
+              Instagram {SITE.instagramHandle}
+            </a>
             <Link
               href="/admin/login"
               className="text-sm text-white/40"
@@ -133,7 +149,7 @@ export function Header() {
               className="mt-2 inline-flex items-center justify-center bg-brand-gold px-4 py-3 text-sm font-semibold text-black"
               onClick={() => setOpen(false)}
             >
-              Agende sua avaliação
+              Agendar minha avaliação
             </a>
           </nav>
         </div>

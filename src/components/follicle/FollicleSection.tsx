@@ -1,0 +1,177 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
+import { FollicleFallback } from "@/components/follicle/FollicleFallback";
+import { FollicleErrorBoundary } from "@/components/follicle/FollicleErrorBoundary";
+import { MAX_GRAFTS } from "@/components/follicle/FollicleModel";
+import { Reveal } from "@/components/Reveal";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+
+const FollicleCanvas = dynamic(
+  () =>
+    import("@/components/follicle/FollicleCanvas").then((m) => m.FollicleCanvas),
+  {
+    ssr: false,
+    loading: () => <FollicleFallback />,
+  },
+);
+
+function densityHint(count: number): string {
+  if (count <= 0) {
+    return "Calvo: ponto de partida — cabeça já preenchida, restam apenas as entradas (têmporas)";
+  }
+  if (count < 1000) {
+    return "1.000: primeiro preenchimento das entradas";
+  }
+  if (count < 5000) {
+    return "5.000: densidade intermediária — linha anterior mais definida";
+  }
+  if (count < MAX_GRAFTS) {
+    return "Ampliação da densidade até o máximo tecnicamente indicado";
+  }
+  return "Máximo: densidade máxima tecnicamente indicada para este planejamento";
+}
+
+function formatGrafts(count: number): string {
+  return count.toLocaleString("pt-BR");
+}
+
+function canUseWebGL(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function FollicleSection() {
+  const reduced = usePrefersReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  const [graftCount, setGraftCount] = useState(0);
+  const [webgl] = useState(() =>
+    typeof window === "undefined" ? true : canUseWebGL(),
+  );
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px", threshold: 0.05 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const show3d = inView && webgl && !reduced;
+  const pct = Math.round((graftCount / MAX_GRAFTS) * 100);
+
+  return (
+    <section
+      ref={ref}
+      id="foliculo"
+      className="scroll-mt-24 bg-[#060810] px-4 py-20 text-white md:px-6 md:py-28"
+      aria-labelledby="foliculo-title"
+    >
+      <div className="mx-auto max-w-6xl">
+        <Reveal>
+          <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
+            Planejamento
+          </p>
+        </Reveal>
+        <Reveal delayMs={80}>
+          <h2
+            id="foliculo-title"
+            className="font-display max-w-3xl text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl"
+          >
+            Da área calva à densidade — veja o planejamento antes de decidir
+          </h2>
+        </Reveal>
+        <Reveal delayMs={160}>
+          <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+            Cada transplante começa com um número: a quantidade de fios necessária
+            para preencher as entradas e devolver a linha anterior. Ajuste a
+            simulação abaixo e veja como a densidade evolui — do ponto de partida
+            ao resultado máximo tecnicamente indicado para o seu caso.
+          </p>
+        </Reveal>
+
+        <Reveal delayMs={220} className="mt-8 max-w-xl">
+          <div className="mb-3 flex items-end justify-between gap-4">
+            <label
+              htmlFor="graft-density"
+              className="text-xs font-semibold tracking-wide text-white/70 uppercase"
+            >
+              Densidade de enxertos
+            </label>
+            <p className="font-display text-2xl text-brand-gold tabular-nums sm:text-3xl">
+              {formatGrafts(graftCount)}
+              <span className="ml-2 text-sm font-normal tracking-normal text-white/45">
+                / {formatGrafts(MAX_GRAFTS)}
+              </span>
+            </p>
+          </div>
+
+          <input
+            id="graft-density"
+            type="range"
+            min={0}
+            max={MAX_GRAFTS}
+            step={50}
+            value={graftCount}
+            onChange={(e) => setGraftCount(Number(e.target.value))}
+            className="graft-slider h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 accent-brand-gold"
+            aria-valuemin={0}
+            aria-valuemax={MAX_GRAFTS}
+            aria-valuenow={graftCount}
+            aria-valuetext={`${formatGrafts(graftCount)} unidades foliculares`}
+            style={{
+              background: `linear-gradient(to right, var(--color-brand-gold, #c4b07a) 0%, var(--color-brand-gold, #c4b07a) ${pct}%, rgba(255,255,255,0.15) ${pct}%, rgba(255,255,255,0.15) 100%)`,
+            }}
+          />
+
+          <div className="mt-2 flex justify-between text-[0.65rem] tracking-wide text-white/40 uppercase">
+            <span>Calvo</span>
+            <span>1.000</span>
+            <span>5.000</span>
+            <span>Máximo</span>
+          </div>
+          <p className="mt-3 text-sm text-white/55">{densityHint(graftCount)}</p>
+        </Reveal>
+
+        <Reveal delayMs={300} variant="scale" className="mt-8">
+          <div className="overflow-hidden border border-white/10">
+            {show3d ? (
+              <FollicleErrorBoundary>
+                <FollicleCanvas autoRotate graftCount={graftCount} />
+              </FollicleErrorBoundary>
+            ) : (
+              <FollicleFallback />
+            )}
+          </div>
+        </Reveal>
+        <Reveal delayMs={380} variant="fade">
+          <p className="mt-4 text-center text-xs leading-relaxed tracking-wide text-white/45">
+            Simulação ilustrativa. O número real de enxertos é definido apenas após
+            avaliação presencial, de acordo com a área doadora disponível.
+          </p>
+          <p className="mt-2 text-center text-[0.65rem] tracking-wide text-white/30">
+            Modo 3D com density map (assets demo). Troque por fotogrametria real
+            em <code className="text-white/40">public/models/patient/</code>{" "}
+            quando tiver.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}

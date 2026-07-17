@@ -2,7 +2,7 @@
 
 > **Regra permanente:** tudo o que for decidido, feito, adiado ou sugerido neste projeto **deve** ser registrado neste arquivo. Nenhuma entrega fica só no chat ou no código sem espelho aqui. Atualizar nas seções **Feito**, **Pendente** e **Ideias** a cada ciclo de trabalho.
 
-**Última atualização:** 2026-07-14 (pasta `conteudos-para-o-site/`)  
+**Última atualização:** 2026-07-15 (Pacote C folículo 3D entregue)  
 **Branch:** `cursor/site-institucional-mapa-bordo-e94e`  
 **Domínio:** www.ffurtado.com.br  
 **Região SEO:** Fortaleza e todo o Ceará
@@ -30,7 +30,7 @@ Ciência · Arte · Cuidado humano — tom confiante, técnico e acolhedor.
 |-------|--------|
 | Site | www.ffurtado.com.br |
 | WhatsApp | (88) 9.9252-4200 |
-| Instagram | @dr.franciscofurtado |
+| Instagram | @drfranciscofurtado |
 | E-mail | atendimento@ffurtado.com.br |
 
 ---
@@ -234,6 +234,8 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 - [x] Links “Área do paciente” / admin no header e footer
 - [x] Pasta de upload do cliente: `conteudos-para-o-site/` (marca, fotos, vídeos, textos, depoimentos)
 - [x] Ícone do site: símbolo pincelada (favicon SVG/PNG + header/footer)
+- [x] Pacote A — motion cinematográfico (hero, pilares, jornada)
+- [x] Pacote C — folículo 3D procedural em Tratamentos (R3F, lazy + fallback)
 
 ---
 
@@ -339,6 +341,11 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-15 | Hero atualizado para `dr-francisco-retrato-hero2.png` (novo upload do cliente). |
 | 2026-07-15 | Hero voltou para `dr-francisco-retrato-hero.png` (retrato anterior). |
 | 2026-07-15 | Teste hero3 (`dr-francisco-retrato-hero3.png`) ancorado à direita do `#inicio`. |
+| 2026-07-15 | Pacote A (motion) entregue. Pacote C: spec + plano do folículo 3D em Tratamentos (`docs/superpowers/...pacote-c-follicle-3d*`). |
+| 2026-07-15 | Pacote C entregue: folículo 3D procedural (R3F) na seção Tratamentos, lazy load + fallback PNG. |
+| 2026-07-16 | Simulador de densidade: cabeça calva + 0 / 1.000 / 5.000 / máx. ~8.000 enxertos (instanced). |
+| 2026-07-16 | Realismo PBR: pele MeshPhysical (SSS leve), sombra área doadora, pontilhado cirúrgico, texturas canvas. |
+| 2026-07-16 | Cabeça real GLB (Lee Perry-Smith, CC BY 3.0) + pele PBR/SSS; fios via MeshSurfaceSampler na superfície real (doador fixo + receptor por densidade). |
 
 ---
 

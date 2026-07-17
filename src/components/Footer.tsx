@@ -1,72 +1,65 @@
-import Image from "next/image";
 import Link from "next/link";
 import { SITE, whatsappUrl } from "@/lib/site";
 
 export function Footer() {
   return (
     <footer className="bg-black text-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-3 md:px-6">
-        <div>
-          <Image
-            src="/brand/simbolo-pincelada.png"
-            alt=""
-            width={48}
-            height={48}
-            className="mb-4 h-12 w-12"
-          />
-          <p className="text-sm font-semibold tracking-[0.18em] uppercase">
-            {SITE.name}
-          </p>
-          <p className="mt-2 text-[0.65rem] tracking-[0.28em] text-white/65 uppercase">
-            {SITE.tagline}
-          </p>
-          <p className="font-signature mt-6 text-2xl text-brand-gold">
-            Dr. Francisco Furtado
-          </p>
-        </div>
+      <div className="mx-auto max-w-6xl px-4 py-14 md:px-6">
+        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+          <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/simbolo-pincelada.png"
+              alt=""
+              width={48}
+              height={48}
+              className="mb-4 h-12 w-12"
+            />
+            <p className="text-sm font-semibold tracking-[0.12em]">
+              {SITE.name} — {SITE.tagline}
+            </p>
+            <p className="mt-2 text-sm text-white/55">{SITE.region}</p>
+          </div>
 
-        <div className="space-y-2 text-sm text-white/70">
-          <p className="text-xs tracking-[0.2em] text-brand-gold uppercase">
-            Contato
-          </p>
-          <a
-            href={whatsappUrl()}
-            className="block transition-colors hover:text-white"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            WhatsApp {SITE.phoneDisplay}
-          </a>
-          <a
-            href={`mailto:${SITE.email}`}
-            className="block transition-colors hover:text-white"
-          >
-            {SITE.email}
-          </a>
-          <a
-            href={SITE.instagram}
-            className="block transition-colors hover:text-white"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Instagram {SITE.instagramHandle}
-          </a>
-          <p className="pt-2 text-white/55">{SITE.region}</p>
-        </div>
+          <div className="space-y-2 text-sm text-white/70">
+            <a
+              href={whatsappUrl()}
+              className="block transition-colors hover:text-white"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp {SITE.phoneDisplay}
+            </a>
+            <a
+              href={`mailto:${SITE.email}`}
+              className="block transition-colors hover:text-white"
+            >
+              {SITE.email}
+            </a>
+            <a
+              href={SITE.instagram}
+              className="block transition-colors hover:text-white"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instagram {SITE.instagramHandle}
+            </a>
+          </div>
 
-        <div className="space-y-2 text-sm text-white/70">
-          <p className="text-xs tracking-[0.2em] text-brand-gold uppercase">
-            Acesso
-          </p>
-          <Link href="/paciente/login" className="block hover:text-white">
-            Área do paciente
-          </Link>
-          <Link href="/admin/login" className="block hover:text-white">
-            Área administrativa
-          </Link>
-          <Link href="/contato" className="block hover:text-white">
-            Agendar avaliação
-          </Link>
+          <div className="flex flex-col gap-2 text-sm text-white/70 sm:flex-row sm:flex-wrap sm:gap-x-5">
+            <Link href="/blog" className="hover:text-white">
+              Blog
+            </Link>
+            <Link href="/paciente/login" className="hover:text-white">
+              Área do paciente
+            </Link>
+            <Link href="/admin/login" className="hover:text-white">
+              Área administrativa
+            </Link>
+            <Link href="/contato" className="hover:text-white">
+              Agendar avaliação
+            </Link>
+          </div>
         </div>
       </div>
       <div className="border-t border-white/10 px-4 py-6 text-center text-xs text-white/45">

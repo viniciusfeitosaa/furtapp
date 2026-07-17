@@ -5,11 +5,11 @@ export const SITE = {
   phoneDisplay: "(88) 9.9252-4200",
   phoneE164: "5588992524200",
   email: "atendimento@ffurtado.com.br",
-  instagram: "https://www.instagram.com/dr.franciscofurtado/",
-  instagramHandle: "@dr.franciscofurtado",
+  instagram: "https://www.instagram.com/drfranciscofurtado/",
+  instagramHandle: "@drfranciscofurtado",
   region: "Fortaleza e todo o Ceará",
   whatsappMessage:
-    "Olá! Gostaria de agendar uma avaliação de tricologia/transplante capilar.",
+    "Olá! Gostaria de agendar minha avaliação de tricologia/transplante capilar.",
 } as const;
 
 export function whatsappUrl(message: string = SITE.whatsappMessage) {
@@ -18,11 +18,11 @@ export function whatsappUrl(message: string = SITE.whatsappMessage) {
 
 export const NAV_LINKS = [
   { href: "/#inicio", label: "Início" },
-  { href: "/#sobre", label: "Sobre o Dr. Francisco" },
   { href: "/#tratamentos", label: "Tratamentos" },
   { href: "/#resultados", label: "Resultados" },
   { href: "/#depoimentos", label: "Depoimentos" },
   { href: "/contato", label: "Contato" },
+  { href: "/blog", label: "Blog" },
 ] as const;
 
 /** Regiões do protocolo fotográfico (portal do paciente) */

@@ -103,37 +103,60 @@ function isEar(p: Vector3): boolean {
   return earDist2(p) < 0.72;
 }
 
+/** Olho / órbita — sem fio. */
+function isEye(p: Vector3): boolean {
+  return (
+    Math.abs(p.x) < 0.95 &&
+    p.y > 1.5 &&
+    p.y < 2.4 &&
+    p.z > 1.05
+  );
+}
+
+/** Bochecha frontal — sem fio (costeleta fica mais atrás, z menor). */
+function isCheek(p: Vector3): boolean {
+  const ax = Math.abs(p.x);
+  return ax > 0.5 && ax < 1.6 && p.y > 0.65 && p.y < 2.25 && p.z > 1.05;
+}
+
+/** Abaixo da orelha / lóbulo → maxilar — sem fio. */
+function isBelowEar(p: Vector3): boolean {
+  const ax = Math.abs(p.x);
+  return ax > 1.15 && ax < 1.98 && p.y < 0.65 && p.z > -0.65 && p.z < 0.65;
+}
+
 /**
- * Rosto: bloqueia miolo + bochecha para o cabelo do crânio.
- * A costeleta reentra depois via Math.max(sideburnMask) com fade longo —
- * é isso que evita o "bloco" cortado reto.
+ * Rosto: bloqueia miolo + bochecha + órbita para o cabelo do crânio.
+ * A costeleta reentra via sideburnMask (z mais baixo, à frente da orelha).
  */
 function faceKeep(p: Vector3, n: Vector3): number {
+  if (isEye(p) || isCheek(p) || isBelowEar(p)) return 0;
+
   let f = 1;
   const ax = Math.abs(p.x);
   const central =
-    (1 - smoothstep(0.85, 1.15, ax)) *
-    smoothstep(0.85, 1.15, p.z) *
-    (1 - smoothstep(2.45, 2.85, p.y));
+    (1 - smoothstep(0.75, 1.1, ax)) *
+    smoothstep(0.75, 1.05, p.z) *
+    (1 - smoothstep(2.4, 2.85, p.y));
   f *= 1 - clamp01(central);
-  // Bochecha: tira o cabelo de crânio; costeleta volta com taper
+  // Bochecha ampla (mesmo fora do hard reject, para fade)
   const cheek =
-    smoothstep(0.95, 1.35, p.z) *
-    (1 - smoothstep(2.35, 2.9, p.y)) *
-    smoothstep(0.95, 1.3, ax);
+    smoothstep(0.85, 1.15, p.z) *
+    (1 - smoothstep(2.3, 2.85, p.y)) *
+    smoothstep(0.7, 1.2, ax);
   f *= 1 - clamp01(cheek);
   const forehead =
-    smoothstep(1.45, 1.75, p.z) * (1 - smoothstep(2.95, 3.25, p.y));
+    smoothstep(1.35, 1.7, p.z) * (1 - smoothstep(2.9, 3.25, p.y));
   f *= 1 - clamp01(forehead);
-  const jaw = smoothstep(0.55, 0.95, p.z) * (1 - smoothstep(0.35, 0.65, p.y));
+  const jaw = smoothstep(0.45, 0.9, p.z) * (1 - smoothstep(0.4, 0.7, p.y));
   f *= 1 - clamp01(jaw);
-  if (n.y < -0.55 && p.z > 0.2) f = 0;
+  if (n.y < -0.5 && p.z > 0.15) f = 0;
   return clamp01(f);
 }
 
 function isDeepFace(p: Vector3, n: Vector3): boolean {
-  // Só rejeita o miolo facial — nunca a faixa da costeleta
-  return faceKeep(p, n) < 0.2 && Math.abs(p.x) < 1.15;
+  if (isEye(p) || isCheek(p) || isBelowEar(p)) return true;
+  return faceKeep(p, n) < 0.2 && Math.abs(p.x) < 1.2;
 }
 
 export function receptorDensity(
@@ -141,7 +164,7 @@ export function receptorDensity(
   n: Vector3,
   m: HeadMetrics,
 ): number {
-  if (isEar(p)) return 0;
+  if (isEar(p) || isEye(p) || isCheek(p) || isBelowEar(p)) return 0;
   if (n.y < 0.12) return 0;
 
   const ax = Math.abs(p.x);
@@ -190,17 +213,22 @@ function sideburnMask(
   const lateral = smoothstep(1.2, 1.4, ax) * (1 - smoothstep(1.7, 1.9, ax));
   if (lateral <= 0.02) return { density: 0, grow: 1 };
 
-  // 0 no lóbulo → 1 no temple
-  const y01 = clamp01((p.y - 0.48) / (2.1 - 0.48));
+  // Não invade olho / bochecha / abaixo da orelha
+  if (isEye(p) || isCheek(p) || isBelowEar(p)) {
+    return { density: 0, grow: 1 };
+  }
+
+  // 0 acima do lóbulo → 1 no temple (não desce abaixo da orelha)
+  const y01 = clamp01((p.y - 0.68) / (2.1 - 0.68));
   if (y01 <= 0) return { density: 0, grow: 1 };
   const topCap = 1 - smoothstep(2.0, 2.4, p.y);
-  // Ponta inferior arredondada (some antes do pescoço)
-  const tip = smoothstep(0.48, 0.85, p.y);
+  // Ponta para no lóbulo — sem cabelo abaixo da orelha
+  const tip = smoothstep(0.68, 0.98, p.y);
 
-  // Diagonal frontal: larga em cima, fina embaixo
-  // y≈0.55 → zMax≈0.22 | y≈1.2 → zMax≈0.55 | y≈2.0 → zMax≈0.95
-  const zMax = mix(0.2, 0.98, Math.pow(y01, 0.85));
-  const zMin = mix(0.05, -0.2, y01);
+  // Diagonal frontal mais contida (não invade a bochecha, z>1.05)
+  // y baixo → zMax≈0.18 | y alto → zMax≈0.72
+  const zMax = mix(0.16, 0.72, Math.pow(y01, 0.9));
+  const zMin = mix(0.02, -0.18, y01);
 
   const span = Math.max(zMax - zMin, 1e-3);
   const zT = (p.z - zMin) / span;
@@ -244,6 +272,7 @@ export function residualDensity(
   m: HeadMetrics,
 ): number {
   if (isNeck(p, n)) return 0;
+  if (isEye(p) || isCheek(p) || isBelowEar(p)) return 0;
 
   const keepNape = napeKeep(p);
   if (keepNape <= 0.05) return 0;
@@ -264,18 +293,17 @@ export function residualDensity(
     (1 - smoothstep(2.05, 2.45, p.y)) *
     smoothstep(-0.35, 0.0, p.z);
   d *= 1 - clamp01(sideRect) * 0.97;
-  // Abaixo da ponta da costeleta: zero residual lateral (sem “barra” no maxilar)
+  // Abaixo da orelha / ponta: zero residual lateral
   const belowTip =
-    smoothstep(1.15, 1.38, ax) *
-    (1 - smoothstep(0.55, 0.75, p.y)) *
-    smoothstep(-0.2, 0.15, p.z);
+    smoothstep(1.15, 1.4, ax) *
+    (1 - smoothstep(0.65, 0.85, p.y)) *
+    smoothstep(-0.35, 0.2, p.z);
   d *= 1 - clamp01(belowTip);
 
   // Vão acima da orelha
   d = Math.max(d, clamp01(aboveEarMask(p)) * keepNape * kEar);
 
   // Costeleta em cunha — ignora earKeep (raiz da orelha).
-  // Só bloqueia interior real da pinna (isEar apertado).
   const sb = sideburnMask(p, n);
   if (sb.density > 0.02 && earDist2(p) >= 0.72) {
     d = Math.max(d, sb.density * keepNape);

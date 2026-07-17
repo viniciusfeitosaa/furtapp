@@ -4,18 +4,17 @@ import { useMemo, useState } from "react";
 import { Reveal } from "@/components/Reveal";
 import { ScalpMapSvg } from "@/components/planning/ScalpMapSvg";
 import {
-  PLAN_MAX_GRAFTS,
-  formatGrafts,
-  planGrafts,
+  PLAN_SCALE_MAX,
+  planFillFromScale,
   planStage,
 } from "@/lib/planningMap";
 import { whatsappUrl } from "@/lib/site";
 
 export function PlanningMapSection() {
-  const [graftCount, setGraftCount] = useState(0);
-  const fill = graftCount / PLAN_MAX_GRAFTS;
+  const [scale, setScale] = useState(0);
+  const fill = planFillFromScale(scale);
   const pct = Math.round(fill * 100);
-  const stage = useMemo(() => planStage(graftCount), [graftCount]);
+  const stage = useMemo(() => planStage(fill), [fill]);
 
   return (
     <section
@@ -41,8 +40,8 @@ export function PlanningMapSection() {
           <p className="font-serif-body mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-white/75 sm:mt-5 sm:text-base sm:text-lg">
             Todo transplante começa pelo desenho do plano: de onde saem os
             enxertos, para onde vão, e com que densidade. Ajuste a escala e veja
-            o mapa clínico se formar — da entrada vazia à densidade máxima
-            ilustrativa.
+            o mapa clínico se formar — da entrada vazia à cobertura ilustrativa.
+            O volume real é individual.
           </p>
         </Reveal>
 
@@ -65,11 +64,7 @@ export function PlanningMapSection() {
 
             {/* Slider colado ao mapa no mobile */}
             <Reveal delayMs={200} className="lg:hidden">
-              <PlanSlider
-                graftCount={graftCount}
-                pct={pct}
-                onChange={setGraftCount}
-              />
+              <PlanSlider scale={scale} pct={pct} onChange={setScale} />
             </Reveal>
           </div>
 
@@ -92,13 +87,17 @@ export function PlanningMapSection() {
               <div className="flex items-end justify-between gap-3 border-t border-white/10 pt-5 sm:gap-4 sm:pt-6">
                 <div className="min-w-0">
                   <p className="text-[0.65rem] tracking-[0.22em] text-white/40 uppercase sm:tracking-[0.28em]">
-                    Unidades foliculares
+                    Densidade ilustrativa
                   </p>
                   <p className="font-display mt-1 text-3xl text-white tabular-nums sm:text-4xl md:text-5xl">
-                    {formatGrafts(planGrafts(fill))}
+                    {pct}
                     <span className="ml-1.5 text-sm font-normal tracking-normal text-white/35 sm:ml-2 sm:text-base">
-                      / {formatGrafts(PLAN_MAX_GRAFTS)}
+                      % do plano simulado
                     </span>
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed text-white/45 sm:text-sm">
+                    Não é quantidade de enxertos — cada paciente tem um limite
+                    próprio, definido na avaliação.
                   </p>
                 </div>
               </div>
@@ -137,18 +136,17 @@ export function PlanningMapSection() {
         </div>
 
         {/* Slider desktop — abaixo do grid */}
-        <Reveal delayMs={200} className="mx-auto mt-10 hidden max-w-xl lg:mt-12 lg:block">
-          <PlanSlider
-            graftCount={graftCount}
-            pct={pct}
-            onChange={setGraftCount}
-          />
+        <Reveal
+          delayMs={200}
+          className="mx-auto mt-10 hidden max-w-xl lg:mt-12 lg:block"
+        >
+          <PlanSlider scale={scale} pct={pct} onChange={setScale} />
         </Reveal>
 
         <p className="mt-8 px-1 text-center text-[0.7rem] leading-relaxed tracking-wide text-white/40 sm:mt-8 sm:text-xs">
-          Simulação ilustrativa para educação do paciente. O número real de
-          enxertos e a distribuição por zona são definidos apenas após avaliação
-          presencial, conforme a área doadora disponível.
+          Simulação educativa — não indica quantos enxertos você precisa ou
+          pode receber. O plano real só é definido após avaliação presencial,
+          conforme a área doadora e o desenho do seu caso.
         </p>
       </div>
     </section>
@@ -156,11 +154,11 @@ export function PlanningMapSection() {
 }
 
 function PlanSlider({
-  graftCount,
+  scale,
   pct,
   onChange,
 }: {
-  graftCount: number;
+  scale: number;
   pct: number;
   onChange: (n: number) => void;
 }) {
@@ -182,15 +180,15 @@ function PlanSlider({
         id="plan-density"
         type="range"
         min={0}
-        max={PLAN_MAX_GRAFTS}
-        step={50}
-        value={graftCount}
+        max={PLAN_SCALE_MAX}
+        step={1}
+        value={scale}
         onChange={(e) => onChange(Number(e.target.value))}
         className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15"
         aria-valuemin={0}
-        aria-valuemax={PLAN_MAX_GRAFTS}
-        aria-valuenow={graftCount}
-        aria-valuetext={`${formatGrafts(graftCount)} unidades foliculares`}
+        aria-valuemax={PLAN_SCALE_MAX}
+        aria-valuenow={scale}
+        aria-valuetext={`${pct} por cento do plano ilustrativo`}
         style={{
           background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${pct}%, rgba(255,255,255,0.15) ${pct}%, rgba(255,255,255,0.15) 100%)`,
         }}
@@ -198,9 +196,9 @@ function PlanSlider({
 
       <div className="mt-2 flex justify-between text-[0.6rem] tracking-wide text-white/40 uppercase sm:text-[0.65rem]">
         <span>Calvo</span>
-        <span>1.000</span>
-        <span>5.000</span>
-        <span>Máximo</span>
+        <span>Entradas</span>
+        <span>Linha</span>
+        <span>Completo</span>
       </div>
     </div>
   );

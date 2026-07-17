@@ -1,7 +1,5 @@
 /** Dados ilustrativos do mapa de planejamento clínico (não é cálculo médico). */
 
-export const PLAN_MAX_GRAFTS = 8000;
-
 export type PlanZoneId =
   | "donor"
   | "templeL"
@@ -104,37 +102,41 @@ export function zoneFills(fill: number): Record<PlanZoneId, number> {
   return out;
 }
 
-export function planGrafts(fill: number): number {
-  return Math.round(clamp01(fill) * PLAN_MAX_GRAFTS);
+/** Escala ilustrativa do slider (0–100). Não representa UF reais. */
+export const PLAN_SCALE_MAX = 100;
+
+export function planFillFromScale(scale: number): number {
+  return clamp01(scale / PLAN_SCALE_MAX);
 }
 
-export function planStage(grafts: number): {
+export function planStage(fill: number): {
   title: string;
   detail: string;
   focus: PlanZoneId | "idle";
 } {
-  if (grafts <= 0) {
+  const f = clamp01(fill);
+  if (f <= 0) {
     return {
       title: "Ponto de partida",
       detail: "Ferradura residual no lugar — entradas e coroa ainda vazias",
       focus: "idle",
     };
   }
-  if (grafts < 1000) {
+  if (f < 0.22) {
     return {
       title: "Entradas",
       detail: "Primeiro preenchimento das têmporas — redesenho da moldura facial",
       focus: "templeL",
     };
   }
-  if (grafts < 3500) {
+  if (f < 0.52) {
     return {
       title: "Linha anterior",
       detail: "Definição da linha frontal com densidade natural na transição",
       focus: "frontal",
     };
   }
-  if (grafts < 6000) {
+  if (f < 0.78) {
     return {
       title: "Couro médio",
       detail: "Ampliação da densidade atrás da linha — continuidade do plano",
@@ -142,13 +144,9 @@ export function planStage(grafts: number): {
     };
   }
   return {
-    title: "Densidade máxima",
+    title: "Plano ilustrativo completo",
     detail:
-      "Coroa incluída no teto ilustrativo — o limite real depende da área doadora",
+      "Coroa incluída na simulação — o volume real depende da área doadora de cada paciente",
     focus: "crown",
   };
-}
-
-export function formatGrafts(n: number): string {
-  return n.toLocaleString("pt-BR");
 }

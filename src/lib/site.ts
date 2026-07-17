@@ -18,11 +18,11 @@ export function whatsappUrl(message: string = SITE.whatsappMessage) {
 
 export const NAV_LINKS = [
   { href: "/#inicio", label: "Início" },
-  { href: "/#sobre", label: "Sobre o Dr. Francisco" },
   { href: "/#tratamentos", label: "Tratamentos" },
   { href: "/#resultados", label: "Resultados" },
   { href: "/#depoimentos", label: "Depoimentos" },
   { href: "/contato", label: "Contato" },
+  { href: "/blog", label: "Blog" },
 ] as const;
 
 /** Regiões do protocolo fotográfico (portal do paciente) */

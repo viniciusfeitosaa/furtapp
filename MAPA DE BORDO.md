@@ -30,7 +30,7 @@ Ciência · Arte · Cuidado humano — tom confiante, técnico e acolhedor.
 |-------|--------|
 | Site | www.ffurtado.com.br |
 | WhatsApp | (88) 9.9252-4200 |
-| Instagram | @dr.franciscofurtado |
+| Instagram | @drfranciscofurtado |
 | E-mail | atendimento@ffurtado.com.br |
 
 ---

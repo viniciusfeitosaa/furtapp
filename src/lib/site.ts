@@ -5,8 +5,8 @@ export const SITE = {
   phoneDisplay: "(88) 9.9252-4200",
   phoneE164: "5588992524200",
   email: "atendimento@ffurtado.com.br",
-  instagram: "https://www.instagram.com/dr.franciscofurtado/",
-  instagramHandle: "@dr.franciscofurtado",
+  instagram: "https://www.instagram.com/drfranciscofurtado/",
+  instagramHandle: "@drfranciscofurtado",
   region: "Fortaleza e todo o Ceará",
   whatsappMessage:
     "Olá! Gostaria de agendar minha avaliação de tricologia/transplante capilar.",

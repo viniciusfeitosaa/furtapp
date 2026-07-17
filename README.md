@@ -36,5 +36,5 @@ Envie fotos, vídeos e textos em **[`conteudos-para-o-site/`](./conteudos-para-o
 
 - WhatsApp: (88) 9.9252-4200
 - E-mail: atendimento@ffurtado.com.br
-- Instagram: @dr.franciscofurtado
+- Instagram: @drfranciscofurtado
 - SEO local: Fortaleza e Ceará

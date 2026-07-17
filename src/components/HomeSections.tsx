@@ -4,12 +4,9 @@ import { JourneyTrack } from "@/components/JourneyTrack";
 import { ResultsVideo } from "@/components/ResultsVideo";
 import { Reveal } from "@/components/Reveal";
 import { ScrollZoomImage } from "@/components/ScrollZoomImage";
+import { TestimonialsSlider } from "@/components/TestimonialsSlider";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { SITE } from "@/lib/site";
-import {
-  TESTIMONIALS,
-  instagramProfileUrl,
-} from "@/lib/testimonials";
 
 export function SectionShell({
   id,
@@ -356,39 +353,7 @@ export function HomeSections() {
               </p>
             </Reveal>
 
-            <ul className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
-              {TESTIMONIALS.map((item, i) => (
-                <Reveal
-                  key={item.handle}
-                  as="li"
-                  delayMs={Math.min(80 + i * 50, 320)}
-                >
-                  <blockquote className="h-full rounded-2xl bg-white px-4 py-3.5 text-brand-charcoal shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
-                    <footer className="flex items-center gap-2.5">
-                      <span
-                        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[1.5px]"
-                        aria-hidden
-                      >
-                        <span className="flex size-full items-center justify-center rounded-full bg-white text-[0.65rem] font-semibold text-brand-charcoal">
-                          {item.handle.slice(0, 1).toUpperCase()}
-                        </span>
-                      </span>
-                      <a
-                        href={instagramProfileUrl(item.handle)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="truncate text-sm font-semibold text-black transition-opacity hover:opacity-70"
-                      >
-                        {item.handle}
-                      </a>
-                    </footer>
-                    <p className="mt-2.5 text-sm leading-relaxed text-brand-charcoal">
-                      {item.quote}
-                    </p>
-                  </blockquote>
-                </Reveal>
-              ))}
-            </ul>
+            <TestimonialsSlider />
 
             <Reveal delayMs={200}>
               <a

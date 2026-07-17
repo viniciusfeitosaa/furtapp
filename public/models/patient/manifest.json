@@ -1,0 +1,13 @@
+{
+  "enabled": false,
+  "glb": "head.glb",
+  "color": "head_color.jpg",
+  "density": "head_density.jpg",
+  "normal": null,
+  "thresholds": {
+    "blackMax": 0.12,
+    "grayPeak": 0.38,
+    "whiteMin": 0.55
+  },
+  "notes": "Defina enabled=true depois de colocar head.glb, head_color.jpg e head_density.jpg nesta pasta."
+}

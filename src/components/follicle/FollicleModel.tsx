@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import {
@@ -18,6 +18,7 @@ import {
   type Group,
   type InstancedMesh,
   type Mesh,
+  type Texture,
   type WebGLProgramParametersWithUniforms,
 } from "three";
 import {
@@ -26,6 +27,17 @@ import {
   countEarHairSites,
   type HairSite,
 } from "@/components/follicle/hairSites";
+import {
+  buildHairSitesFromDensity,
+  buildScalpShadesFromDensity,
+} from "@/components/follicle/hairSitesDensity";
+import { loadDensityMap, type DensityMapData } from "@/components/follicle/densityMap";
+import {
+  LEGACY_ASSETS,
+  loadPatientManifest,
+  patientUrl,
+  type DensityThresholds,
+} from "@/components/follicle/follicleConfig";
 
 /** Quantidade de enxertos na zona receptora (0 = Calvo, até MAX_GRAFTS). */
 export type GraftCount = number;
@@ -47,16 +59,77 @@ type Props = {
   userDragging?: boolean;
 };
 
-function useHeadGeometry(): BufferGeometry | null {
-  const gltf = useGLTF("/models/head.glb");
-  return useMemo(() => {
+type AssetMode = "loading" | "legacy" | "photo";
+
+type ResolvedAssets = {
+  mode: AssetMode;
+  glb: string;
+  color: string;
+  normal: string | null;
+  densityUrl: string | null;
+  thresholds: DensityThresholds | null;
+};
+
+function useResolvedAssets(): ResolvedAssets {
+  const [assets, setAssets] = useState<ResolvedAssets>({
+    mode: "loading",
+    glb: LEGACY_ASSETS.glb,
+    color: LEGACY_ASSETS.color,
+    normal: LEGACY_ASSETS.normal,
+    densityUrl: null,
+    thresholds: null,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const manifest = await loadPatientManifest();
+      if (cancelled) return;
+      if (manifest?.enabled) {
+        setAssets({
+          mode: "photo",
+          glb: patientUrl(manifest.glb),
+          color: patientUrl(manifest.color),
+          normal: manifest.normal ? patientUrl(manifest.normal) : null,
+          densityUrl: patientUrl(manifest.density),
+          thresholds: manifest.thresholds,
+        });
+      } else {
+        setAssets({
+          mode: "legacy",
+          glb: LEGACY_ASSETS.glb,
+          color: LEGACY_ASSETS.color,
+          normal: LEGACY_ASSETS.normal,
+          densityUrl: null,
+          thresholds: null,
+        });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return assets;
+}
+
+function HeadMesh({
+  glbUrl,
+  onGeometry,
+}: {
+  glbUrl: string;
+  onGeometry: (geo: BufferGeometry | null) => void;
+}) {
+  const gltf = useGLTF(glbUrl);
+  useLayoutEffect(() => {
     let geo: BufferGeometry | null = null;
     gltf.scene.traverse((o) => {
       const m = o as Mesh;
       if (m.isMesh && !geo) geo = m.geometry as BufferGeometry;
     });
-    return geo;
-  }, [gltf]);
+    onGeometry(geo);
+  }, [gltf, onGeometry]);
+  return null;
 }
 
 function writeHair(
@@ -81,11 +154,29 @@ function fillStaticHair(mesh: InstancedMesh | null, sites: HairSite[]) {
   if (!mesh || sites.length === 0) return;
   mesh.instanceMatrix.setUsage(DynamicDrawUsage);
   for (let i = 0; i < sites.length; i += 1) {
-    const site = sites[i]!;
-    writeHair(mesh, site, 1, i);
+    writeHair(mesh, sites[i]!, 1, i);
   }
   mesh.count = sites.length;
   mesh.instanceMatrix.needsUpdate = true;
+}
+
+function useTextures(colorUrl: string, normalUrl: string | null) {
+  return useMemo(() => {
+    const loader = new TextureLoader();
+    const color = loader.load(colorUrl);
+    color.flipY = false;
+    color.colorSpace = SRGBColorSpace;
+    color.wrapS = color.wrapT = RepeatWrapping;
+    color.anisotropy = 8;
+    let normal: Texture | null = null;
+    if (normalUrl) {
+      normal = loader.load(normalUrl);
+      normal.flipY = false;
+      normal.wrapS = normal.wrapT = RepeatWrapping;
+      normal.anisotropy = 8;
+    }
+    return { color, normal };
+  }, [colorUrl, normalUrl]);
 }
 
 export function FollicleModel({
@@ -102,41 +193,81 @@ export function FollicleModel({
   const skinShader = useRef<WebGLProgramParametersWithUniforms | null>(null);
   const graftFill = useRef(0);
 
-  const geometry = useHeadGeometry();
+  const assets = useResolvedAssets();
+  const [geometry, setGeometry] = useState<BufferGeometry | null>(null);
+  const [densityMap, setDensityMap] = useState<DensityMapData | null>(null);
 
-  const { albedo, normalMap } = useMemo(() => {
-    const loader = new TextureLoader();
-    const a = loader.load("/models/head-albedo.jpg");
-    a.flipY = false;
-    a.colorSpace = SRGBColorSpace;
-    a.wrapS = a.wrapT = RepeatWrapping;
-    a.anisotropy = 8;
-    const n = loader.load("/models/head-normal.jpg");
-    n.flipY = false;
-    n.wrapS = n.wrapT = RepeatWrapping;
-    n.anisotropy = 8;
-    return { albedo: a, normalMap: n };
+  const onGeometry = useCallback((geo: BufferGeometry | null) => {
+    setGeometry(geo);
   }, []);
+
+  const { color: albedo, normal: normalMap } = useTextures(
+    assets.mode === "loading" ? LEGACY_ASSETS.color : assets.color,
+    assets.mode === "photo" ? assets.normal : LEGACY_ASSETS.normal,
+  );
 
   useLayoutEffect(() => {
     return () => {
       albedo.dispose();
-      normalMap.dispose();
+      normalMap?.dispose();
     };
   }, [albedo, normalMap]);
 
-  // Sombra de suporte + máscara do couro (textura só no couro, não no rosto)
+  // Carrega density map no modo fotogrametria
+  useEffect(() => {
+    if (assets.mode !== "photo" || !assets.densityUrl) return;
+    let cancelled = false;
+    loadDensityMap(assets.densityUrl)
+      .then((map) => {
+        if (!cancelled) setDensityMap(map);
+      })
+      .catch((err) => {
+        console.error(
+          "[follicle] density map falhou — verifique os arquivos patient/",
+          err,
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [assets.mode, assets.densityUrl]);
+
+  // Limpa density ao sair do modo foto (sem setState síncrono no ramo early-return)
+  const densityForMode =
+    assets.mode === "photo" ? densityMap : null;
+
+  const photoReady =
+    assets.mode === "photo" &&
+    !!geometry &&
+    !!densityForMode &&
+    !!assets.thresholds;
+
+  // Sombra / máscara
   useLayoutEffect(() => {
     if (!geometry) return;
-    const { residual: rs, receptor: rc, surface } = buildScalpShades(geometry);
-    geometry.setAttribute("aResidualShade", new Float32BufferAttribute(rs, 1));
-    geometry.setAttribute("aReceptorShade", new Float32BufferAttribute(rc, 1));
-    geometry.setAttribute("aScalpMask", new Float32BufferAttribute(surface, 1));
-  }, [geometry]);
+    if (photoReady && densityForMode && assets.thresholds) {
+      const { residual: rs, receptor: rc, surface } = buildScalpShadesFromDensity(
+        geometry,
+        densityForMode,
+        assets.thresholds,
+      );
+      geometry.setAttribute("aResidualShade", new Float32BufferAttribute(rs, 1));
+      geometry.setAttribute("aReceptorShade", new Float32BufferAttribute(rc, 1));
+      geometry.setAttribute("aScalpMask", new Float32BufferAttribute(surface, 1));
+      return;
+    }
+    if (assets.mode === "legacy") {
+      const { residual: rs, receptor: rc, surface } = buildScalpShades(geometry);
+      geometry.setAttribute("aResidualShade", new Float32BufferAttribute(rs, 1));
+      geometry.setAttribute("aReceptorShade", new Float32BufferAttribute(rc, 1));
+      geometry.setAttribute("aScalpMask", new Float32BufferAttribute(surface, 1));
+    }
+  }, [geometry, photoReady, densityForMode, assets.mode, assets.thresholds]);
 
   const onBeforeCompile = useCallback(
     (shader: WebGLProgramParametersWithUniforms) => {
       shader.uniforms.uGraftFill = { value: graftFill.current };
+      shader.uniforms.uPhotoMode = { value: assets.mode === "photo" ? 1 : 0 };
       skinShader.current = shader;
 
       shader.vertexShader = shader.vertexShader
@@ -163,6 +294,7 @@ vScalpMask = aScalpMask;`,
           "#include <common>",
           `#include <common>
 uniform float uGraftFill;
+uniform float uPhotoMode;
 varying float vResidualShade;
 varying float vReceptorShade;
 varying float vScalpMask;`,
@@ -171,13 +303,14 @@ varying float vScalpMask;`,
           "#include <map_fragment>",
           `#include <map_fragment>
 {
-  // Rosto: tom bronzeado (ACES + luz de estúdio sobem muito o midtone).
-  vec3 flatSkin = vec3(0.561, 0.322, 0.196); // #8f5232
-  float scalp = clamp(vScalpMask, 0.0, 1.0);
-  // Couro também puxado para o mesmo tom — albedo original é clara demais.
-  diffuseColor.rgb = mix(flatSkin, diffuseColor.rgb * flatSkin * 1.35, scalp * 0.55);
+  if (uPhotoMode < 0.5) {
+    // Legado: tom uniforme no rosto; albedo só no couro
+    vec3 flatSkin = vec3(0.561, 0.322, 0.196);
+    float scalp = clamp(vScalpMask, 0.0, 1.0);
+    diffuseColor.rgb = mix(flatSkin, diffuseColor.rgb * flatSkin * 1.35, scalp * 0.55);
+  }
+  // Foto: albedo real intacto
 
-  // Sombra de suporte sob cabelo; entradas limpas no Calvo (uGraftFill=0)
   float shade = vResidualShade;
   shade = mix(shade, min(shade, vReceptorShade), clamp(uGraftFill, 0.0, 1.0));
   diffuseColor.rgb *= shade;
@@ -188,25 +321,51 @@ varying float vScalpMask;`,
           `#include <normal_fragment_maps>
 {
   float scalp = clamp(vScalpMask, 0.0, 1.0);
-  normal = normalize(mix(nonPerturbedNormal, normal, scalp * 0.35));
+  if (uPhotoMode < 0.5) {
+    normal = normalize(mix(nonPerturbedNormal, normal, scalp * 0.35));
+  }
 }`,
         );
     },
-    [],
+    [assets.mode],
   );
 
-  const receptorSites = useMemo(
-    () => (geometry ? buildHairSites(geometry, MAX_GRAFTS, "receptor") : []),
-    [geometry],
-  );
-  const residualSites = useMemo(
-    () => (geometry ? buildHairSites(geometry, RESIDUAL_HAIRS, "residual") : []),
-    [geometry],
-  );
+  const receptorSites = useMemo(() => {
+    if (!geometry) return [] as HairSite[];
+    if (photoReady && densityForMode && assets.thresholds) {
+      return buildHairSitesFromDensity(
+        geometry,
+        MAX_GRAFTS,
+        "receptor",
+        densityForMode,
+        assets.thresholds,
+      );
+    }
+    if (assets.mode === "legacy") {
+      return buildHairSites(geometry, MAX_GRAFTS, "receptor");
+    }
+    return [] as HairSite[];
+  }, [geometry, photoReady, densityForMode, assets.mode, assets.thresholds]);
 
-  // Auditoria: fios na orelha devem ser 0
+  const residualSites = useMemo(() => {
+    if (!geometry) return [] as HairSite[];
+    if (photoReady && densityForMode && assets.thresholds) {
+      return buildHairSitesFromDensity(
+        geometry,
+        RESIDUAL_HAIRS,
+        "residual",
+        densityForMode,
+        assets.thresholds,
+      );
+    }
+    if (assets.mode === "legacy") {
+      return buildHairSites(geometry, RESIDUAL_HAIRS, "residual");
+    }
+    return [] as HairSite[];
+  }, [geometry, photoReady, densityForMode, assets.mode, assets.thresholds]);
+
   useLayoutEffect(() => {
-    if (!geometry) return;
+    if (assets.mode !== "legacy" || !geometry) return;
     const earResidual = countEarHairSites(residualSites, geometry);
     const earReceptor = countEarHairSites(receptorSites, geometry);
     if (earResidual > 0 || earReceptor > 0) {
@@ -214,13 +373,12 @@ varying float vScalpMask;`,
         `[follicle] fios na orelha: residual=${earResidual} receptor=${earReceptor}`,
       );
     }
-  }, [geometry, residualSites, receptorSites]);
+  }, [geometry, residualSites, receptorSites, assets.mode]);
 
   useLayoutEffect(() => {
     targetCount.current = graftCount;
   }, [graftCount]);
 
-  // Cabeça preenchida — zona dos enxertos fica vazia no Calvo
   useLayoutEffect(() => {
     fillStaticHair(residual.current, residualSites);
   }, [residualSites]);
@@ -276,14 +434,20 @@ varying float vScalpMask;`,
     }
     mesh.instanceMatrix.needsUpdate = true;
 
-    // Sombra de suporte das entradas acompanha o preenchimento dos enxertos
     graftFill.current = visible / MAX_GRAFTS;
     if (skinShader.current) {
       skinShader.current.uniforms.uGraftFill.value = graftFill.current;
+      if (skinShader.current.uniforms.uPhotoMode) {
+        skinShader.current.uniforms.uPhotoMode.value =
+          assets.mode === "photo" ? 1 : 0;
+      }
     }
   });
 
-  if (!geometry) return null;
+  if (assets.mode === "loading") return null;
+
+  const glbUrl = assets.glb;
+  const useFlatTint = assets.mode === "legacy";
 
   return (
     <group
@@ -292,30 +456,32 @@ varying float vScalpMask;`,
       position={[0, -0.35, 0]}
       rotation={[0, 0, 0]}
     >
-      <mesh geometry={geometry} castShadow receiveShadow>
-        {/*
-          PBR: albedo/normal só no couro (aScalpMask).
-          Rosto permanece tom uniforme — evita falhas faciais da textura.
-          Entradas = couro limpo no Calvo (sombra do receptor só com uGraftFill).
-        */}
-        <meshPhysicalMaterial
-          map={albedo}
-          normalMap={normalMap}
-          normalScale={new Vector2(0.22, 0.22)}
-          color="#a3623d"
-          roughness={0.86}
-          metalness={0.0}
-          clearcoat={0.03}
-          clearcoatRoughness={0.7}
-          sheen={0.12}
-          sheenRoughness={0.7}
-          sheenColor="#8f5232"
-          onBeforeCompile={onBeforeCompile}
-          customProgramCacheKey={() => "scalp-pbr-skin-tan-v3"}
-        />
-      </mesh>
+      <HeadMesh glbUrl={glbUrl} onGeometry={onGeometry} />
 
-      {/* Cabelo em toda a cabeça (exceto zona dos enxertos) */}
+      {geometry ? (
+        <mesh geometry={geometry} castShadow receiveShadow>
+          <meshPhysicalMaterial
+            map={albedo}
+            normalMap={normalMap ?? undefined}
+            normalScale={new Vector2(0.22, 0.22)}
+            color={useFlatTint ? "#a3623d" : "#ffffff"}
+            roughness={assets.mode === "photo" ? 0.72 : 0.86}
+            metalness={0.0}
+            clearcoat={0.03}
+            clearcoatRoughness={0.7}
+            sheen={assets.mode === "photo" ? 0.08 : 0.12}
+            sheenRoughness={0.7}
+            sheenColor={useFlatTint ? "#8f5232" : "#c4a08a"}
+            onBeforeCompile={onBeforeCompile}
+            customProgramCacheKey={() =>
+              assets.mode === "photo"
+                ? "scalp-photo-density-v1"
+                : "scalp-pbr-skin-tan-v3"
+            }
+          />
+        </mesh>
+      ) : null}
+
       <instancedMesh
         ref={residual}
         args={[undefined, undefined, RESIDUAL_HAIRS]}
@@ -326,7 +492,6 @@ varying float vScalpMask;`,
         <meshStandardMaterial color="#2a2724" roughness={0.42} metalness={0.12} />
       </instancedMesh>
 
-      {/* Enxertos: vazios no Calvo → preenchem em 1.000 / 5.000 / Máximo */}
       <instancedMesh
         ref={receptor}
         args={[undefined, undefined, MAX_GRAFTS]}
@@ -340,4 +505,5 @@ varying float vScalpMask;`,
   );
 }
 
-useGLTF.preload("/models/head.glb");
+// Preload legado; o GLB do paciente é carregado sob demanda
+useGLTF.preload(LEGACY_ASSETS.glb);

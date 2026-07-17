@@ -155,6 +155,11 @@ export function FollicleSection() {
           Simulação ilustrativa. O número real de enxertos é definido apenas após
           avaliação presencial, de acordo com a área doadora disponível.
         </p>
+        <p className="mt-2 text-center text-[0.65rem] tracking-wide text-white/30">
+          Pipeline pronto para fotogrametria: coloque GLB + density map em{" "}
+          <code className="text-white/40">public/models/patient/</code> e ative o{" "}
+          <code className="text-white/40">manifest.json</code>.
+        </p>
       </div>
     </section>
   );

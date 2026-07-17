@@ -5,7 +5,6 @@ import { ResultsVideo } from "@/components/ResultsVideo";
 import { Reveal } from "@/components/Reveal";
 import { ScrollZoomImage } from "@/components/ScrollZoomImage";
 import { FAQ_ITEMS } from "@/lib/faq";
-import { PHOTO_REGIONS } from "@/lib/site";
 
 export function SectionShell({
   id,
@@ -324,41 +323,25 @@ export function HomeSections() {
       <SectionShell
         id="jornada"
         eyebrow="Pós-operatório"
-        title="Cuidado contínuo — inclusive depois que você já esqueceu que fez a cirurgia"
+        title="Doze meses de acompanhamento — não só as primeiras 48 horas"
       >
         <Reveal delayMs={120}>
           <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-            As primeiras 48 horas são a janela mais delicada da recuperação — e é
-            nelas que o acompanhamento é mais próximo. Depois, o protocolo
-            continua: fotos padronizadas a cada 3 meses, por 12 meses, disponíveis
-            na{" "}
+            As primeiras 48 horas pedem atenção próxima. Depois, o protocolo segue
+            com fotos padronizadas a cada três meses, até o marco de 12 meses —
+            registros na{" "}
             <a
               href="/paciente/login"
               className="text-black underline decoration-brand-gold underline-offset-4"
             >
               área do paciente
             </a>
-            .
+            , para acompanhar a densidade de verdade.
           </p>
         </Reveal>
-        <Reveal delayMs={200}>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-brand-gray">
-            M0 → M3 → M6 → M9 → M12 — cinco registros fotográficos padronizados
-            (frontal, superior, coroa, e ambos os perfis temporais), para
-            acompanhar a evolução real da densidade, não só a memória de como era
-            antes.
-          </p>
-        </Reveal>
-        <Reveal delayMs={280} variant="scale">
+        <Reveal delayMs={200} variant="scale">
           <JourneyTrack />
         </Reveal>
-        <ul className="mt-8 grid gap-2 text-sm text-brand-gray md:grid-cols-2">
-          {PHOTO_REGIONS.map((r, i) => (
-            <Reveal key={r.id} as="li" delayMs={80 + i * 60}>
-              • {r.label}
-            </Reveal>
-          ))}
-        </ul>
       </SectionShell>
 
       <SectionShell id="faq" eyebrow="Dúvidas" title="Perguntas frequentes">

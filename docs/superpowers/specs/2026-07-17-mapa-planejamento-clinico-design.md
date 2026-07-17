@@ -28,7 +28,9 @@
 
 ## Slider
 
-- 0 … 8000 UF (ilustrativo, alinhado ao MAX legado)
+- Escala ilustrativa 0–100% (sem quantidade absoluta de UF)
+- Cascata de zonas: entradas → frontal → médio → coroa
+- Disclaimer: volume real é individual, definido na avaliação
 - Marcos: Calvo · 1.000 · 5.000 · Máximo
 - Disclaimer: simulação ilustrativa; plano real só após avaliação
 

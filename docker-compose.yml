@@ -1,0 +1,12 @@
+services:
+  furtapp:
+    build: .
+    image: furtapp:latest
+    container_name: furtapp
+    restart: unless-stopped
+    ports:
+      # Host 3002 → container 3000 (3000 já está em uso no Mac)
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1

@@ -225,9 +225,9 @@ function sideburnMask(
   // Ponta para no lóbulo — sem cabelo abaixo da orelha
   const tip = smoothstep(0.68, 0.98, p.y);
 
-  // Diagonal frontal mais contida (não invade a bochecha, z>1.05)
-  // y baixo → zMax≈0.18 | y alto → zMax≈0.72
-  const zMax = mix(0.16, 0.72, Math.pow(y01, 0.9));
+  // Diagonal frontal: para antes da bochecha (isCheek em z>1.05)
+  // y baixo → zMax≈0.22 | y alto → zMax≈0.88
+  const zMax = mix(0.2, 0.88, Math.pow(y01, 0.85));
   const zMin = mix(0.02, -0.18, y01);
 
   const span = Math.max(zMax - zMin, 1e-3);

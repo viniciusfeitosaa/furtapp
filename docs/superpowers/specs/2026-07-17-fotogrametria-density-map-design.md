@@ -46,10 +46,13 @@ src/components/follicle/
   FollicleModel.tsx      # usa modo photo ou legacy
 ```
 
+## Demo assets (sem fotogrametria real)
+
+Enquanto não houver scan do paciente, `scripts/bake-patient-density.mjs` gera um pacote demo em `public/models/patient/` (GLB/albedo/normal da Lee Perry-Smith + density bake UV) com `enabled: true`, para validar o pipeline A.
+
 ## Fora de escopo (esta entrega)
 
-- Gerar fotogrametria ou pintar o density map (feito por você).
-- Trocar o preview legado visualmente até `enabled: true`.
+- Fotogrametria real do paciente.
 - Multi-paciente / upload no portal (fase seguinte).
 
 ## Critérios de sucesso

@@ -211,8 +211,8 @@ export function PlanningSection() {
         {tab === "photo3d" ? (
           <p className="mt-3 text-center text-[0.65rem] tracking-wide text-white/35">
             {photo3dReady
-              ? "Modo fotogrametria ativo (assets em public/models/patient/)."
-              : "3D genérico por enquanto. Para o paciente real: GLB + density map em public/models/patient/ e manifest enabled."}
+              ? "Modo A ativo com assets demo (cabeça + density map UV). Troque por fotogrametria real do paciente quando tiver."
+              : "3D genérico por enquanto. Para ativar o modo A: GLB + density map em public/models/patient/ e manifest enabled."}
           </p>
         ) : (
           <p className="mt-3 text-center text-[0.65rem] tracking-wide text-white/35">

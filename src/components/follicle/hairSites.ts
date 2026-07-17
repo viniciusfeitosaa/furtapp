@@ -261,8 +261,8 @@ export function residualDensity(
   m: HeadMetrics,
 ): number {
   if (isNeck(p, n)) return 0;
-  // Pinna profunda: sem fio (mas a costeleta ao redor continua)
-  if (isEar(p) && !inSideburnCorridor(p)) return 0;
+  // Pinna profunda: sem fio
+  if (isEar(p)) return 0;
 
   const keepNape = napeKeep(p);
   if (keepNape <= 0.05) return 0;
@@ -411,10 +411,7 @@ export function buildHairSites(
     if (Math.random() > Math.min(1, d + 0.08)) continue;
 
     // Hard rejects: pinna profunda e pescoço.
-    // Costeleta (corredor lateral) não é rejeitada por isEar — a orelha E
-    // da malha é maior e engolia o lado esquerdo.
-    if (isNeck(p, nrm)) continue;
-    if (isEar(p) && !inSideburnCorridor(p)) continue;
+    if (isEar(p) || isNeck(p, nrm)) continue;
     if (isDeepFace(p, nrm)) continue;
 
     if (!isResidual) {
@@ -441,8 +438,7 @@ export function buildHairSites(
         .addScaledVector(t1, (Math.random() - 0.5) * 0.18)
         .addScaledVector(t2, (Math.random() - 0.5) * 0.18)
         .normalize();
-      if (isNeck(hp, hn) || isDeepFace(hp, hn)) continue;
-      if (isEar(hp) && !inSideburnCorridor(hp)) continue;
+      if (isEar(hp) || isNeck(hp, hn) || isDeepFace(hp, hn)) continue;
       pushHair(hp, hn, grow);
     }
   }
@@ -455,8 +451,47 @@ export function buildHairSites(
     });
   }
 
+  // Malha assimétrica (orelha E maior) → espelha costeleta D→E se faltar
+  const balanced =
+    region === "residual" ? balanceSideburnSites(sites, count) : sites;
+
   geo.dispose();
-  return sites.slice(0, count);
+  return balanced.slice(0, count);
+}
+
+function isSideburnSite(s: HairSite): boolean {
+  return inSideburnCorridor(s.position);
+}
+
+/** Garante costeleta esquerda ≈ direita espelhando o lado mais denso. */
+function balanceSideburnSites(sites: HairSite[], count: number): HairSite[] {
+  const right = sites.filter((s) => isSideburnSite(s) && s.position.x > 0);
+  const left = sites.filter((s) => isSideburnSite(s) && s.position.x < 0);
+  if (right.length === 0 && left.length === 0) return sites;
+
+  const rich = right.length >= left.length ? right : left;
+  const richSign = rich === right ? 1 : -1;
+  const poorCount = rich === right ? left.length : right.length;
+  if (poorCount >= rich.length * 0.9) return sites;
+
+  // Remove costeleta do lado pobre; recoloca espelho completo do lado rico
+  const kept = sites.filter(
+    (s) => !(isSideburnSite(s) && Math.sign(s.position.x) === -richSign),
+  );
+  const mirrors: HairSite[] = rich.map((src) => ({
+    position: new Vector3(-src.position.x, src.position.y, src.position.z),
+    normal: new Vector3(-src.normal.x, src.normal.y, src.normal.z).normalize(),
+    jitter: Math.random(),
+    grow: src.grow,
+  }));
+
+  const out = [...kept, ...mirrors];
+  if (out.length <= count) return out;
+  // Corta sítios fora da costeleta no fim da lista para caber no budget
+  const sideburns = out.filter(isSideburnSite);
+  const other = out.filter((s) => !isSideburnSite(s));
+  const otherBudget = Math.max(0, count - sideburns.length);
+  return [...other.slice(0, otherBudget), ...sideburns].slice(0, count);
 }
 
 export function buildScalpShades(geometry: BufferGeometry): {

@@ -13,6 +13,11 @@ const STEP_LABELS: Record<(typeof CHECKPOINTS)[number], string> = {
   M12: "12 meses",
 };
 
+/** size-2.5 = 0.625rem → raio 0.3125rem; py-3 = 0.75rem */
+const DOT = "0.625rem";
+const DOT_R = "0.3125rem";
+const ROW_PAD = "0.75rem";
+
 export function JourneyTrack() {
   const ref = useRef<HTMLDivElement>(null);
   const raw = useScrollProgress(ref);
@@ -25,21 +30,27 @@ export function JourneyTrack() {
 
   return (
     <div ref={ref} className="mt-10">
-      {/* Desktop: linha horizontal com nós */}
+      {/* Desktop: faixa h-2.5 = altura do nó → linha no centro */}
       <ol className="relative hidden sm:grid sm:grid-cols-5">
         <div
-          className="pointer-events-none absolute top-[0.7rem] right-[10%] left-[10%] h-px bg-brand-gray-light"
+          className="pointer-events-none absolute top-0 right-[10%] left-[10%] flex items-center"
+          style={{ height: DOT }}
           aria-hidden
         >
-          <div
-            className="absolute inset-y-0 left-0 origin-left bg-brand-gold motion-reduce:transition-none"
-            style={{ width: `${progress * 100}%` }}
-          />
+          <div className="relative h-px w-full bg-brand-gray-light">
+            <div
+              className="absolute inset-y-0 left-0 origin-left bg-brand-gold motion-reduce:transition-none"
+              style={{ width: `${progress * 100}%` }}
+            />
+          </div>
         </div>
         {CHECKPOINTS.map((cp, i) => {
           const on = i <= activeIdx;
           return (
-            <li key={cp} className="relative flex flex-col items-center text-center">
+            <li
+              key={cp}
+              className="relative flex flex-col items-center text-center"
+            >
               <span
                 className={`relative z-10 block size-2.5 rounded-full transition-colors duration-300 motion-reduce:transition-none ${
                   on ? "bg-brand-gold" : "bg-brand-gray-mid"
@@ -65,28 +76,34 @@ export function JourneyTrack() {
         })}
       </ol>
 
-      {/* Mobile: trilha vertical */}
-      <ol className="relative space-y-0 sm:hidden">
+      {/* Mobile: nós no topo da linha (após py-3); trilha no centro dos círculos */}
+      <ol className="relative sm:hidden">
         <div
-          className="pointer-events-none absolute top-2 bottom-2 left-[0.3rem] w-px bg-brand-gray-light"
+          className="pointer-events-none absolute left-0 flex w-2.5 justify-center"
+          style={{
+            top: `calc(${ROW_PAD} + ${DOT_R})`,
+            bottom: `calc(${ROW_PAD} + ${DOT_R})`,
+          }}
           aria-hidden
         >
-          <div
-            className="absolute inset-x-0 top-0 origin-top bg-brand-gold motion-reduce:transition-none"
-            style={{ height: `${progress * 100}%` }}
-          />
+          <div className="relative h-full w-px bg-brand-gray-light">
+            <div
+              className="absolute inset-x-0 top-0 origin-top bg-brand-gold motion-reduce:transition-none"
+              style={{ height: `${progress * 100}%` }}
+            />
+          </div>
         </div>
         {CHECKPOINTS.map((cp, i) => {
           const on = i <= activeIdx;
           return (
-            <li key={cp} className="relative flex items-start gap-4 py-3 pl-1">
+            <li key={cp} className="relative flex items-start gap-4 py-3">
               <span
-                className={`relative z-10 mt-1.5 block size-2.5 shrink-0 rounded-full transition-colors duration-300 motion-reduce:transition-none ${
+                className={`relative z-10 block size-2.5 shrink-0 rounded-full transition-colors duration-300 motion-reduce:transition-none ${
                   on ? "bg-brand-gold" : "bg-brand-gray-mid"
                 }`}
                 aria-hidden
               />
-              <div>
+              <div className="-mt-0.5">
                 <span
                   className={`font-display text-xl tracking-wide transition-colors duration-300 motion-reduce:transition-none ${
                     on ? "text-black" : "text-brand-gray"

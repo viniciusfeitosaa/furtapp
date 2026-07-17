@@ -320,29 +320,59 @@ export function HomeSections() {
         </Reveal>
       </SectionShell>
 
-      <SectionShell
+      <section
         id="jornada"
-        eyebrow="Pós-operatório"
-        title="Doze meses de acompanhamento — não só as primeiras 48 horas"
+        className="relative overflow-hidden bg-[#e8e8e6] px-4 py-20 text-brand-charcoal md:px-6 md:py-28"
       >
-        <Reveal delayMs={120}>
-          <p className="font-serif-body max-w-2xl text-lg text-brand-charcoal">
-            As primeiras 48 horas pedem atenção próxima. Depois, o protocolo segue
-            com fotos padronizadas a cada três meses, até o marco de 12 meses —
-            registros na{" "}
-            <a
-              href="/paciente/login"
-              className="text-black underline decoration-brand-gold underline-offset-4"
-            >
-              área do paciente
-            </a>
-            , para acompanhar a densidade de verdade.
-          </p>
-        </Reveal>
-        <Reveal delayMs={200} variant="scale">
-          <JourneyTrack />
-        </Reveal>
-      </SectionShell>
+        {/* Retrato Gemini — base atmosférica */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <img
+            src="/media/jornada-pos-op.png"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[68%_20%] opacity-[0.42] sm:object-[72%_18%] sm:opacity-55 md:object-right md:opacity-70 lg:opacity-80"
+          />
+          {/* Véu: legibilidade do texto à esquerda / topo */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(105deg, rgba(232,232,230,0.97) 0%, rgba(232,232,230,0.92) 28%, rgba(232,232,230,0.72) 48%, rgba(232,232,230,0.35) 68%, rgba(232,232,230,0.12) 82%, transparent 100%), linear-gradient(180deg, rgba(232,232,230,0.55) 0%, transparent 22%, transparent 78%, rgba(232,232,230,0.65) 100%)",
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-6xl">
+          <Reveal delayMs={0}>
+            <p className="mb-3 text-[0.7rem] tracking-[0.3em] uppercase text-brand-charcoal">
+              Pós-operatório
+            </p>
+          </Reveal>
+          <Reveal delayMs={80}>
+            <h2 className="max-w-3xl font-display text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl">
+              Doze meses de acompanhamento — não só as primeiras 48 horas
+            </h2>
+          </Reveal>
+          <div className="mt-8">
+            <Reveal delayMs={120}>
+              <p className="font-serif-body max-w-xl text-lg text-brand-charcoal md:max-w-2xl">
+                As primeiras 48 horas pedem atenção próxima. Depois, o protocolo
+                segue com fotos padronizadas a cada três meses, até o marco de 12
+                meses — registros na{" "}
+                <a
+                  href="/paciente/login"
+                  className="text-black underline decoration-brand-gold underline-offset-4"
+                >
+                  área do paciente
+                </a>
+                , para acompanhar a densidade de verdade.
+              </p>
+            </Reveal>
+            <Reveal delayMs={200} variant="scale">
+              <JourneyTrack />
+            </Reveal>
+          </div>
+        </div>
+      </section>
 
       <SectionShell id="faq" eyebrow="Dúvidas" title="Perguntas frequentes">
         <div className="space-y-6">

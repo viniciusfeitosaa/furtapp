@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { CHECKPOINTS, PHOTO_REGIONS } from "@/lib/site";
+import { CHECKPOINTS } from "@/lib/site";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 
@@ -107,12 +107,10 @@ export function JourneyTrack() {
         })}
       </ol>
 
-      <p className="mt-8 max-w-2xl text-sm leading-relaxed text-brand-gray">
-        Em cada marco, o mesmo protocolo de cinco ângulos —{" "}
-        {PHOTO_REGIONS.map((r) => r.label.split(" / ")[0].toLowerCase()).join(
-          ", ",
-        )}
-        — para comparar evolução real, não só a memória.
+      <p className="mt-8 max-w-2xl text-sm leading-relaxed text-brand-charcoal/70">
+        Em cada marco, o mesmo protocolo de cinco ângulos — frontal, superior,
+        coroa e ambos os perfis temporais — para comparar evolução real, não só a
+        memória.
       </p>
     </div>
   );

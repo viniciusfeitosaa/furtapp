@@ -54,9 +54,10 @@ export function PlanningMapSection() {
         </Reveal>
         <Reveal delayMs={140}>
           <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/70 sm:text-lg">
-            Leitura técnica do couro: área doadora, zonas receptoras e densidade
-            do plano. Ajuste a escala e veja o escaneamento se formar — da
-            entrada vazia à densidade máxima ilustrativa.
+            Leitura técnica sobre uma cabeça real vista de cima: doadora,
+            receptoras e densidade do plano em overlay de scanner. Ajuste a
+            escala e veja o planejamento se formar — da entrada vazia à densidade
+            máxima ilustrativa.
           </p>
         </Reveal>
 

@@ -276,22 +276,21 @@ export function HomeSections() {
 
       <SectionShell
         id="resultados"
-        eyebrow="Prova visual"
-        title="Acompanhamento real — do consultório ao resultado"
+        title="Da Eslovênia ao Ceará — confiança que atravessa fronteiras"
       >
         <Reveal delayMs={80}>
-          <p className="font-serif-body max-w-2xl text-base leading-relaxed text-brand-charcoal sm:text-lg">
-            Um olhar sobre o acompanhamento de um paciente e o trabalho clínico
-            do Dr. Francisco Furtado — o mesmo critério que guia cada etapa do
-            protocolo de{" "}
-            <a
-              href="#jornada"
-              className="text-black underline decoration-brand-gold underline-offset-4"
-            >
-              12 meses pós-operatório
-            </a>
-            .
-          </p>
+          <div className="font-serif-body max-w-2xl space-y-4 text-base leading-relaxed text-brand-charcoal sm:text-lg">
+            <p>
+              Paciente da Eslovênia buscou transplante capilar em vários países
+              da Europa. Em nenhum se sentiu verdadeiramente confortável — até
+              conhecer o Dr. Francisco Furtado.
+            </p>
+            <p>
+              O vídeo mostra o pós-operatório, os resultados e o relato dele:
+              o nível de confiança e a qualidade do cuidado que fizeram a
+              diferença na escolha.
+            </p>
+          </div>
         </Reveal>
 
         <Reveal delayMs={160} variant="scale" className="mt-8 sm:mt-10">
@@ -300,8 +299,9 @@ export function HomeSections() {
 
         <Reveal delayMs={220}>
           <p className="mt-5 text-center text-xs leading-relaxed tracking-wide text-brand-gray sm:mt-6">
-            Conteúdo real, publicado com consentimento. O resultado individual
-            varia conforme avaliação, área doadora e aderência ao pós-operatório.
+            Relato e imagens reais, com consentimento do paciente. O resultado
+            individual varia conforme avaliação, área doadora e aderência ao
+            pós-operatório.
           </p>
         </Reveal>
       </SectionShell>

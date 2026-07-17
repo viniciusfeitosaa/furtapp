@@ -156,9 +156,9 @@ export function FollicleSection() {
           avaliação presencial, de acordo com a área doadora disponível.
         </p>
         <p className="mt-2 text-center text-[0.65rem] tracking-wide text-white/30">
-          Pipeline pronto para fotogrametria: coloque GLB + density map em{" "}
-          <code className="text-white/40">public/models/patient/</code> e ative o{" "}
-          <code className="text-white/40">manifest.json</code>.
+          Modo 3D com density map (assets demo). Troque por fotogrametria real em{" "}
+          <code className="text-white/40">public/models/patient/</code> quando
+          tiver.
         </p>
       </div>
     </section>

@@ -5,17 +5,34 @@ import { Reveal } from "@/components/Reveal";
 import { ScalpMapSvg } from "@/components/planning/ScalpMapSvg";
 import {
   PLAN_MAX_GRAFTS,
+  RECEPTOR_ZONES,
   formatGrafts,
   planGrafts,
   planStage,
+  zoneFills,
+  zoneGrafts,
+  type ReceptorZoneId,
 } from "@/lib/planningMap";
 import { whatsappUrl } from "@/lib/site";
+
+const ZONE_UI: Record<
+  ReceptorZoneId,
+  { label: string; short: string }
+> = {
+  templeL: { label: "Entrada esquerda", short: "Entrada E" },
+  templeR: { label: "Entrada direita", short: "Entrada D" },
+  frontal: { label: "Linha anterior", short: "Linha" },
+  mid: { label: "Couro médio", short: "Médio" },
+  crown: { label: "Coroa", short: "Coroa" },
+};
 
 export function PlanningMapSection() {
   const [graftCount, setGraftCount] = useState(0);
   const fill = graftCount / PLAN_MAX_GRAFTS;
   const pct = Math.round(fill * 100);
   const stage = useMemo(() => planStage(graftCount), [graftCount]);
+  const fills = useMemo(() => zoneFills(fill), [fill]);
+  const graftsByZone = useMemo(() => zoneGrafts(fill), [fill]);
 
   return (
     <section
@@ -46,22 +63,26 @@ export function PlanningMapSection() {
           </p>
         </Reveal>
 
-        <div className="mt-12 grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14">
+        <div className="mt-12 grid items-start gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:gap-16">
           <Reveal delayMs={180} variant="scale">
             <div className="relative overflow-hidden border border-white/10 bg-[#080a12]">
               <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent"
+                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-gold/70 to-transparent"
+                aria-hidden
+              />
+              <div
+                className="pointer-events-none absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-brand-gold/30 to-transparent"
                 aria-hidden
               />
               <ScalpMapSvg
                 fill={fill}
                 focus={stage.focus}
-                className="mx-auto block h-auto w-full max-w-lg"
+                className="mx-auto block h-auto w-full max-w-xl"
               />
             </div>
           </Reveal>
 
-          <div className="flex flex-col gap-8 lg:pt-4">
+          <div className="flex flex-col gap-7 lg:pt-2">
             <Reveal delayMs={220} variant="right">
               <div>
                 <p className="text-[0.65rem] tracking-[0.28em] text-white/40 uppercase">
@@ -76,37 +97,72 @@ export function PlanningMapSection() {
               </div>
             </Reveal>
 
-            <Reveal delayMs={280} variant="right">
-              <div className="flex items-end justify-between gap-4 border-t border-white/10 pt-6">
-                <div>
-                  <p className="text-[0.65rem] tracking-[0.28em] text-white/40 uppercase">
-                    Unidades foliculares
-                  </p>
-                  <p className="font-display mt-1 text-4xl text-white tabular-nums sm:text-5xl">
-                    {formatGrafts(planGrafts(fill))}
-                    <span className="ml-2 text-base font-normal tracking-normal text-white/35">
-                      / {formatGrafts(PLAN_MAX_GRAFTS)}
-                    </span>
-                  </p>
-                </div>
+            <Reveal delayMs={260} variant="right">
+              <div className="border-t border-white/10 pt-6">
+                <p className="text-[0.65rem] tracking-[0.28em] text-white/40 uppercase">
+                  Unidades foliculares
+                </p>
+                <p className="font-display mt-1 text-4xl text-white tabular-nums sm:text-5xl">
+                  {formatGrafts(planGrafts(fill))}
+                  <span className="ml-2 text-base font-normal tracking-normal text-white/35">
+                    / {formatGrafts(PLAN_MAX_GRAFTS)}
+                  </span>
+                </p>
               </div>
             </Reveal>
 
-            <Reveal delayMs={320} variant="right">
-              <ul className="grid gap-3 text-sm text-white/55">
-                <Legend swatch="donor" label="Área doadora — ferradura residual" />
-                <Legend
-                  swatch="empty"
-                  label="Área receptora — vazia no ponto de partida"
-                />
-                <Legend
-                  swatch="graft"
-                  label="Plano de enxerto — densidade ilustrativa"
-                />
+            <Reveal delayMs={300} variant="right">
+              <div>
+                <p className="mb-3 text-[0.65rem] tracking-[0.28em] text-white/40 uppercase">
+                  Distribuição por zona
+                </p>
+                <ul className="space-y-2.5">
+                  {RECEPTOR_ZONES.map((z) => {
+                    const level = fills[z.id];
+                    const n = graftsByZone[z.id];
+                    const active =
+                      stage.focus === z.id ||
+                      (stage.focus === "temples" &&
+                        (z.id === "templeL" || z.id === "templeR"));
+                    return (
+                      <li key={z.id}>
+                        <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
+                          <span
+                            className={
+                              active ? "text-brand-gold" : "text-white/60"
+                            }
+                          >
+                            {ZONE_UI[z.id].label}
+                          </span>
+                          <span className="tabular-nums text-white/45">
+                            {formatGrafts(n)}
+                          </span>
+                        </div>
+                        <div className="h-1 w-full bg-white/10">
+                          <div
+                            className="h-full bg-brand-gold transition-[width] duration-500 ease-out"
+                            style={{
+                              width: `${Math.round(level * 100)}%`,
+                              opacity: 0.35 + level * 0.65,
+                            }}
+                          />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </Reveal>
+
+            <Reveal delayMs={340} variant="right">
+              <ul className="grid gap-2.5 text-sm text-white/50">
+                <Legend swatch="donor" label="Doadora — ferradura com residual" />
+                <Legend swatch="empty" label="Receptora vazia — tracejado" />
+                <Legend swatch="graft" label="Plano — densidade em unidades" />
               </ul>
             </Reveal>
 
-            <Reveal delayMs={360} variant="right">
+            <Reveal delayMs={380} variant="right">
               <a
                 href={whatsappUrl(
                   "Olá! Vi o mapa de planejamento no site e gostaria de agendar minha avaliação.",
@@ -182,7 +238,7 @@ function Legend({
       ? "bg-[#6a5a32]"
       : swatch === "graft"
         ? "bg-brand-gold"
-        : "border border-white/25 bg-transparent";
+        : "border border-dashed border-white/30 bg-transparent";
   return (
     <li className="flex items-center gap-3">
       <span className={`inline-block h-2.5 w-2.5 shrink-0 ${tone}`} aria-hidden />

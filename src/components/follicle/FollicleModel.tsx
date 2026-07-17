@@ -65,8 +65,9 @@ function writeHair(
   grow: number,
   index: number,
 ) {
-  const len = HAIR_LEN * grow;
-  const t = HAIR_THICK * Math.max(grow, 0.001);
+  const g = Math.max(grow * (site.grow ?? 1), 0.001);
+  const len = HAIR_LEN * g;
+  const t = HAIR_THICK * Math.max(Math.sqrt(g), 0.35);
   dummy.position.copy(site.position);
   dummy.quaternion.setFromUnitVectors(up, site.normal);
   dummy.scale.set(t, len, t);
@@ -80,7 +81,8 @@ function fillStaticHair(mesh: InstancedMesh | null, sites: HairSite[]) {
   if (!mesh || sites.length === 0) return;
   mesh.instanceMatrix.setUsage(DynamicDrawUsage);
   for (let i = 0; i < sites.length; i += 1) {
-    writeHair(mesh, sites[i]!, 1, i);
+    const site = sites[i]!;
+    writeHair(mesh, site, 1, i);
   }
   mesh.count = sites.length;
   mesh.instanceMatrix.needsUpdate = true;

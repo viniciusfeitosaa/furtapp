@@ -11,15 +11,12 @@ export type HairSite = {
   position: Vector3;
   normal: Vector3;
   jitter: number;
+  /** Escala de comprimento do fio (costeleta/bordas mais curtas). */
+  grow: number;
 };
 
 export type ScalpRegion = "receptor" | "residual";
 
-/**
- * Métricas do head.glb (Lee Perry-Smith) medidas na malha real.
- * O bbox inclui extremos laterais baixos (|x|≈4.3) que NÃO são orelhas;
- * as orelhas reais estão em |x|≈1.6–1.9, y≈0.5–2.2.
- */
 type HeadMetrics = {
   earX: number;
   earY0: number;
@@ -48,11 +45,6 @@ function band(v: number, lo: number, hi: number, e: number) {
   return smoothstep(lo - e, lo, v) * (1 - smoothstep(hi, hi + e, v));
 }
 
-/**
- * Deriva métricas a partir da geometria (robusto a escala).
- * Orelha = saliência lateral na faixa de altura da cabeça média —
- * NÃO o extremo global de |x| (que fica baixo no bbox).
- */
 export function computeHeadMetrics(geometry: BufferGeometry): HeadMetrics {
   if (!geometry.attributes.normal) geometry.computeVertexNormals();
   geometry.computeBoundingBox();
@@ -92,9 +84,6 @@ export function computeHeadMetrics(geometry: BufferGeometry): HeadMetrics {
   };
 }
 
-/**
- * Pinna medida na malha real: |x| 1.62–1.90, y 0.68–2.0, z −0.50–0.33.
- */
 const EAR = { cx: 1.74, cy: 1.32, cz: -0.06, rx: 0.3, ry: 0.86, rz: 0.62 };
 
 function earDist2(p: Vector3): number {
@@ -104,51 +93,48 @@ function earDist2(p: Vector3): number {
   return dx * dx + dy * dy + dz * dz;
 }
 
-/**
- * 0 dentro da orelha, 1 fora.
- * Fade começa mais perto da pinna — mantém densidade até a raiz
- * (evita o "buraco" acima da orelha).
- */
+/** Densidade até a raiz da orelha — fade só dentro da pinna. */
 function earKeep(p: Vector3): number {
-  return smoothstep(0.9, 1.25, earDist2(p));
+  return smoothstep(0.85, 1.15, earDist2(p));
 }
 
 function isEar(p: Vector3): boolean {
-  return earDist2(p) < 1.0;
+  return earDist2(p) < 0.95;
 }
 
 /**
- * Rosto suave com atenuações contínuas.
- * A costeleta fica livre de bloqueios binários na borda.
+ * Rosto: bloqueia miolo + bochecha para o cabelo do crânio.
+ * A costeleta reentra depois via Math.max(sideburnMask) com fade longo —
+ * é isso que evita o "bloco" cortado reto.
  */
 function faceKeep(p: Vector3, n: Vector3): number {
   let f = 1;
+  const ax = Math.abs(p.x);
   const central =
-    (1 - smoothstep(1.05, 1.35, Math.abs(p.x))) *
-    smoothstep(0.7, 1.0, p.z) *
-    (1 - smoothstep(2.5, 2.85, p.y));
+    (1 - smoothstep(0.85, 1.15, ax)) *
+    smoothstep(0.85, 1.15, p.z) *
+    (1 - smoothstep(2.45, 2.85, p.y));
   f *= 1 - clamp01(central);
-  // Bochecha: fade mais gradual (não corta a costeleta em bloco)
+  // Bochecha: tira o cabelo de crânio; costeleta volta com taper
   const cheek =
-    smoothstep(1.38, 1.72, p.z) * (1 - smoothstep(2.45, 2.9, p.y));
+    smoothstep(0.95, 1.35, p.z) *
+    (1 - smoothstep(2.35, 2.9, p.y)) *
+    smoothstep(0.95, 1.3, ax);
   f *= 1 - clamp01(cheek);
   const forehead =
-    smoothstep(1.5, 1.75, p.z) * (1 - smoothstep(2.9, 3.2, p.y));
+    smoothstep(1.45, 1.75, p.z) * (1 - smoothstep(2.95, 3.25, p.y));
   f *= 1 - clamp01(forehead);
-  const jaw = smoothstep(0.5, 0.85, p.z) * (1 - smoothstep(0.45, 0.7, p.y));
+  const jaw = smoothstep(0.55, 0.95, p.z) * (1 - smoothstep(0.35, 0.65, p.y));
   f *= 1 - clamp01(jaw);
-  if (n.y < -0.5 && p.z > 0) f = 0;
+  if (n.y < -0.55 && p.z > 0.2) f = 0;
   return clamp01(f);
 }
 
-function isFace(p: Vector3, n: Vector3): boolean {
-  return faceKeep(p, n) < 0.4;
+function isDeepFace(p: Vector3, n: Vector3): boolean {
+  // Só rejeita o miolo facial — nunca a faixa da costeleta
+  return faceKeep(p, n) < 0.2 && Math.abs(p.x) < 1.15;
 }
 
-/**
- * Entradas (têmporas) — zona receptora, vazia no Calvo.
- * Só têmpora frontal-lateral; não invade coroa/occipital.
- */
 export function receptorDensity(
   p: Vector3,
   n: Vector3,
@@ -178,9 +164,6 @@ function isNeck(p: Vector3, n: Vector3): boolean {
   return false;
 }
 
-/**
- * Nuca arredondada: fade largo, sem "navalha" horizontal.
- */
 function napeKeep(p: Vector3): number {
   const back = 1 - smoothstep(-0.55, 0.75, p.z);
   const side = smoothstep(0.85, 1.55, Math.abs(p.x));
@@ -189,9 +172,53 @@ function napeKeep(p: Vector3): number {
 }
 
 /**
- * Densidade residual — laterais suaves.
- * Costeleta por normais (não caixas band); bridge acima da orelha.
+ * Costeleta: máscara contínua (sem band em caixa).
+ * Retorna { density, grow } — grow encurta os fios na borda (fim do "bloco").
  */
+function sideburnMask(
+  p: Vector3,
+  n: Vector3,
+): { density: number; grow: number } {
+  const ax = Math.abs(p.x);
+
+  // Faixa lateral na frente da orelha
+  const lateral = smoothstep(1.15, 1.4, ax) * (1 - smoothstep(1.7, 1.9, ax));
+  // Altura: desce do temple ao lóbulo com cauda longa (não corte em y=0.62)
+  const height = smoothstep(0.35, 0.85, p.y) * (1 - smoothstep(1.85, 2.35, p.y));
+  // Profundidade: da frente da orelha até a bochecha, fade LONGO
+  const depth =
+    smoothstep(-0.15, 0.25, p.z) * (1 - smoothstep(0.75, 1.45, p.z));
+  // Normal um pouco frontal / lateral — evita occipital
+  const facing = smoothstep(-0.45, 0.2, n.z);
+
+  const core = lateral * height * depth * Math.max(facing, 0.4);
+  if (core <= 0.02) return { density: 0, grow: 1 };
+
+  // Densidade: cheia no alto/perto da orelha; rareia na bochecha e embaixo
+  const densY = mix(0.25, 1, smoothstep(0.4, 1.4, p.y));
+  const densZ = 1 - smoothstep(0.7, 1.35, p.z); // some na bochecha
+  const densX = 1 - smoothstep(1.55, 1.82, ax);
+  const density = clamp01(core * densY * densZ * densX);
+
+  // Comprimento: curto na ponta da costeleta (visualmente some o "bloco")
+  const grow = mix(
+    0.28,
+    1,
+    clamp01(smoothstep(0.45, 1.35, p.y) * (1 - smoothstep(0.85, 1.4, p.z))),
+  );
+
+  return { density, grow };
+}
+
+/** Bridge denso logo acima da orelha. */
+function aboveEarMask(p: Vector3): number {
+  return (
+    band(Math.abs(p.x), 1.25, 1.75, 0.28) *
+    band(p.y, 1.75, 2.75, 0.35) *
+    band(p.z, -0.65, 0.55, 0.35)
+  );
+}
+
 export function residualDensity(
   p: Vector3,
   n: Vector3,
@@ -202,48 +229,35 @@ export function residualDensity(
   const keepNape = napeKeep(p);
   if (keepNape <= 0.05) return 0;
 
-  // Sem bloqueio binário isEar na densidade — só earKeep suave
   const kEar = earKeep(p);
   if (kEar <= 0) return 0;
 
   const keepFace = faceKeep(p, n);
-
   let d = keepNape * kEar * keepFace;
 
-  // Bridge: preenche o vão logo acima da orelha (falha clássica)
-  const aboveEar =
-    band(Math.abs(p.x), 1.28, 1.72, 0.22) *
-    band(p.y, 1.85, 2.65, 0.28) *
-    band(p.z, -0.55, 0.45, 0.28) *
-    kEar;
-  d = Math.max(d, clamp01(aboveEar) * keepNape);
+  // Preenche o vão acima da orelha
+  d = Math.max(d, clamp01(aboveEarMask(p)) * keepNape * kEar);
 
-  // Costeleta orgânica (normais + fades — sem band rígido)
-  const isSide = smoothstep(0.4, 0.65, Math.abs(p.x));
-  const isSideFrontY = smoothstep(0.55, 0.72, p.y);
-  // Frente da orelha até a bochecha (não usa |z| — evita cortar a frente)
-  const isSideFrontZ =
-    smoothstep(-0.25, 0.2, p.z) * (1 - smoothstep(0.95, 1.35, p.z));
+  // Costeleta orgânica — sobrescreve faceKeep na faixa lateral
+  const sb = sideburnMask(p, n);
+  d = Math.max(d, sb.density * keepNape * kEar);
 
-  if (isSide > 0.1 && isSideFrontY > 0.1 && isSideFrontZ > 0.1) {
-    // Descida suave pelo lóbulo via normal frontal
-    const sDescend = smoothstep(-0.15, 0.18, n.z);
-    // Fade lateral para a bochecha (sem bloco reto)
-    const sEdgeFade = 1 - smoothstep(1.3, 1.62, Math.abs(p.x));
-    // Mais denso em cima, mais ralo perto da mandíbula
-    const sDenst = mix(0.4, 0.88, smoothstep(0.55, 1.35, p.y));
-    const sideburnFinal = sDenst * sDescend * sEdgeFade * isSideFrontZ * isSide;
-    d = Math.max(d, clamp01(sideburnFinal) * keepNape * kEar);
-  }
-
-  // Calvície clássica nas têmporas
-  const templeGap = receptorDensity(p, n, m);
-  d *= 1 - templeGap;
-
+  d *= 1 - receptorDensity(p, n, m);
   return clamp01(d);
 }
 
-/** Máscara do couro (inclui entradas vazias) para textura PBR. */
+/** Grow local para residual (encurta bordas da costeleta). */
+function residualGrow(p: Vector3, n: Vector3, density: number): number {
+  const sb = sideburnMask(p, n);
+  if (sb.density > 0.05) {
+    // Na costeleta: usa o taper; mistura com densidade
+    return mix(sb.grow * 0.85, sb.grow, density);
+  }
+  // Nuca: um pouco mais curto na borda inferior
+  const napeEdge = smoothstep(0.05, 0.45, napeKeep(p));
+  return mix(0.65, 1, napeEdge);
+}
+
 export function scalpSurfaceMask(
   p: Vector3,
   n: Vector3,
@@ -251,7 +265,9 @@ export function scalpSurfaceMask(
 ): number {
   void m;
   if (isNeck(p, n)) return 0;
-  return clamp01(napeKeep(p) * earKeep(p) * faceKeep(p, n));
+  const sb = sideburnMask(p, n);
+  const base = napeKeep(p) * earKeep(p) * faceKeep(p, n);
+  return clamp01(Math.max(base, sb.density * napeKeep(p) * earKeep(p)));
 }
 
 function regionDensity(region: ScalpRegion) {
@@ -287,7 +303,6 @@ function tangentBasis(n: Vector3, t1: Vector3, t2: Vector3) {
 }
 const UP_REF = new Vector3(0, 1, 0);
 const X_REF = new Vector3(1, 0, 0);
-/** Fios do mesmo folículo — raios curtos para densidade real. */
 const CLUMP_RADIUS_RESIDUAL = 0.0035;
 const CLUMP_RADIUS_RECEPTOR = 0.005;
 
@@ -313,16 +328,17 @@ export function buildHairSites(
   const nrm = new Vector3();
   const t1 = new Vector3();
   const t2 = new Vector3();
-  const maxTries = count * 120;
+  const maxTries = count * 140;
   const clumpRadius = isResidual
     ? CLUMP_RADIUS_RESIDUAL
     : CLUMP_RADIUS_RECEPTOR;
 
-  const pushHair = (pos: Vector3, normal: Vector3) => {
+  const pushHair = (pos: Vector3, normal: Vector3, grow: number) => {
     sites.push({
       position: pos.clone(),
       normal: normal.clone(),
       jitter: Math.random(),
+      grow,
     });
   };
 
@@ -331,19 +347,24 @@ export function buildHairSites(
     nrm.normalize();
     const d = dens(p, nrm, m);
 
-    if (d < 0.05) continue;
-    // Aceitação proporcional à densidade local (ralo orgânico nas bordas)
-    if (Math.random() > d) continue;
-    if (isEar(p) || isFace(p, nrm) || isNeck(p, nrm)) continue;
+    if (d < 0.04) continue;
+    if (Math.random() > Math.min(1, d + 0.08)) continue;
+
+    // Hard rejects: só pinna e pescoço.
+    // NÃO usar isFace nas laterais — era isso que mantinha a costeleta em bloco.
+    if (isEar(p) || isNeck(p, nrm)) continue;
+    if (isDeepFace(p, nrm)) continue;
 
     if (!isResidual) {
-      pushHair(p, nrm);
+      pushHair(p, nrm, 1);
       continue;
     }
 
+    const grow = residualGrow(p, nrm, d);
+
     let unitSize = 1;
-    if (d > 0.6 && Math.random() < d * 0.9) unitSize = 2;
-    if (d > 0.82 && Math.random() < d * 0.75) unitSize = 3;
+    if (d > 0.55 && Math.random() < d * 0.9) unitSize = 2;
+    if (d > 0.8 && Math.random() < d * 0.7) unitSize = 3;
 
     tangentBasis(nrm, t1, t2);
     for (let h = 0; h < unitSize && sites.length < count; h += 1) {
@@ -355,11 +376,11 @@ export function buildHairSites(
         .addScaledVector(t2, Math.sin(ang) * r);
       const hn = nrm
         .clone()
-        .addScaledVector(t1, (Math.random() - 0.5) * 0.22)
-        .addScaledVector(t2, (Math.random() - 0.5) * 0.22)
+        .addScaledVector(t1, (Math.random() - 0.5) * 0.18)
+        .addScaledVector(t2, (Math.random() - 0.5) * 0.18)
         .normalize();
-      if (isEar(hp) || isNeck(hp, hn) || isFace(hp, hn)) continue;
-      pushHair(hp, hn);
+      if (isEar(hp) || isNeck(hp, hn) || isDeepFace(hp, hn)) continue;
+      pushHair(hp, hn, grow);
     }
   }
 
@@ -422,7 +443,7 @@ export function countFaceHairSites(
   void geometry;
   let n = 0;
   for (const s of sites) {
-    if (isFace(s.position, s.normal)) n += 1;
+    if (isDeepFace(s.position, s.normal)) n += 1;
   }
   return n;
 }

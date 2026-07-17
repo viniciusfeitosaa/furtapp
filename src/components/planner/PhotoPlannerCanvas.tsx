@@ -3,45 +3,54 @@
 import { useEffect, useRef } from "react";
 import {
   buildPhotoHairSites,
+  graftMask,
   type PhotoHairSite,
 } from "@/components/planner/photoDensity";
 
-const RESIDUAL = 4200;
-const GRAFT = 2800;
+const RESIDUAL = 5600;
+const GRAFT = 4200;
 
 function drawScalp(ctx: CanvasRenderingContext2D, w: number, h: number) {
   ctx.fillStyle = "#0c1018";
   ctx.fillRect(0, 0, w, h);
 
-  // Couro — oval
   const cx = w * 0.5;
   const cy = h * 0.42;
   const rx = w * 0.38;
   const ry = h * 0.48;
 
   const skin = ctx.createRadialGradient(cx, cy - ry * 0.2, rx * 0.1, cx, cy, rx);
-  skin.addColorStop(0, "#c49a78");
+  skin.addColorStop(0, "#c9a07c");
   skin.addColorStop(0.55, "#a67a55");
-  skin.addColorStop(1, "#8a6240");
+  skin.addColorStop(1, "#7a5538");
   ctx.fillStyle = skin;
   ctx.beginPath();
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Sombra suave nas entradas (zona calva)
-  ctx.fillStyle = "rgba(90, 55, 35, 0.22)";
-  for (const side of [-1, 1]) {
-    ctx.beginPath();
-    ctx.ellipse(cx + side * rx * 0.48, cy - ry * 0.1, rx * 0.22, ry * 0.28, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // Zona calva evidente (entradas + frontal + coroa) — brilho do couro
+  paintBaldGlow(ctx, w, h);
 
   // Contorno
-  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.strokeStyle = "rgba(255,255,255,0.1)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   ctx.stroke();
+}
+
+/** Manchas claras onde o slider vai plantar — leitura imediata da calvície. */
+function paintBaldGlow(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const step = 4;
+  for (let py = 0; py < h; py += step) {
+    for (let px = 0; px < w; px += step) {
+      const g = graftMask(px / w, py / h);
+      if (g < 0.2) continue;
+      const a = 0.1 + g * 0.28;
+      ctx.fillStyle = `rgba(210, 175, 140, ${a})`;
+      ctx.fillRect(px, py, step + 1, step + 1);
+    }
+  }
 }
 
 function drawHair(
@@ -53,15 +62,18 @@ function drawHair(
 ) {
   const x = site.x * w;
   const y = site.y * h;
-  const len = site.len * Math.min(w, h) * 2.2;
+  const scale = Math.min(w, h);
+  const len = site.len * scale * 2.8;
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(site.angle);
-  ctx.strokeStyle =
-    site.kind === "graft"
-      ? `rgba(32, 28, 24, ${0.75 * alpha})`
-      : `rgba(28, 24, 20, ${0.55 * alpha})`;
-  ctx.lineWidth = site.kind === "graft" ? 1.15 : 1;
+  if (site.kind === "graft") {
+    ctx.strokeStyle = `rgba(22, 18, 14, ${0.88 * alpha})`;
+    ctx.lineWidth = 1.45;
+  } else {
+    ctx.strokeStyle = `rgba(20, 16, 12, ${0.72 * alpha})`;
+    ctx.lineWidth = 1.25;
+  }
   ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(0, 0);
@@ -93,7 +105,7 @@ export function PhotoPlannerCanvas({
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const rect = canvas.getBoundingClientRect();
       const w = Math.max(320, Math.floor(rect.width));
-      const h = Math.max(200, Math.floor(rect.height));
+      const h = Math.max(240, Math.floor(rect.height));
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -110,8 +122,9 @@ export function PhotoPlannerCanvas({
       const visible = Math.round(sites.graft.length * clampFill(fill));
       for (let i = 0; i < visible; i += 1) {
         const s = sites.graft[i]!;
-        const t = visible <= 1 ? 1 : (visible - i) / Math.min(80, visible);
-        drawHair(ctx, s, w, h, 0.55 + 0.45 * Math.min(1, t));
+        // Últimos fios (frente da onda) um pouco mais fortes
+        const edge = visible <= 1 ? 1 : Math.min(1, (visible - i) / 120);
+        drawHair(ctx, s, w, h, 0.65 + 0.35 * edge);
       }
     };
 
@@ -124,7 +137,7 @@ export function PhotoPlannerCanvas({
   return (
     <canvas
       ref={canvasRef}
-      className="aspect-[16/10] h-auto w-full bg-[#060810] md:aspect-[21/9]"
+      className="aspect-[16/11] h-auto w-full bg-[#060810] md:aspect-[18/9]"
       aria-label="Simulação 2.5D da densidade capilar sobre o couro"
     />
   );

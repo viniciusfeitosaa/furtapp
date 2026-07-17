@@ -329,7 +329,7 @@ export function HomeSections() {
           <img
             src="/media/jornada-pos-op.png"
             alt=""
-            className="absolute inset-0 h-full w-full object-cover object-[68%_8%] opacity-[0.42] sm:object-[72%_5%] sm:opacity-55 md:object-[100%_0%] md:opacity-70 lg:opacity-80"
+            className="absolute inset-0 h-full w-full object-cover object-[68%_28%] opacity-[0.42] sm:object-[72%_26%] sm:opacity-55 md:object-[100%_32%] md:opacity-70 lg:opacity-80"
           />
           {/* Véu: legibilidade do texto à esquerda / topo */}
           <div

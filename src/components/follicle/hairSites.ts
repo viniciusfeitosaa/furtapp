@@ -172,8 +172,13 @@ function napeKeep(p: Vector3): number {
 }
 
 /**
- * Costeleta: máscara contínua (sem band em caixa).
- * Retorna { density, grow } — grow encurta os fios na borda (fim do "bloco").
+ * Costeleta em cunha / lágrima (formato real), NÃO faixa reta:
+ *
+ *   temple (y alto)  → larga, avança na bochecha
+ *   meio             → borda frontal diagonal (recua com y)
+ *   lóbulo (y baixo) → ponta fina colada na orelha
+ *
+ * zMax(y) define a diagonal clássica da frente.
  */
 function sideburnMask(
   p: Vector3,
@@ -181,34 +186,43 @@ function sideburnMask(
 ): { density: number; grow: number } {
   const ax = Math.abs(p.x);
 
-  // Faixa lateral na frente da orelha
-  const lateral = smoothstep(1.15, 1.4, ax) * (1 - smoothstep(1.7, 1.9, ax));
-  // Altura: desce do temple ao lóbulo com cauda longa (não corte em y=0.62)
-  const height = smoothstep(0.35, 0.85, p.y) * (1 - smoothstep(1.85, 2.35, p.y));
-  // Profundidade: da frente da orelha até a bochecha, fade LONGO
-  const depth =
-    smoothstep(-0.15, 0.25, p.z) * (1 - smoothstep(0.75, 1.45, p.z));
-  // Normal um pouco frontal / lateral — evita occipital
-  const facing = smoothstep(-0.45, 0.2, n.z);
+  const lateral = smoothstep(1.2, 1.4, ax) * (1 - smoothstep(1.7, 1.9, ax));
+  if (lateral <= 0.02) return { density: 0, grow: 1 };
 
-  const core = lateral * height * depth * Math.max(facing, 0.4);
-  if (core <= 0.02) return { density: 0, grow: 1 };
+  // 0 no lóbulo → 1 no temple
+  const y01 = clamp01((p.y - 0.48) / (2.1 - 0.48));
+  if (y01 <= 0) return { density: 0, grow: 1 };
+  const topCap = 1 - smoothstep(2.0, 2.4, p.y);
+  // Ponta inferior arredondada (some antes do pescoço)
+  const tip = smoothstep(0.48, 0.85, p.y);
 
-  // Densidade: cheia no alto/perto da orelha; rareia na bochecha e embaixo
-  const densY = mix(0.25, 1, smoothstep(0.4, 1.4, p.y));
-  const densZ = 1 - smoothstep(0.7, 1.35, p.z); // some na bochecha
-  const densX = 1 - smoothstep(1.55, 1.82, ax);
-  const density = clamp01(core * densY * densZ * densX);
+  // Diagonal frontal: larga em cima, fina embaixo
+  // y≈0.55 → zMax≈0.22 | y≈1.2 → zMax≈0.55 | y≈2.0 → zMax≈0.95
+  const zMax = mix(0.2, 0.98, Math.pow(y01, 0.85));
+  const zMin = mix(0.05, -0.2, y01);
 
-  // Comprimento: bem curto na ponta (diferença visual clara vs bloco antigo)
+  const span = Math.max(zMax - zMin, 1e-3);
+  const zT = (p.z - zMin) / span;
+  if (zT < -0.2 || zT > 1.2) return { density: 0, grow: 1 };
+
+  const inBack = smoothstep(-0.15, 0.12, zT);
+  // Borda frontal macia (a diagonal “de verdade”)
+  const inFront = 1 - smoothstep(0.55, 1.02, zT);
+  const inWedge = inBack * inFront;
+
+  const facing = smoothstep(-0.6, 0.2, n.z);
+  const core = lateral * topCap * tip * inWedge * Math.max(facing, 0.45);
+  if (core <= 0.03) return { density: 0, grow: 1 };
+
+  // Cheia junto à orelha; rareia na diagonal
+  const densCore = mix(0.55, 1, 1 - clamp01(zT * 1.1));
+  const densY = mix(0.55, 1, y01);
+  const density = clamp01(core * densCore * densY);
+
   const grow = mix(
     0.12,
     1,
-    clamp01(
-      smoothstep(0.4, 1.45, p.y) *
-        (1 - smoothstep(0.65, 1.25, p.z)) *
-        (1 - smoothstep(1.5, 1.78, ax)),
-    ),
+    clamp01(densY * densCore * smoothstep(0.55, 1, tip)),
   );
 
   return { density, grow };
@@ -239,12 +253,26 @@ export function residualDensity(
   const keepFace = faceKeep(p, n);
   let d = keepNape * kEar * keepFace;
 
-  // Preenche o vão acima da orelha
+  // Apaga o retângulo de cabelo de crânio na faixa da costeleta
+  // (senão a cunha some por baixo da faixa reta).
+  const ax = Math.abs(p.x);
+  const sideRect =
+    smoothstep(1.15, 1.38, ax) *
+    (1 - smoothstep(1.7, 1.92, ax)) *
+    smoothstep(0.4, 0.65, p.y) *
+    (1 - smoothstep(2.05, 2.45, p.y)) *
+    smoothstep(-0.3, 0.05, p.z);
+  d *= 1 - clamp01(sideRect) * 0.97;
+
+  // Vão acima da orelha
   d = Math.max(d, clamp01(aboveEarMask(p)) * keepNape * kEar);
 
-  // Costeleta orgânica — sobrescreve faceKeep na faixa lateral
+  // Costeleta em cunha — NÃO multiplicar por earKeep (a raiz da orelha
+  // fica dentro do fade da pinna e apagava o miolo da costeleta).
   const sb = sideburnMask(p, n);
-  d = Math.max(d, sb.density * keepNape * kEar);
+  if (sb.density > 0.02 && !isEar(p)) {
+    d = Math.max(d, sb.density * keepNape);
+  }
 
   d *= 1 - receptorDensity(p, n, m);
   return clamp01(d);

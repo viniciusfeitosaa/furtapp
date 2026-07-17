@@ -142,3 +142,51 @@ body {
     opacity: 1;
   }
 }
+
+/* Slider do mapa — alvo de toque maior no mobile */
+.plan-range {
+  touch-action: pan-y;
+  accent-color: #b6a46e;
+}
+
+.plan-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  background: #b6a46e;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  margin-top: -7px;
+}
+
+.plan-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: #b6a46e;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.plan-range::-webkit-slider-runnable-track {
+  height: 8px;
+}
+
+.plan-range::-moz-range-track {
+  height: 8px;
+  background: transparent;
+}
+
+@media (min-width: 768px) {
+  .plan-range::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+    margin-top: -5px;
+  }
+  .plan-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -20,25 +20,25 @@ export function PlanningMapSection() {
   return (
     <section
       id="foliculo"
-      className="scroll-mt-24 bg-[#060810] px-4 py-20 text-white md:px-6 md:py-28"
+      className="scroll-mt-24 overflow-x-hidden bg-[#060810] px-4 py-14 text-white sm:py-20 md:px-6 md:py-28"
       aria-labelledby="plan-map-title"
     >
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto w-full min-w-0 max-w-6xl">
         <Reveal>
-          <p className="mb-3 text-[0.7rem] tracking-[0.3em] text-brand-gold uppercase">
+          <p className="mb-3 text-[0.65rem] tracking-[0.22em] text-brand-gold uppercase sm:text-[0.7rem] sm:tracking-[0.3em]">
             Planejamento
           </p>
         </Reveal>
         <Reveal delayMs={80}>
           <h2
             id="plan-map-title"
-            className="font-display max-w-3xl text-[2.15rem] leading-[1.05] sm:text-4xl md:text-5xl"
+            className="font-display max-w-3xl text-[1.85rem] leading-[1.08] sm:text-[2.15rem] sm:text-4xl md:text-5xl"
           >
             O mapa antes da decisão
           </h2>
         </Reveal>
         <Reveal delayMs={140}>
-          <p className="font-serif-body mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+          <p className="font-serif-body mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-white/75 sm:mt-5 sm:text-base sm:text-lg">
             Todo transplante começa pelo desenho do plano: de onde saem os
             enxertos, para onde vão, e com que densidade. Ajuste a escala e veja
             o mapa clínico se formar — da entrada vazia à densidade máxima
@@ -46,45 +46,57 @@ export function PlanningMapSection() {
           </p>
         </Reveal>
 
-        <div className="mt-12 grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14">
-          <Reveal delayMs={180} variant="scale">
-            <div className="relative overflow-hidden border border-white/10 bg-[#080a12]">
-              <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent"
-                aria-hidden
-              />
-              <ScalpMapSvg
-                fill={fill}
-                focus={stage.focus}
-                className="mx-auto block h-auto w-full max-w-lg"
-              />
-            </div>
-          </Reveal>
+        {/* Mobile: mapa → slider → leitura. Desktop: mapa | painel, slider abaixo. */}
+        <div className="mt-8 grid min-w-0 items-start gap-8 sm:mt-10 lg:mt-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12">
+          <div className="min-w-0 space-y-6 sm:space-y-8">
+            <Reveal delayMs={180} variant="scale">
+              <div className="relative overflow-hidden border border-white/10 bg-[#080a12]">
+                <div
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent"
+                  aria-hidden
+                />
+                <ScalpMapSvg
+                  fill={fill}
+                  focus={stage.focus}
+                  className="mx-auto block h-auto w-full max-w-none sm:max-w-lg"
+                />
+              </div>
+            </Reveal>
 
-          <div className="flex flex-col gap-8 lg:pt-4">
-            <Reveal delayMs={220} variant="right">
+            {/* Slider colado ao mapa no mobile */}
+            <Reveal delayMs={200} className="lg:hidden">
+              <PlanSlider
+                graftCount={graftCount}
+                pct={pct}
+                onChange={setGraftCount}
+              />
+            </Reveal>
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-6 sm:gap-8 lg:pt-2">
+            <Reveal delayMs={220} variant="up">
               <div>
-                <p className="text-[0.65rem] tracking-[0.28em] text-white/40 uppercase">
+                <p className="text-[0.65rem] tracking-[0.22em] text-white/40 uppercase sm:tracking-[0.28em]">
                   Etapa do plano
                 </p>
-                <p className="font-display mt-2 text-3xl text-brand-gold sm:text-4xl">
+                <p className="font-display mt-2 text-2xl text-brand-gold sm:text-3xl md:text-4xl">
                   {stage.title}
                 </p>
-                <p className="font-serif-body mt-3 text-base leading-relaxed text-white/70">
+                <p className="font-serif-body mt-2 text-sm leading-relaxed text-white/70 sm:mt-3 sm:text-base">
                   {stage.detail}
                 </p>
               </div>
             </Reveal>
 
-            <Reveal delayMs={280} variant="right">
-              <div className="flex items-end justify-between gap-4 border-t border-white/10 pt-6">
-                <div>
-                  <p className="text-[0.65rem] tracking-[0.28em] text-white/40 uppercase">
+            <Reveal delayMs={260} variant="up">
+              <div className="flex items-end justify-between gap-3 border-t border-white/10 pt-5 sm:gap-4 sm:pt-6">
+                <div className="min-w-0">
+                  <p className="text-[0.65rem] tracking-[0.22em] text-white/40 uppercase sm:tracking-[0.28em]">
                     Unidades foliculares
                   </p>
-                  <p className="font-display mt-1 text-4xl text-white tabular-nums sm:text-5xl">
+                  <p className="font-display mt-1 text-3xl text-white tabular-nums sm:text-4xl md:text-5xl">
                     {formatGrafts(planGrafts(fill))}
-                    <span className="ml-2 text-base font-normal tracking-normal text-white/35">
+                    <span className="ml-1.5 text-sm font-normal tracking-normal text-white/35 sm:ml-2 sm:text-base">
                       / {formatGrafts(PLAN_MAX_GRAFTS)}
                     </span>
                   </p>
@@ -92,28 +104,31 @@ export function PlanningMapSection() {
               </div>
             </Reveal>
 
-            <Reveal delayMs={320} variant="right">
-              <ul className="grid gap-3 text-sm text-white/55">
-                <Legend swatch="donor" label="Área doadora — ferradura residual" />
+            <Reveal delayMs={300} variant="up">
+              <ul className="grid gap-2.5 text-sm text-white/55 sm:gap-3">
+                <Legend
+                  swatch="donor"
+                  label="Doadora — ferradura residual"
+                />
                 <Legend
                   swatch="empty"
-                  label="Área receptora — vazia no ponto de partida"
+                  label="Receptora — vazia no ponto de partida"
                 />
                 <Legend
                   swatch="graft"
-                  label="Plano de enxerto — densidade ilustrativa"
+                  label="Enxerto — densidade ilustrativa"
                 />
               </ul>
             </Reveal>
 
-            <Reveal delayMs={360} variant="right">
+            <Reveal delayMs={340} variant="up">
               <a
                 href={whatsappUrl(
                   "Olá! Vi o mapa de planejamento no site e gostaria de agendar minha avaliação.",
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-12 items-center justify-center bg-brand-gold px-7 py-3.5 text-sm font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft"
+                className="inline-flex min-h-12 w-full items-center justify-center bg-brand-gold px-6 py-3.5 text-center text-sm font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft sm:w-auto sm:px-7"
               >
                 Agendar avaliação para o plano real
               </a>
@@ -121,52 +136,73 @@ export function PlanningMapSection() {
           </div>
         </div>
 
-        <Reveal delayMs={200} className="mx-auto mt-12 max-w-xl">
-          <div className="mb-3 flex items-end justify-between gap-4">
-            <label
-              htmlFor="plan-density"
-              className="text-xs font-semibold tracking-wide text-white/70 uppercase"
-            >
-              Escala do planejamento
-            </label>
-            <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
-              {pct}% do teto ilustrativo
-            </p>
-          </div>
-
-          <input
-            id="plan-density"
-            type="range"
-            min={0}
-            max={PLAN_MAX_GRAFTS}
-            step={50}
-            value={graftCount}
-            onChange={(e) => setGraftCount(Number(e.target.value))}
-            className="graft-slider h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 accent-brand-gold"
-            aria-valuemin={0}
-            aria-valuemax={PLAN_MAX_GRAFTS}
-            aria-valuenow={graftCount}
-            aria-valuetext={`${formatGrafts(graftCount)} unidades foliculares`}
-            style={{
-              background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${pct}%, rgba(255,255,255,0.15) ${pct}%, rgba(255,255,255,0.15) 100%)`,
-            }}
+        {/* Slider desktop — abaixo do grid */}
+        <Reveal delayMs={200} className="mx-auto mt-10 hidden max-w-xl lg:mt-12 lg:block">
+          <PlanSlider
+            graftCount={graftCount}
+            pct={pct}
+            onChange={setGraftCount}
           />
-
-          <div className="mt-2 flex justify-between text-[0.65rem] tracking-wide text-white/40 uppercase">
-            <span>Calvo</span>
-            <span>1.000</span>
-            <span>5.000</span>
-            <span>Máximo</span>
-          </div>
         </Reveal>
 
-        <p className="mt-8 text-center text-xs leading-relaxed tracking-wide text-white/40">
+        <p className="mt-8 px-1 text-center text-[0.7rem] leading-relaxed tracking-wide text-white/40 sm:mt-8 sm:text-xs">
           Simulação ilustrativa para educação do paciente. O número real de
           enxertos e a distribuição por zona são definidos apenas após avaliação
           presencial, conforme a área doadora disponível.
         </p>
       </div>
     </section>
+  );
+}
+
+function PlanSlider({
+  graftCount,
+  pct,
+  onChange,
+}: {
+  graftCount: number;
+  pct: number;
+  onChange: (n: number) => void;
+}) {
+  return (
+    <div className="min-w-0">
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <label
+          htmlFor="plan-density"
+          className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase sm:text-xs"
+        >
+          Escala do planejamento
+        </label>
+        <p className="shrink-0 text-[0.65rem] tracking-wide text-white/40 uppercase">
+          {pct}%
+        </p>
+      </div>
+
+      <input
+        id="plan-density"
+        type="range"
+        min={0}
+        max={PLAN_MAX_GRAFTS}
+        step={50}
+        value={graftCount}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15"
+        aria-valuemin={0}
+        aria-valuemax={PLAN_MAX_GRAFTS}
+        aria-valuenow={graftCount}
+        aria-valuetext={`${formatGrafts(graftCount)} unidades foliculares`}
+        style={{
+          background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${pct}%, rgba(255,255,255,0.15) ${pct}%, rgba(255,255,255,0.15) 100%)`,
+        }}
+      />
+
+      <div className="mt-2 flex justify-between text-[0.6rem] tracking-wide text-white/40 uppercase sm:text-[0.65rem]">
+        <span>Calvo</span>
+        <span>1.000</span>
+        <span>5.000</span>
+        <span>Máximo</span>
+      </div>
+    </div>
   );
 }
 
@@ -184,9 +220,12 @@ function Legend({
         ? "bg-brand-gold"
         : "border border-white/25 bg-transparent";
   return (
-    <li className="flex items-center gap-3">
-      <span className={`inline-block h-2.5 w-2.5 shrink-0 ${tone}`} aria-hidden />
-      <span>{label}</span>
+    <li className="flex items-start gap-3">
+      <span
+        className={`mt-1.5 inline-block h-2.5 w-2.5 shrink-0 ${tone}`}
+        aria-hidden
+      />
+      <span className="min-w-0 leading-snug">{label}</span>
     </li>
   );
 }

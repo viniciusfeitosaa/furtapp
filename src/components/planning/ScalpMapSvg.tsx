@@ -254,14 +254,14 @@ export function ScalpMapSvg({ fill, focus = "idle", className = "" }: Props) {
         );
       })}
 
-      {/* Rótulos de orientação */}
+      {/* Rótulos de orientação — letter-spacing menor para caber no mobile */}
       <text
         x="200"
         y="48"
         textAnchor="middle"
         fill="rgba(182,164,110,0.7)"
-        fontSize="11"
-        letterSpacing="0.28em"
+        fontSize="10"
+        letterSpacing="0.2em"
         style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
       >
         FRENTE
@@ -271,8 +271,8 @@ export function ScalpMapSvg({ fill, focus = "idle", className = "" }: Props) {
         y="462"
         textAnchor="middle"
         fill="rgba(255,255,255,0.35)"
-        fontSize="11"
-        letterSpacing="0.28em"
+        fontSize="10"
+        letterSpacing="0.2em"
         style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
       >
         NUCA
@@ -282,8 +282,8 @@ export function ScalpMapSvg({ fill, focus = "idle", className = "" }: Props) {
         y="390"
         textAnchor="middle"
         fill="rgba(182,164,110,0.55)"
-        fontSize="10"
-        letterSpacing="0.18em"
+        fontSize="9"
+        letterSpacing="0.14em"
         style={{ fontFamily: "var(--font-poppins), system-ui, sans-serif" }}
       >
         DOADORA

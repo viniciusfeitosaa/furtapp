@@ -3,9 +3,9 @@ import { LiveTryOn } from "@/components/tryon/LiveTryOn";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Experimente ao vivo | Densidade ilustrativa",
+  title: "Experimente ao vivo | Segmentação de cabelo",
   description:
-    "Ative a câmera e veja um preenchimento ilustrativo de densidade capilar no seu rosto — simulação educativa do Dr. Francisco Furtado.",
+    "Ative a câmera: a IA segmenta seu cabelo e aplica reforço de tom/densidade no aparelho — experiência educativa do Dr. Francisco Furtado.",
 };
 
 export default function ExperimentePage() {
@@ -19,10 +19,9 @@ export default function ExperimentePage() {
           Veja a densidade se formar — ao vivo
         </h1>
         <p className="font-serif-body mt-5 max-w-2xl text-lg text-white/75">
-          Estamos evoluindo esta experiência para um try-on de cabelo de verdade
-          (com oclusão e estilos reais — não um chapéu 3D). A versão atual é
-          experimental. Privado no seu aparelho — {SITE.name} não recebe a
-          imagem.
+          Agora a câmera segmenta o cabelo real e aplica reforço de tom —
+          sem o chapéu 3D. Em seguida virão estilos completos via SDK. Privado
+          no seu aparelho — {SITE.name} não recebe a imagem.
         </p>
 
         <div className="mt-10">

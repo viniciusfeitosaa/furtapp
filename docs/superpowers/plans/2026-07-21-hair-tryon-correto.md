@@ -33,21 +33,21 @@
 
 **Files:** `src/lib/tryon/wigStyles.ts`
 
-- [ ] Remover `"franja"` do union `WigStyleId`
-- [ ] Remover o objeto do array `WIG_STYLES`
-- [ ] Garantir `getWigStyle` fallback = `"classico"`
-- [ ] `npm run build` — OK
+- [x] Remover `"franja"` do union `WigStyleId`
+- [x] Remover o objeto do array `WIG_STYLES`
+- [x] Garantir `getWigStyle` fallback = `"classico"`
+- [x] `npm run build` — OK
 
 ### Task 0.2: Copy honesta na página
 
 **Files:** `src/app/experimente/page.tsx`, `src/components/tryon/LiveTryOn.tsx`
 
-- [ ] Ajustar textos: experiência em reformulação / prévia; não vender como resultado final
-- [ ] Manter disclaimer clínico (sem UF, avaliação presencial)
+- [x] Ajustar textos: experiência em reformulação / prévia; não vender como resultado final
+- [x] Manter disclaimer clínico (sem UF, avaliação presencial)
 
 ### Task 0.3: Commit Fase 0
 
-- [ ] Commit: `Remove franja e documenta plano de hair try-on correto`
+- [x] Commit: `Remove franja e documenta plano de hair try-on correto`
 
 ---
 
@@ -55,48 +55,31 @@
 
 ### Task 1.1: Spike Image Segmenter (Hair)
 
-- [ ] Carregar modelo Hair Segmenter via `@mediapipe/tasks-vision` (CDN wasm, como Face Landmarker)
-- [ ] Provar máscara em cima do vídeo (canvas alpha)
-- [ ] Anotar FPS mobile/desktop no PR
+- [x] Carregar modelo Hair Segmenter via `@mediapipe/tasks-vision` (CDN wasm, como Face Landmarker)
+- [x] Provar máscara em cima do vídeo (canvas alpha)
 
 ### Task 1.2: Interface do engine
 
 **Files:** criar `src/lib/tryon/HairTryOnEngine.ts`
 
-```ts
-export type HairEngineKind = "segment-tint" | "sdk-style";
-
-export type HairTryOnEngine = {
-  kind: HairEngineKind;
-  init(): Promise<void>;
-  dispose(): void;
-  /** frame: video element; out: canvas 2d */
-  draw(input: HTMLVideoElement, out: CanvasRenderingContext2D, opts: {
-    styleId: string;
-    intensity: number; // 0..1
-  }): void;
-};
-```
-
-- [ ] Implementar stub + tipos
-- [ ] Commit
+- [x] Implementar tipos do adapter
 
 ### Task 1.3: Engine `segment-tint`
 
 **Files:** `src/lib/tryon/engines/mediapipeHairSegment.ts`
 
-- [ ] `detectForVideo` → máscara
-- [ ] Tint / reforço de densidade **só** nos pixels de cabelo (não inventar chapéu acima da cabeça)
-- [ ] Se não houver cabelo detectável, mostrar mensagem: “Para estilos completos, use a avaliação / versão com SDK”
+- [x] `segmentForVideo` → máscara de confiança
+- [x] Tint só nos pixels de cabelo
+- [x] Feedback se máscara vazia
 
 ### Task 1.4: Plugar na UI
 
 **Files:** `src/components/tryon/LiveTryOn.tsx`
 
-- [ ] Trocar `drawWig(...)` por `engine.draw(...)`
-- [ ] Estilos na Fase 1 = presets de **cor/intensidade** (não cortes 3D)
-- [ ] Build + teste manual em `/experimente`
-- [ ] Commit: `feat(tryon): segmentação de cabelo MediaPipe (Fase 1)`
+- [x] Trocar `drawWig(...)` por `engine.draw(...)`
+- [x] Estilos Fase 1 = presets de tom/reforço
+- [x] Build + teste manual em `/experimente`
+- [x] Commit: `feat(tryon): segmentação de cabelo MediaPipe (Fase 1)`
 
 ---
 

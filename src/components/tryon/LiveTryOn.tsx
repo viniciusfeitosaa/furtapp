@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCamera } from "@/hooks/useCamera";
-import { drawHairFill } from "@/lib/tryon/drawHairFill";
+import { drawWig } from "@/lib/tryon/drawWig";
+import { WIG_STYLES, type WigStyleId } from "@/lib/tryon/wigStyles";
 import { whatsappUrl } from "@/lib/site";
 
 const WASM_ROOT =
@@ -19,11 +20,21 @@ export function LiveTryOn() {
   const landmarkerRef = useRef<FaceLandmarkerType | null>(null);
   const rafRef = useRef(0);
   const lastTsRef = useRef(-1);
-  const [density, setDensity] = useState(55);
+  const styleRef = useRef<WigStyleId>("classico");
+  const opacityRef = useRef(0.85);
+  const [opacity, setOpacity] = useState(85);
+  const [styleId, setStyleId] = useState<WigStyleId>("classico");
   const [modelReady, setModelReady] = useState(false);
   const [modelError, setModelError] = useState<string | null>(null);
   const [tracking, setTracking] = useState(false);
   const trackingRef = useRef(false);
+
+  useEffect(() => {
+    styleRef.current = styleId;
+  }, [styleId]);
+  useEffect(() => {
+    opacityRef.current = opacity / 100;
+  }, [opacity]);
 
   useEffect(() => {
     let cancelled = false;
@@ -69,6 +80,7 @@ export function LiveTryOn() {
     if (state !== "live") {
       cancelAnimationFrame(rafRef.current);
       setTracking(false);
+      trackingRef.current = false;
       return;
     }
 
@@ -118,7 +130,15 @@ export function LiveTryOn() {
           ctx.save();
           ctx.translate(w, 0);
           ctx.scale(-1, 1);
-          drawHairFill(ctx, face, w, h, density / 100, false);
+          drawWig(
+            ctx,
+            face,
+            w,
+            h,
+            styleRef.current,
+            opacityRef.current,
+            false,
+          );
           ctx.restore();
         } else if (trackingRef.current) {
           trackingRef.current = false;
@@ -133,9 +153,9 @@ export function LiveTryOn() {
 
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [state, density, videoRef]);
+  }, [state, videoRef]);
 
-  const pct = density;
+  const active = WIG_STYLES.find((s) => s.id === styleId) ?? WIG_STYLES[1]!;
 
   return (
     <div className="mx-auto w-full max-w-5xl">
@@ -156,7 +176,7 @@ export function LiveTryOn() {
           <canvas
             ref={canvasRef}
             className="absolute inset-0 h-full w-full object-cover"
-            aria-label="Visualização ao vivo do experimento de densidade"
+            aria-label="Experimente estilos de cabelo ao vivo"
           />
 
           {state !== "live" ? (
@@ -165,9 +185,8 @@ export function LiveTryOn() {
                 Experimente ao vivo
               </p>
               <p className="font-serif-body max-w-md text-sm text-white/70 sm:text-base">
-                Ative a câmera frontal para ver um preenchimento ilustrativo de
-                densidade na linha anterior — no seu próprio rosto, em tempo
-                real. Nada é gravado ou enviado.
+                Ative a câmera e prove estilos de cabelo como uma peruca virtual
+                no seu rosto. Nada é gravado ou enviado.
               </p>
               <button
                 type="button"
@@ -204,72 +223,106 @@ export function LiveTryOn() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+      <div className="mt-8 space-y-8">
         <div>
-          <div className="mb-3 flex items-end justify-between gap-3">
-            <label
-              htmlFor="tryon-density"
-              className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
-            >
-              Densidade ilustrativa
-            </label>
-            <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
-              {pct}%
-            </p>
+          <p className="mb-3 text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase">
+            Estilo da peruca
+          </p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+            {WIG_STYLES.map((s) => {
+              const on = s.id === styleId;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setStyleId(s.id)}
+                  className={`border px-3 py-3 text-left transition-colors ${
+                    on
+                      ? "border-brand-gold bg-brand-gold/15 text-white"
+                      : "border-white/15 text-white/70 hover:border-white/35 hover:text-white"
+                  }`}
+                >
+                  <span className="block text-sm font-semibold tracking-wide">
+                    {s.label}
+                  </span>
+                  <span className="mt-1 block text-[0.7rem] leading-snug text-white/45">
+                    {s.blurb}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-          <input
-            id="tryon-density"
-            type="range"
-            min={0}
-            max={100}
-            step={1}
-            value={density}
-            onChange={(e) => setDensity(Number(e.target.value))}
-            disabled={state !== "live"}
-            className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
-            style={{
-              background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${pct}%, rgba(255,255,255,0.15) ${pct}%, rgba(255,255,255,0.15) 100%)`,
-            }}
-          />
-          <div className="mt-2 flex justify-between text-[0.6rem] tracking-wide text-white/40 uppercase">
-            <span>Vazio</span>
-            <span>Entradas</span>
-            <span>Linha</span>
-            <span>Completo</span>
-          </div>
+          <p className="mt-3 text-sm text-white/50">
+            Selecionado: <span className="text-brand-gold">{active.label}</span> —{" "}
+            {active.blurb}
+          </p>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <p className="text-sm leading-relaxed text-white/55">
-            Simulação educativa no navegador. Não indica quantos enxertos você
-            precisa — o plano real só sai na avaliação presencial.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {state === "live" ? (
-              <button
-                type="button"
-                onClick={stop}
-                className="inline-flex min-h-11 items-center justify-center border border-white/25 px-5 py-2.5 text-xs font-semibold tracking-wide text-white/80 uppercase transition-colors hover:border-white/50"
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <div>
+            <div className="mb-3 flex items-end justify-between gap-3">
+              <label
+                htmlFor="tryon-opacity"
+                className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
               >
-                Encerrar câmera
-              </button>
-            ) : null}
-            <a
-              href={whatsappUrl(
-                "Olá! Experimentei a simulação ao vivo no site e gostaria de agendar minha avaliação.",
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center bg-brand-gold px-5 py-2.5 text-xs font-semibold tracking-wide text-brand-charcoal uppercase transition-colors hover:bg-brand-gold-soft"
-            >
-              Agendar avaliação
-            </a>
-            <Link
-              href="/#foliculo"
-              className="inline-flex min-h-11 items-center justify-center border border-brand-gold/50 px-5 py-2.5 text-xs font-semibold tracking-wide text-brand-gold uppercase transition-colors hover:bg-brand-gold hover:text-brand-charcoal"
-            >
-              Ver mapa de planejamento
-            </Link>
+                Intensidade da peruca
+              </label>
+              <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
+                {opacity}%
+              </p>
+            </div>
+            <input
+              id="tryon-opacity"
+              type="range"
+              min={20}
+              max={100}
+              step={1}
+              value={opacity}
+              onChange={(e) => setOpacity(Number(e.target.value))}
+              disabled={state !== "live"}
+              className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
+              style={{
+                background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${opacity}%, rgba(255,255,255,0.15) ${opacity}%, rgba(255,255,255,0.15) 100%)`,
+              }}
+            />
+            <div className="mt-2 flex justify-between text-[0.6rem] tracking-wide text-white/40 uppercase">
+              <span>Sutil</span>
+              <span>Cheia</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <p className="text-sm leading-relaxed text-white/55">
+              Simulação educativa — uma prévia visual de estilos, não o resultado
+              cirúrgico. O plano real só sai na avaliação presencial.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {state === "live" ? (
+                <button
+                  type="button"
+                  onClick={stop}
+                  className="inline-flex min-h-11 items-center justify-center border border-white/25 px-5 py-2.5 text-xs font-semibold tracking-wide text-white/80 uppercase transition-colors hover:border-white/50"
+                >
+                  Encerrar câmera
+                </button>
+              ) : null}
+              <a
+                href={whatsappUrl(
+                  "Olá! Experimentei os estilos de cabelo ao vivo no site e gostaria de agendar minha avaliação.",
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center justify-center bg-brand-gold px-5 py-2.5 text-xs font-semibold tracking-wide text-brand-charcoal uppercase transition-colors hover:bg-brand-gold-soft"
+              >
+                Agendar avaliação
+              </a>
+              <Link
+                href="/#foliculo"
+                className="inline-flex min-h-11 items-center justify-center border border-brand-gold/50 px-5 py-2.5 text-xs font-semibold tracking-wide text-brand-gold uppercase transition-colors hover:bg-brand-gold hover:text-brand-charcoal"
+              >
+                Ver mapa de planejamento
+              </Link>
+            </div>
           </div>
         </div>
       </div>

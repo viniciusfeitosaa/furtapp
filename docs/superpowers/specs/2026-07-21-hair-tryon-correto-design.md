@@ -35,19 +35,23 @@ O MediaPipe Face Landmarker sozinho resolve pose facial — **não** resolve seg
 
 ## 3. Três caminhos viáveis
 
-### A — SDK B2B de beleza/AR (recomendado para qualidade)
+### A — SDK B2B de beleza/AR (pago)
 
 | SDK | Força | Atenção |
 |-----|--------|---------|
-| **Banuba** Hair Style / Color | Web + mobile, segmentação + estilos | Licença comercial, custo |
-| **Perfect Corp** YouCam Hair | Padrão da indústria, IA adaptativa em foto/vídeo | Licença; integração via SDK/API |
-| **DeepAR** | Engine tipo Spark/Snap, assets 3D + oclusão | **Hair no Web indisponível** (só iOS, 2026) |
+| **Banuba** Hair Style / Color | Web + mobile, estilos | Licença comercial |
+| **Perfect Corp** YouCam Hair | Foto/vídeo de marca | Licença |
+| **DeepAR** | Face filters | Hair no Web indisponível (só iOS) |
 
-**Quando usar:** queremos “parece de verdade” em semanas, não em meses de R&D.
+### A2 — Open source / grátis (escolhido)
 
-**Escolha Fase 2 (2026-07-21):** **Banuba WebAR** — único dos candidatos com hair color/style viável no browser. DeepAR descartado para este site (Web-first). Perfect Corp fica como plano B se aceitarmos fluxo foto→resultado.
+| Stack | Força | Limite |
+|-------|--------|--------|
+| **MediaPipe Hair Segmenter** | Apache 2.0, Web, on-device, sem token | Recolor/densidade do cabelo existente — **não** troca o corte 3D |
 
-Detalhes do spike: `docs/superpowers/specs/2026-07-21-hair-tryon-fase2-spike.md`
+**Escolha (2026-07-21):** MediaPipe gratuito. Banuba foi removido do produto para evitar licença. Cortes AR “de verdade” exigem SDK pago; não há equivalente OSS maduro no browser.
+
+Detalhes: `docs/superpowers/specs/2026-07-21-hair-tryon-fase2-spike.md`
 
 ### B — Pipeline open-source / próprio (mais controle, mais risco)
 
@@ -62,40 +66,29 @@ Detalhes do spike: `docs/superpowers/specs/2026-07-21-hair-tryon-fase2-spike.md`
 
 | Fase | Entrega | Tecnologia |
 |------|---------|------------|
-| **0** | Tirar franja; copy honesta; desligar estilos ruins ou marcar “em reformulação” | Código atual |
-| **1** | Prova de pipeline: segmentação de cabelo + recolor/densidade ilustrativa (sem chapéu) | MediaPipe Hair Segmenter |
-| **2** | Try-on de **estilos** com qualidade | DeepAR *ou* Banuba Web + 3–5 assets |
-| **3** | Ligar estilos à narrativa clínica + WhatsApp (“quero avaliar o estilo X”) | Next.js `/experimente` |
+| **0** | Tirar franja; copy honesta | Código atual |
+| **1** | Segmentação + recolor/densidade (grátis) | MediaPipe Hair Segmenter |
+| **2** | ~~Banuba estilos~~ → **cancelada**; MediaPipe é o provider definitivo | OSS |
+| **3** | ~~CTA home~~ — cancelada | — |
 
-Fase 1 evita mostrar o chapéu; Fase 2 entrega o que o usuário pediu (perucas/estilos de verdade).
+Fase 1 é o produto: sem chapéu, sem licença.
 
 ---
 
-## 4. Arquitetura alvo (Fase 2 — estilos reais)
+## 4. Arquitetura (MediaPipe)
 
 ```
 [/experimente]
-   LiveTryOnShell (UI marca, disclaimer, CTA)
+   LiveTryOn
         │
-        ├─ Camera / PhotoCapture
+        ├─ useCamera (getUserMedia)
         │
-        └─ HairTryOnEngine (adapter)
-               ├─ provider: 'deepar' | 'banuba' | 'mediapipe-segment'
-               ├─ loadStyle(styleId)
-               └─ render(frame) → canvas/video
+        └─ HairTryOnEngine → mediapipeHairSegment
+               ├─ ImageSegmenter (hair)
+               └─ tint soft-light nos pixels de cabelo
 ```
 
-**Adapter pattern:** a UI do site não fala com o SDK direto. Trocar Banuba↔DeepAR não reescreve a página.
-
-**Estilos (catálogo clínico, sem franja no MVP comercial):**
-
-- Curto  
-- Clássico  
-- Volumoso  
-- Risca lateral  
-- Ondulado  
-
-Cada `styleId` mapeia para um **asset** do SDK (não para polígono canvas).
+**Looks:** Natural, Castanho, Escuro, Densidade, Quente — reforço de tom, não asset 3D.
 
 ---
 
@@ -109,13 +102,13 @@ Cada `styleId` mapeia para um **asset** do SDK (não para polígono canvas).
 
 ---
 
-## 6. Critérios de aceite (Fase 2)
+## 6. Critérios de aceite
 
-- [ ] Em vídeo frontal, o cabelo **não** flutua como chapéu ao girar a cabeça ±20°.  
-- [ ] Oclusão básica: face/testa não “atravessa” o volume de forma óbvia.  
-- [ ] ≥4 estilos selecionáveis sem franja.  
-- [ ] 30 fps em desktop médio; ≥15 fps em mobile mid-range.  
-- [ ] Nada parece cálculo de UF / promessa cirúrgica.
+- [x] Sem chapéu/peruca flutuante — só tint na máscara de cabelo.  
+- [x] ≥4 looks selecionáveis.  
+- [ ] 30 fps desktop / ≥15 fps mobile (teste manual).  
+- [x] Sem UF / promessa cirúrgica.  
+- [x] Sem dependência de SDK pago.
 
 ---
 
@@ -129,6 +122,5 @@ Cada `styleId` mapeia para um **asset** do SDK (não para polígono canvas).
 
 ## 8. Próximo passo
 
-Implementação detalhada em  
-`docs/superpowers/plans/2026-07-21-hair-tryon-correto.md`  
-começando pela Fase 0 (retirar franja + reformular UX) e Fase 1 (segmentação), com spike de licença DeepAR/Banuba em paralelo.
+Implementação em `docs/superpowers/plans/2026-07-21-hair-tryon-correto.md`.  
+Provider definitivo: MediaPipe (grátis).

@@ -1,23 +1,25 @@
-/** Presets de tom/reforço para Fase 1 (segmentação) — não são cortes 3D. */
+/**
+ * Presets de tom/densidade — MediaPipe Hair Segmenter (Apache 2.0, grátis).
+ * Não são cortes 3D; reforçam o cabelo detectado na máscara.
+ */
 
-export type HairTintId =
+export type HairLookId =
   | "natural"
   | "castanho"
   | "escuro"
-  | "volume"
+  | "densidade"
   | "quente";
 
-export type HairTintPreset = {
-  id: HairTintId;
+export type HairLook = {
+  id: HairLookId;
   label: string;
   blurb: string;
-  /** Cor RGB do tint. */
   rgb: [number, number, number];
-  /** Multiplicador extra de opacidade (1 = padrão). */
+  /** Multiplicador de opacidade (1 = padrão). */
   boost: number;
 };
 
-export const HAIR_TINT_PRESETS: HairTintPreset[] = [
+export const HAIR_LOOKS: HairLook[] = [
   {
     id: "natural",
     label: "Natural",
@@ -40,11 +42,11 @@ export const HAIR_TINT_PRESETS: HairTintPreset[] = [
     boost: 1.15,
   },
   {
-    id: "volume",
+    id: "densidade",
     label: "Densidade",
     blurb: "Reforço visual de preenchimento",
     rgb: [28, 20, 14],
-    boost: 1.35,
+    boost: 1.4,
   },
   {
     id: "quente",
@@ -55,6 +57,13 @@ export const HAIR_TINT_PRESETS: HairTintPreset[] = [
   },
 ];
 
-export function getHairTint(id: string): HairTintPreset {
-  return HAIR_TINT_PRESETS.find((p) => p.id === id) ?? HAIR_TINT_PRESETS[0]!;
+export function getHairLook(id: string): HairLook {
+  return HAIR_LOOKS.find((p) => p.id === id) ?? HAIR_LOOKS[0]!;
 }
+
+/** @deprecated use HAIR_LOOKS */
+export const HAIR_TINT_PRESETS = HAIR_LOOKS;
+/** @deprecated use getHairLook */
+export const getHairTint = getHairLook;
+export type HairTintId = HairLookId;
+export type HairTintPreset = HairLook;

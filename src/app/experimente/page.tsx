@@ -3,9 +3,9 @@ import { LiveTryOn } from "@/components/tryon/LiveTryOn";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Experimente ao vivo | Densidade ilustrativa",
+  title: "Experimente ao vivo | Segmentação de cabelo",
   description:
-    "Ative a câmera e veja um preenchimento ilustrativo de densidade capilar no seu rosto — simulação educativa do Dr. Francisco Furtado.",
+    "Ative a câmera: a IA segmenta seu cabelo e aplica reforço de tom/densidade no aparelho — experiência educativa do Dr. Francisco Furtado.",
 };
 
 export default function ExperimentePage() {
@@ -19,8 +19,8 @@ export default function ExperimentePage() {
           Veja a densidade se formar — ao vivo
         </h1>
         <p className="font-serif-body mt-5 max-w-2xl text-lg text-white/75">
-          Como um espelho inteligente: sua câmera, seu rosto e vários estilos de
-          cabelo em forma de peruca virtual. Privado no seu aparelho —{" "}
+          Segmentação de cabelo no aparelho (Fase 1). Com token Banuba, o site
+          sobe para estilos/cor comerciais (Fase 2). Privado no seu aparelho —{" "}
           {SITE.name} não recebe a imagem.
         </p>
 

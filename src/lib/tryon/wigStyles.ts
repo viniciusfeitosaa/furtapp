@@ -2,7 +2,6 @@ export type WigStyleId =
   | "curto"
   | "classico"
   | "volumoso"
-  | "franja"
   | "lateral"
   | "ondulado";
 
@@ -14,7 +13,7 @@ export type WigStyle = {
   crown: number;
   /** Queda nas laterais (× faceLen). */
   sideDrop: number;
-  /** Quanto a franja desce sobre a testa (0–1 da faceLen). */
+  /** Quanto a linha desce sobre a testa (0–1 da faceLen). */
   bangs: number;
   /** Deslocamento da risca (-1 esq … 1 dir). */
   part: number;
@@ -62,18 +61,6 @@ export const WIG_STYLES: WigStyle[] = [
     flare: 0.22,
     wave: 0.35,
     color: { base: "#120e0a", mid: "#2a2218", hi: "#5c4a36" },
-  },
-  {
-    id: "franja",
-    label: "Com franja",
-    blurb: "Franja cobrindo a testa",
-    crown: 0.5,
-    sideDrop: 0.36,
-    bangs: 0.22,
-    part: 0,
-    flare: 0.16,
-    wave: 0.3,
-    color: { base: "#16110d", mid: "#33281e", hi: "#5a4834" },
   },
   {
     id: "lateral",

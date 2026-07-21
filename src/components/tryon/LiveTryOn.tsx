@@ -185,8 +185,8 @@ export function LiveTryOn() {
                 Experimente ao vivo
               </p>
               <p className="font-serif-body max-w-md text-sm text-white/70 sm:text-base">
-                Ative a câmera e prove estilos de cabelo como uma peruca virtual
-                no seu rosto. Nada é gravado ou enviado.
+                Prévia experimental. Em breve: try-on com segmentação e estilos
+                reais (Banuba / DeepAR). Nada é gravado ou enviado.
               </p>
               <button
                 type="button"
@@ -228,7 +228,7 @@ export function LiveTryOn() {
           <p className="mb-3 text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase">
             Estilo da peruca
           </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
             {WIG_STYLES.map((s) => {
               const on = s.id === styleId;
               return (
@@ -293,8 +293,10 @@ export function LiveTryOn() {
 
           <div className="flex flex-col gap-4">
             <p className="text-sm leading-relaxed text-white/55">
-              Simulação educativa — uma prévia visual de estilos, não o resultado
-              cirúrgico. O plano real só sai na avaliação presencial.
+              Esta prévia ainda não é o try-on final — o plano técnico está em{" "}
+              <span className="text-white/70">docs/superpowers</span> (segmentação
+              + SDK). Não representa resultado cirúrgico; a avaliação presencial
+              define o plano real.
             </p>
             <div className="flex flex-wrap gap-3">
               {state === "live" ? (

@@ -19,9 +19,10 @@ export default function ExperimentePage() {
           Veja a densidade se formar — ao vivo
         </h1>
         <p className="font-serif-body mt-5 max-w-2xl text-lg text-white/75">
-          Como um espelho inteligente: sua câmera, seu rosto e vários estilos de
-          cabelo em forma de peruca virtual. Privado no seu aparelho —{" "}
-          {SITE.name} não recebe a imagem.
+          Estamos evoluindo esta experiência para um try-on de cabelo de verdade
+          (com oclusão e estilos reais — não um chapéu 3D). A versão atual é
+          experimental. Privado no seu aparelho — {SITE.name} não recebe a
+          imagem.
         </p>
 
         <div className="mt-10">

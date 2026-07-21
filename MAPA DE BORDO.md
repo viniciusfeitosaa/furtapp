@@ -348,6 +348,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-16 | Cabeça real GLB (Lee Perry-Smith, CC BY 3.0) + pele PBR/SSS; fios via MeshSurfaceSampler na superfície real (doador fixo + receptor por densidade). |
 | 2026-07-21 | MVP **Experimente ao vivo** (`/experimente`): câmera + MediaPipe Face Landmarker + densidade ilustrativa 0–100% no cliente; link no menu e teaser após o mapa. |
 | 2026-07-21 | Try-on: overlay vira **perucas** com 6 estilos (curto, clássico, volumoso, franja, lateral, ondulado) + intensidade. |
+| 2026-07-21 | Diagnóstico: overlay 2D rejeitado (“chapéu”). Spec + plano de hair try-on correto (segmentação → SDK Banuba/DeepAR). Removida opção **franja**. |
 
 ---
 

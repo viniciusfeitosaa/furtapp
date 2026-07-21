@@ -273,6 +273,27 @@ export function HomeSections() {
           </div>
         </div>
         <PlanningMapSection />
+
+        <div className="mx-auto mt-12 max-w-6xl border-t border-white/10 pt-10 sm:mt-14 sm:pt-12">
+          <Reveal delayMs={80}>
+            <p className="text-[0.65rem] tracking-[0.22em] text-brand-gold uppercase sm:text-[0.7rem]">
+              Experimente
+            </p>
+            <h3 className="font-display mt-3 max-w-2xl text-2xl text-white sm:text-3xl">
+              Quer ver no espelho — ao vivo?
+            </h3>
+            <p className="font-serif-body mt-3 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">
+              Abra a câmera e veja um preenchimento ilustrativo de densidade na
+              linha anterior, no seu próprio rosto. Nada é gravado.
+            </p>
+            <a
+              href="/experimente"
+              className="mt-6 inline-flex min-h-12 items-center justify-center border border-brand-gold/70 px-6 py-3 text-sm font-semibold tracking-wide text-brand-gold transition-colors hover:bg-brand-gold hover:text-brand-charcoal"
+            >
+              Abrir Experimente ao vivo
+            </a>
+          </Reveal>
+        </div>
       </section>
 
       <SectionShell

@@ -47,6 +47,9 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col gap-2 text-sm text-white/70 sm:flex-row sm:flex-wrap sm:gap-x-5">
+            <Link href="/experimente" className="hover:text-white">
+              Experimente ao vivo
+            </Link>
             <Link href="/blog" className="hover:text-white">
               Blog
             </Link>

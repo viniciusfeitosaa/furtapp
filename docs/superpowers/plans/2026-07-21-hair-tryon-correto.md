@@ -128,25 +128,27 @@ export const HAIR_TRYON_PROVIDER =
 
 ## Fase 3 — Produto / conversão
 
+> **Cancelada (2026-07-21):** pedido explícito — merge sem etapa de CTA/teaser na home.
+
 ### Task 3.1: CTA contextual
 
-- [ ] WhatsApp com texto incluindo estilo selecionado
-- [ ] Teaser na home apontando para a versão estável
+- [x] ~~WhatsApp com texto incluindo estilo selecionado~~ *(já parcial no LiveTryOn Banuba; sem teaser home)*
+- [x] ~~Teaser na home~~ — **não fazer**
 
 ### Task 3.2: Remover código morto
 
-- [ ] Deletar ou isolar `drawWig.ts` quando SDK estiver no ar
+- [ ] Deletar ou isolar `drawWig.ts` quando SDK estiver no ar *(oportunista, pós-trial)*
 - [ ] Atualizar `2026-07-21-experimente-ao-vivo-design.md` com “superseded by…”
 
 ---
 
 ## Ordem de execução sugerida
 
-1. Fase 0 (hoje)  
-2. Spike licença SDK (e-mail/trial) **em paralelo** com Fase 1  
-3. Fase 1 mergeável mesmo se SDK atrasar  
-4. Fase 2 quando houver trial + assets  
-5. Fase 3 polish  
+1. Fase 0  
+2. Spike licença SDK **em paralelo** com Fase 1  
+3. Fase 1 + scaffold Fase 2 mergeáveis sem trial  
+4. Ativar Banuba quando houver token + assets  
+5. ~~Fase 3 polish CTA~~ — cancelada  
 
 ---
 

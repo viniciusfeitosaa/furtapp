@@ -41,11 +41,13 @@ O MediaPipe Face Landmarker sozinho resolve pose facial — **não** resolve seg
 |-----|--------|---------|
 | **Banuba** Hair Style / Color | Web + mobile, segmentação + estilos | Licença comercial, custo |
 | **Perfect Corp** YouCam Hair | Padrão da indústria, IA adaptativa em foto/vídeo | Licença; integração via SDK/API |
-| **DeepAR** | Engine tipo Spark/Snap, assets 3D + oclusão | Precisa de hair assets bons + Studio |
+| **DeepAR** | Engine tipo Spark/Snap, assets 3D + oclusão | **Hair no Web indisponível** (só iOS, 2026) |
 
 **Quando usar:** queremos “parece de verdade” em semanas, não em meses de R&D.
 
-**Recomendação de produto:** **DeepAR** ou **Banuba** para *live* no browser; **Perfect Corp** se aceitarmos fluxo **foto → resultado** (muito comum e às vezes mais convincente que vídeo fraco).
+**Escolha Fase 2 (2026-07-21):** **Banuba WebAR** — único dos candidatos com hair color/style viável no browser. DeepAR descartado para este site (Web-first). Perfect Corp fica como plano B se aceitarmos fluxo foto→resultado.
+
+Detalhes do spike: `docs/superpowers/specs/2026-07-21-hair-tryon-fase2-spike.md`
 
 ### B — Pipeline open-source / próprio (mais controle, mais risco)
 

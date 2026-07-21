@@ -1,4 +1,4 @@
-import type { HairTryOnEngine } from "@/lib/tryon/HairTryOnEngine";
+import type { CanvasHairEngine } from "@/lib/tryon/HairTryOnEngine";
 import { getHairTint } from "@/lib/tryon/hairTintPresets";
 
 const WASM_ROOT =
@@ -12,7 +12,7 @@ type ImageSegmenterType = import("@mediapipe/tasks-vision").ImageSegmenter;
  * Fase 1: pinta / reforça apenas pixels classificados como cabelo.
  * Não inventa volume acima da cabeça (sem “chapéu”).
  */
-export function createMediaPipeHairSegmentEngine(): HairTryOnEngine {
+export function createMediaPipeHairSegmentEngine(): CanvasHairEngine {
   let segmenter: ImageSegmenterType | null = null;
   let maskCanvas: HTMLCanvasElement | null = null;
   let maskCtx: CanvasRenderingContext2D | null = null;
@@ -20,6 +20,7 @@ export function createMediaPipeHairSegmentEngine(): HairTryOnEngine {
 
   return {
     kind: "segment-tint",
+    ownsCamera: false,
 
     async init() {
       const visionMod = await import("@mediapipe/tasks-vision");

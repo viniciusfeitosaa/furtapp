@@ -87,23 +87,24 @@
 
 ### Task 2.1: Spike comercial (paralelo à Fase 1)
 
-- [ ] Solicitar trial **DeepAR** e/ou **Banuba** Web
-- [ ] Checklist: preço, watermark, WebGL, iOS Safari, LGPD (on-device vs cloud)
-- [ ] Escolher **um** provider (doc: atualizar spec §3 com a escolha)
+- [x] Solicitar trial **DeepAR** e/ou **Banuba** Web *(doc: Banuba escolhido; DeepAR Web sem hair)*
+- [x] Checklist: preço, watermark, WebGL, iOS Safari, LGPD (on-device vs cloud)
+- [x] Escolher **um** provider (doc: atualizar spec §3 com a escolha) → **Banuba**
 
 ### Task 2.2: Adapter do SDK escolhido
 
-**Files:** `src/lib/tryon/engines/deeparHair.ts` *ou* `banubaHair.ts`
+**Files:** `src/lib/tryon/engines/banubaHair.ts`
 
-- [ ] `init` carrega WASM/SDK lazy (dynamic import)
-- [ ] `loadStyle(styleId)` troca effect/asset
-- [ ] Tratar permissão de câmera (reusar `useCamera` ou API do SDK)
+- [x] `init` carrega WASM/SDK lazy (dynamic import CDN)
+- [x] `loadStyle(styleId)` troca effect/asset (`setStyle`)
+- [x] Tratar permissão de câmera (Webcam Banuba; MediaPipe reusa `useCamera`)
 
 ### Task 2.3: Catálogo de assets
 
-- [ ] 4–5 hair assets licenciados mapeados aos ids: `curto`, `classico`, `volumoso`, `lateral`, `ondulado`
-- [ ] **Sem** franja no catálogo clínico v1
-- [ ] Preview thumbs na UI (imagem estática por estilo)
+- [x] 4–5 hair assets ids: `curto`, `classico`, `volumoso`, `lateral`, `ondulado` (`styleCatalog.ts`)
+- [x] **Sem** franja no catálogo clínico v1
+- [ ] Preview thumbs na UI (imagem estática por estilo) — pendente assets
+- [ ] Zips licenciados Banuba — **bloqueado até trial + assets**
 
 ### Task 2.4: Feature flag
 
@@ -111,17 +112,17 @@
 
 ```ts
 export const HAIR_TRYON_PROVIDER =
-  process.env.NEXT_PUBLIC_HAIR_TRYON_PROVIDER ?? "segment-tint";
+  process.env.NEXT_PUBLIC_HAIR_TRYON_PROVIDER ?? "auto";
 ```
 
-- [ ] Alternar segment-tint ↔ sdk sem redeploy de UI
-- [ ] Commit: `feat(tryon): provider SDK de estilos (Fase 2)`
+- [x] Alternar segment-tint ↔ banuba (`auto` sem credenciais = Fase 1)
+- [x] Commit: `feat(tryon): provider Banuba + feature flag (Fase 2)`
 
 ### Task 2.5: Aceite visual
 
-- [ ] Gravar 10s de vídeo teste (desktop + iPhone)
+- [ ] Gravar 10s de vídeo teste (desktop + iPhone) — requer token
 - [ ] Checklist §6 da spec
-- [ ] Atualizar `MAPA DE BORDO.md`
+- [x] Atualizar `MAPA DE BORDO.md`
 
 ---
 

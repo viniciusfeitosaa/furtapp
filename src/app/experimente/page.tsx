@@ -19,9 +19,9 @@ export default function ExperimentePage() {
           Veja a densidade se formar — ao vivo
         </h1>
         <p className="font-serif-body mt-5 max-w-2xl text-lg text-white/75">
-          Agora a câmera segmenta o cabelo real e aplica reforço de tom —
-          sem o chapéu 3D. Em seguida virão estilos completos via SDK. Privado
-          no seu aparelho — {SITE.name} não recebe a imagem.
+          Segmentação de cabelo no aparelho (Fase 1). Com token Banuba, o site
+          sobe para estilos/cor comerciais (Fase 2). Privado no seu aparelho —{" "}
+          {SITE.name} não recebe a imagem.
         </p>
 
         <div className="mt-10">

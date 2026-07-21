@@ -7,18 +7,32 @@ export type HairDrawOpts = {
   intensity: number;
 };
 
-export type HairTryOnEngine = {
-  kind: HairEngineKind;
+/** Engine canvas (MediaPipe): caller fornece vídeo + canvas. */
+export type CanvasHairEngine = {
+  kind: "segment-tint";
+  ownsCamera: false;
   init: () => Promise<void>;
   dispose: () => void;
-  /**
-   * Desenha o frame do vídeo (já espelhado pelo caller, se desejado)
-   * e aplica o efeito no mesmo canvas.
-   * Retorna true se detectou cabelo neste frame.
-   */
   draw: (
     input: HTMLVideoElement,
     ctx: CanvasRenderingContext2D,
     opts: HairDrawOpts,
   ) => boolean;
 };
+
+/**
+ * Engine SDK (Banuba): dono da câmera e do canvas interno via Dom.render.
+ */
+export type SdkHairEngine = {
+  kind: "sdk-style";
+  ownsCamera: true;
+  init: () => Promise<void>;
+  dispose: () => void;
+  mount: (container: HTMLElement) => Promise<void>;
+  unmount: () => void;
+  startCamera: () => Promise<void>;
+  stopCamera: () => void;
+  setStyle: (styleId: string, intensity: number) => Promise<void>;
+};
+
+export type HairTryOnEngine = CanvasHairEngine | SdkHairEngine;

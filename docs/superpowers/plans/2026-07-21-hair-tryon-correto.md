@@ -4,9 +4,9 @@
 
 **Goal:** Substituir o overlay “chapéu de papelão” por um try-on de cabelo crível (segmentação +, em seguida, SDK de estilos), mantendo `/experimente` no site.
 
-**Architecture:** Adapter `HairTryOnEngine` atrás da UI; Fase 0 limpa o catálogo; Fase 1 MediaPipe Hair Segmenter; Fase 2 DeepAR ou Banuba com assets reais; UI nunca fala com o SDK direto.
+**Architecture:** Adapter `HairTryOnEngine` + MediaPipe Hair Segmenter (grátis/OSS). Banuba/DeepAR removidos.
 
-**Tech Stack:** Next.js 16, React 19, `@mediapipe/tasks-vision` (já no repo), candidato Fase 2: DeepAR Web ou Banuba Web SDK.
+**Tech Stack:** Next.js 16, React 19, `@mediapipe/tasks-vision` (Apache 2.0).
 
 **Spec:** `docs/superpowers/specs/2026-07-21-hair-tryon-correto-design.md`
 
@@ -19,8 +19,7 @@
 | `src/lib/tryon/wigStyles.ts` | Catálogo de estilos (sem franja na Fase 0) |
 | `src/lib/tryon/drawWig.ts` | **Deprecar** após Fase 1 (não usar em produção) |
 | `src/lib/tryon/HairTryOnEngine.ts` | Interface do adapter |
-| `src/lib/tryon/engines/mediapipeHairSegment.ts` | Fase 1: máscara de cabelo + tint |
-| `src/lib/tryon/engines/deeparHair.ts` (ou banuba) | Fase 2: estilos reais |
+| `src/lib/tryon/engines/mediapipeHairSegment.ts` | Provider definitivo: máscara + tint |
 | `src/components/tryon/LiveTryOn.tsx` | UI: câmera, estilos, intensidade, CTA |
 | `src/app/experimente/page.tsx` | Copy / SEO |
 | `docs/superpowers/specs/2026-07-21-hair-tryon-correto-design.md` | Decisões |
@@ -83,45 +82,19 @@
 
 ---
 
-## Fase 2 — Estilos reais (SDK)
+## Fase 2 — Estilos reais (SDK pago)
 
-### Task 2.1: Spike comercial (paralelo à Fase 1)
+> **Cancelada / substituída (2026-07-21):** Banuba removido. Provider definitivo = **MediaPipe** (grátis).
 
-- [x] Solicitar trial **DeepAR** e/ou **Banuba** Web *(doc: Banuba escolhido; DeepAR Web sem hair)*
-- [x] Checklist: preço, watermark, WebGL, iOS Safari, LGPD (on-device vs cloud)
-- [x] Escolher **um** provider (doc: atualizar spec §3 com a escolha) → **Banuba**
+### Task 2.1–2.4 (histórico Banuba)
 
-### Task 2.2: Adapter do SDK escolhido
-
-**Files:** `src/lib/tryon/engines/banubaHair.ts`
-
-- [x] `init` carrega WASM/SDK lazy (dynamic import CDN)
-- [x] `loadStyle(styleId)` troca effect/asset (`setStyle`)
-- [x] Tratar permissão de câmera (Webcam Banuba; MediaPipe reusa `useCamera`)
-
-### Task 2.3: Catálogo de assets
-
-- [x] 4–5 hair assets ids: `curto`, `classico`, `volumoso`, `lateral`, `ondulado` (`styleCatalog.ts`)
-- [x] **Sem** franja no catálogo clínico v1
-- [ ] Preview thumbs na UI (imagem estática por estilo) — pendente assets
-- [ ] Zips licenciados Banuba — **bloqueado até trial + assets**
-
-### Task 2.4: Feature flag
-
-**Files:** `src/lib/tryon/config.ts`
-
-```ts
-export const HAIR_TRYON_PROVIDER =
-  process.env.NEXT_PUBLIC_HAIR_TRYON_PROVIDER ?? "auto";
-```
-
-- [x] Alternar segment-tint ↔ banuba (`auto` sem credenciais = Fase 1)
-- [x] Commit: `feat(tryon): provider Banuba + feature flag (Fase 2)`
+- [x] Spike: Banuba escolhido → **revertido** por exigência de stack gratuita
+- [x] Remover `banubaHair.ts`, env vars e feature flag comercial
+- [x] MediaPipe único provider + presets unificados
 
 ### Task 2.5: Aceite visual
 
-- [ ] Gravar 10s de vídeo teste (desktop + iPhone) — requer token
-- [ ] Checklist §6 da spec
+- [ ] Checklist visual em `/experimente` (desktop + mobile)
 - [x] Atualizar `MAPA DE BORDO.md`
 
 ---
@@ -147,7 +120,7 @@ export const HAIR_TRYON_PROVIDER =
 1. Fase 0  
 2. Spike licença SDK **em paralelo** com Fase 1  
 3. Fase 1 + scaffold Fase 2 mergeáveis sem trial  
-4. Ativar Banuba quando houver token + assets  
+4. MediaPipe é o provider definitivo (sem SDK pago)  
 5. ~~Fase 3 polish CTA~~ — cancelada  
 
 ---

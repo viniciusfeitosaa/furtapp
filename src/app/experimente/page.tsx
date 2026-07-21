@@ -3,9 +3,9 @@ import { LiveTryOn } from "@/components/tryon/LiveTryOn";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Experimente ao vivo | Segmentação de cabelo",
+  title: "Experimente ao vivo | MediaPipe (grátis)",
   description:
-    "Ative a câmera: a IA segmenta seu cabelo e aplica reforço de tom/densidade no aparelho — experiência educativa do Dr. Francisco Furtado.",
+    "Ative a câmera: MediaPipe segmenta seu cabelo e aplica reforço de tom/densidade no aparelho — experiência educativa do Dr. Francisco Furtado.",
 };
 
 export default function ExperimentePage() {
@@ -19,9 +19,8 @@ export default function ExperimentePage() {
           Veja a densidade se formar — ao vivo
         </h1>
         <p className="font-serif-body mt-5 max-w-2xl text-lg text-white/75">
-          Segmentação de cabelo no aparelho (Fase 1). Com token Banuba, o site
-          sobe para estilos/cor comerciais (Fase 2). Privado no seu aparelho —{" "}
-          {SITE.name} não recebe a imagem.
+          Segmentação open source (MediaPipe) no seu aparelho — sem licença
+          comercial. Privado — {SITE.name} não recebe a imagem.
         </p>
 
         <div className="mt-10">

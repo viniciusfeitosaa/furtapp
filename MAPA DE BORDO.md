@@ -352,6 +352,7 @@ Ver briefing completo nas conversas iniciais. Paleta hex obrigatória; dourado n
 | 2026-07-21 | Fase 1: MediaPipe **Hair Segmenter** + tint no cabelo detectado; engine adapter; presets de tom (sem drawWig na UI). |
 | 2026-07-21 | Fase 2 spike: **Banuba** escolhido (DeepAR Web sem hair). Feature flag + adapter Banuba; fallback MediaPipe até token/assets. |
 | 2026-07-21 | Merge hair try-on (Fases 0–2) na `main`; Fase 3 CTA/teaser **cancelada**. |
+| 2026-07-21 | Banuba **removido**; try-on 100% **MediaPipe** (grátis/OSS). |
 
 ---
 

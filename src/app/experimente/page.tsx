@@ -19,9 +19,9 @@ export default function ExperimentePage() {
           Veja a densidade se formar — ao vivo
         </h1>
         <p className="font-serif-body mt-5 max-w-2xl text-lg text-white/75">
-          Como um espelho inteligente: sua câmera, seu rosto, e um plano
-          ilustrativo de preenchimento na linha anterior. Privado no seu
-          aparelho — {SITE.name} não recebe a imagem.
+          Como um espelho inteligente: sua câmera, seu rosto e vários estilos de
+          cabelo em forma de peruca virtual. Privado no seu aparelho —{" "}
+          {SITE.name} não recebe a imagem.
         </p>
 
         <div className="mt-10">

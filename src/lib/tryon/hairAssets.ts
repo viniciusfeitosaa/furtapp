@@ -1,6 +1,7 @@
 /** Catálogo do modelo 3D gratuito (Sketchfab CC BY). */
 
-export const HAIR_GLB_URL = "/models/hair/short-layered.glb";
+export const HAIR_GLB_URL =
+  "/models/short_hair_cut_in_layers_with_bones.glb";
 
 export const HAIR_GLB_ASSET = {
   id: "short-layered",

@@ -80,7 +80,7 @@ export function LiveTryOn() {
       } catch {
         if (!cancelled) {
           setModelError(
-            "Não foi possível carregar MediaPipe. Coloque o GLB em public/models/hair/short-layered.glb",
+            "Não foi possível carregar MediaPipe. Verifique o GLB em public/models/short_hair_cut_in_layers_with_bones.glb",
           );
         }
       }
@@ -129,7 +129,7 @@ export function LiveTryOn() {
               await seg.init();
               setMode("segment");
               setModelError(
-                "GLB falhou ao carregar — usando segmentação MediaPipe. Verifique public/models/hair/short-layered.glb",
+                "GLB falhou ao carregar — usando segmentação MediaPipe. Verifique public/models/short_hair_cut_in_layers_with_bones.glb",
               );
             } catch {
               /* keep error */
@@ -277,7 +277,7 @@ export function LiveTryOn() {
             <span className="text-brand-gold/90">
               Falta o arquivo{" "}
               <code className="text-white/80">
-                public/models/hair/short-layered.glb
+                public/models/short_hair_cut_in_layers_with_bones.glb
               </code>{" "}
               — baixe no Sketchfab e coloque nessa pasta.
             </span>

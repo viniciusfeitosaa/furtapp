@@ -15,7 +15,9 @@ import { Readable } from "node:stream";
 import path from "node:path";
 
 const UID = "60f13e9fa15941409654483c51add79e";
-const OUT = path.resolve("public/models/hair/short-layered.glb");
+const OUT = path.resolve(
+  "public/models/short_hair_cut_in_layers_with_bones.glb",
+);
 
 const token = process.env.SKETCHFAB_API_TOKEN?.trim();
 if (!token) {
@@ -23,7 +25,7 @@ if (!token) {
     "Defina SKETCHFAB_API_TOKEN (https://sketchfab.com/settings/password).",
   );
   console.error(
-    "Ou baixe manualmente o GLB e salve em public/models/hair/short-layered.glb",
+    "Ou baixe manualmente o GLB e salve em public/models/short_hair_cut_in_layers_with_bones.glb",
   );
   process.exit(1);
 }
@@ -64,7 +66,7 @@ if (ctype.includes("zip") || glbUrl.includes(".zip")) {
   console.log(
     "Baixado como ZIP:",
     zipOut,
-    "— extraia o .glb e renomeie para short-layered.glb",
+    "— extraia o .glb e salve como short_hair_cut_in_layers_with_bones.glb",
   );
   process.exit(0);
 }

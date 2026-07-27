@@ -30,7 +30,8 @@ export const HAIR_GLB_ASSET = {
     localZ: -2,
     scalpFrac: 0.55,
     rotX: 0,
-    rotY: Math.PI,
+    // 0 = frente do penteado para a câmera (com π aparecia a nuca)
+    rotY: 0,
     rotZ: 0,
   },
 } as const;

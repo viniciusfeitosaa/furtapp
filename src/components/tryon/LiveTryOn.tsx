@@ -348,14 +348,13 @@ export function LiveTryOn() {
                   step={0.5}
                   value={offsetY}
                   onChange={(e) => setOffsetY(Number(e.target.value))}
-                  disabled={state !== "live"}
-                  className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
+                  className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15"
                   style={{
                     background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${((offsetY + 20) / 35) * 100}%, rgba(255,255,255,0.15) ${((offsetY + 20) / 35) * 100}%, rgba(255,255,255,0.15) 100%)`,
                   }}
                 />
                 <p className="mt-2 text-[0.7rem] text-white/40">
-                  Negativo desce · positivo sobe · anote o valor ideal
+                  Arraste para a esquerda para descer · valor atual em destaque
                 </p>
               </div>
             ) : null}

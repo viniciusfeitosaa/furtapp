@@ -22,10 +22,10 @@ export const HAIR_GLB_ASSET = {
    *   localZ ↓ (mais negativo) empurra o volume para trás
    */
   fit: {
-    // Restaurado: posição da 2ª foto (quase ideal, levemente acima)
+    // Meio-termo: 8 flutuava na linha do cabelo; -5 cobria os olhos
     matrixScale: 20,
     localX: 0,
-    localY: 8,
+    localY: 2,
     localZ: -2,
     scalpFrac: 0.16,
     rotX: 0,

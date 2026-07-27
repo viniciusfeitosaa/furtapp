@@ -15,14 +15,21 @@ export const HAIR_GLB_ASSET = {
   licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
   glbUrl: HAIR_GLB_URL,
   /**
-   * fit.scale multiplica a altura do cabelo relativa à face.
-   * offsetY em frações da faceLen (para cima da fronte).
-   * offsetZ em frações da largura (profundidade ortográfica).
+   * Calibração visual (frações da face / radianos locais no modelo).
+   * - scale: tamanho relativo à face
+   * - anchorUp: deslocamento da fronte ao longo do eixo “topo” (negativo = mais baixo)
+   * - rot*: orientação fixa do asset (oco para o couro, não para a câmera)
    */
   fit: {
-    scale: 1.35,
-    offsetY: 0.12,
-    offsetZ: 0,
+    scale: 1.15,
+    anchorUp: -0.08,
+    offsetX: 0,
+    /** Empurra o pivot um pouco “para trás” no eixo da tela (Z ortográfico). */
+    offsetZ: -0.15,
+    /** Inclinação local do GLB (radianos). */
+    rotX: -0.35,
+    rotY: Math.PI,
+    rotZ: 0,
   },
 } as const;
 

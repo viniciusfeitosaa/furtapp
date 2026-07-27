@@ -25,7 +25,7 @@ export function LiveTryOn() {
   const rafRef = useRef(0);
   const styleRef = useRef<HairLookId>("natural");
   const intensityRef = useRef(0.8);
-  const offsetYRef = useRef(HAIR_GLB_ASSET.fit.localY);
+  const offsetYRef = useRef<number>(HAIR_GLB_ASSET.fit.localY);
   const [intensity, setIntensity] = useState(80);
   const [offsetY, setOffsetY] = useState<number>(HAIR_GLB_ASSET.fit.localY);
   const [styleId, setStyleId] = useState<HairLookId>("natural");

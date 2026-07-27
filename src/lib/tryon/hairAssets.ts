@@ -22,11 +22,12 @@ export const HAIR_GLB_ASSET = {
    *   localZ ↓ (mais negativo) empurra o volume para trás
    */
   fit: {
-    matrixScale: 20,
+    // Flutuava ~5–8 cm acima do crânio → localY bem mais baixo + escala ↑
+    matrixScale: 24,
     localX: 0,
-    localY: 8,
-    localZ: -2,
-    scalpFrac: 0.16,
+    localY: 1.5,
+    localZ: -1.5,
+    scalpFrac: 0.22,
     rotX: 0,
     rotY: Math.PI,
     rotZ: 0,

@@ -15,21 +15,20 @@ export const HAIR_GLB_ASSET = {
   licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
   glbUrl: HAIR_GLB_URL,
   /**
-   * Calibração para o cabelo “vestir” o crânio:
-   * - scalpFrac: onde fica o pivot no eixo Y do mesh (0=base, 1=topo)
-   * - crownUp: quanto sobe a âncora a partir da fronte (× faceLen)
-   * - widthMul / heightMul: escala vs largura/altura da face
+   * Calibração no espaço métrico do MediaPipe (centímetros):
+   * câmera virtual FOV 63°, origem na óptica, olhando -Z.
+   * Ajuste fino para franja acima das sobrancelhas (foto ideal):
+   *   matrixScale ↑ cobre mais o crânio | localY ↑ sobe a franja
+   *   localZ ↓ (mais negativo) empurra o volume para trás
    */
   fit: {
-    scalpFrac: 0.18,
-    crownUp: 0.4,
-    widthMul: 1.85,
-    heightMul: 1.25,
-    scale: 1,
-    offsetX: 0,
-    offsetZ: 0,
-    rotX: 0.05,
-    rotY: 0,
+    matrixScale: 20,
+    localX: 0,
+    localY: 8,
+    localZ: -2,
+    scalpFrac: 0.16,
+    rotX: 0,
+    rotY: Math.PI,
     rotZ: 0,
   },
 } as const;

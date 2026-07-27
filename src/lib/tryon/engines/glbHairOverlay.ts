@@ -6,8 +6,9 @@ import {
   FrontSide,
   Group,
   Material,
+  Matrix4,
   Mesh,
-  OrthographicCamera,
+  PerspectiveCamera,
   Scene,
   Vector3,
   WebGLRenderer,
@@ -20,29 +21,23 @@ const WASM_ROOT =
 const FACE_MODEL =
   "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task";
 
-const FOREHEAD = 10;
-const CHIN = 152;
-const LEFT_TEMPLE = 234;
-const RIGHT_TEMPLE = 454;
-
 type FaceLandmarkerType = import("@mediapipe/tasks-vision").FaceLandmarker;
-type Landmark = { x: number; y: number; z: number };
 
 export type GlbHairDrawOpts = {
   intensity: number;
 };
 
 /**
- * Cabelo 3D ancorado no crânio:
- * - pivot na “base/scalp” do mesh (não no centro)
- * - posição no topo estimado da cabeça
- * - escala pela largura da face para cobrir orelha a orelha
+ * Caminho correto para o resultado ideal (rosto + cabelo 3D):
+ * `facialTransformationMatrixes` + PerspectiveCamera FOV 63° em centímetros
+ * (mesmo referencial do MediaPipe / exemplo three.js webcam).
+ * O cabelo herda yaw/pitch/roll reais da cabeça — não um offset 2.5D.
  */
 export function createGlbHairOverlayEngine() {
   let landmarker: FaceLandmarkerType | null = null;
   let renderer: WebGLRenderer | null = null;
   let scene: Scene | null = null;
-  let camera: OrthographicCamera | null = null;
+  let camera: PerspectiveCamera | null = null;
   let hairRoot: Group | null = null;
   let hairPivot: Group | null = null;
   let hairModel: Group | null = null;
@@ -50,6 +45,7 @@ export function createGlbHairOverlayEngine() {
   let ready = false;
   let inited = false;
 
+  const faceMatrix = new Matrix4();
   const _size = new Vector3();
   const _center = new Vector3();
   const _box = new Box3();
@@ -82,12 +78,14 @@ export function createGlbHairOverlayEngine() {
           baseOptions: { modelAssetPath: FACE_MODEL, delegate: "GPU" },
           runningMode: "VIDEO",
           numFaces: 1,
+          outputFacialTransformationMatrixes: true,
         });
       } catch {
         landmarker = await visionMod.FaceLandmarker.createFromOptions(vision, {
           baseOptions: { modelAssetPath: FACE_MODEL, delegate: "CPU" },
           runningMode: "VIDEO",
           numFaces: 1,
+          outputFacialTransformationMatrixes: true,
         });
       }
 
@@ -103,16 +101,18 @@ export function createGlbHairOverlayEngine() {
       renderer.outputColorSpace = "srgb";
 
       scene = new Scene();
-      camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 5000);
-      camera.position.set(0, 0, 1000);
+      // Espaço métrico MediaPipe: cm, FOV 63°, near/far em cm (ex. three.js webcam)
+      camera = new PerspectiveCamera(63, 1, 1, 10000);
 
-      scene.add(new AmbientLight(0xffffff, 1.2));
-      const key = new DirectionalLight(0xffffff, 0.7);
-      key.position.set(0.3, 1, 1);
+      scene.add(new AmbientLight(0xffffff, 1.25));
+      const key = new DirectionalLight(0xffffff, 0.8);
+      key.position.set(40, 120, 80);
       scene.add(key);
 
       hairRoot = new Group();
+      hairRoot.matrixAutoUpdate = false;
       scene.add(hairRoot);
+
       hairPivot = new Group();
       hairRoot.add(hairPivot);
 
@@ -129,14 +129,14 @@ export function createGlbHairOverlayEngine() {
         for (const m of mats) {
           if (!(m instanceof Material)) continue;
           m.transparent = true;
-          m.alphaTest = 0.22;
+          m.alphaTest = 0.2;
           m.depthWrite = true;
           m.side = FrontSide;
           m.needsUpdate = true;
         }
       });
 
-      // 1) Normalizar para maxDim = 1 e centralizar
+      // Mesh unitário (maxDim=1), centralizado
       _box.setFromObject(hairModel);
       _box.getSize(_size);
       _box.getCenter(_center);
@@ -149,7 +149,7 @@ export function createGlbHairOverlayEngine() {
         -_center.z * unitScale,
       );
 
-      // 2) Pivot no scalp: origem perto da base do mesh, volume sobe em +Y
+      // Pivot no scalp (base do volume)
       hairModel.updateMatrixWorld(true);
       _box.setFromObject(hairModel);
       const scalpY =
@@ -157,8 +157,9 @@ export function createGlbHairOverlayEngine() {
         (_box.max.y - _box.min.y) * HAIR_GLB_ASSET.fit.scalpFrac;
       hairModel.position.y -= scalpY;
 
-      const { rotX, rotY, rotZ } = HAIR_GLB_ASSET.fit;
-      hairPivot.rotation.set(rotX, rotY, rotZ);
+      const fit = HAIR_GLB_ASSET.fit;
+      hairPivot.rotation.set(fit.rotX, fit.rotY, fit.rotZ);
+      hairPivot.position.set(fit.localX, fit.localY, fit.localZ);
       hairPivot.add(hairModel);
 
       ready = true;
@@ -186,7 +187,8 @@ export function createGlbHairOverlayEngine() {
         !renderer ||
         !scene ||
         !camera ||
-        !hairRoot
+        !hairRoot ||
+        !hairPivot
       ) {
         return false;
       }
@@ -197,10 +199,7 @@ export function createGlbHairOverlayEngine() {
       const canvas = renderer.domElement;
       if (canvas.width !== w || canvas.height !== h) {
         renderer.setSize(w, h, false);
-        camera.left = -w / 2;
-        camera.right = w / 2;
-        camera.top = h / 2;
-        camera.bottom = -h / 2;
+        camera.aspect = w / h;
         camera.updateProjectionMatrix();
       }
 
@@ -215,67 +214,24 @@ export function createGlbHairOverlayEngine() {
         return false;
       }
 
-      const lms = result.faceLandmarks?.[0] as Landmark[] | undefined;
-      if (!lms?.length) {
+      const mats = result.facialTransformationMatrixes;
+      if (!mats?.length || !mats[0]?.data || mats[0].data.length < 16) {
         hairRoot.visible = false;
         renderer.render(scene, camera);
         return false;
       }
 
-      const forehead = lms[FOREHEAD];
-      const chin = lms[CHIN];
-      const left = lms[LEFT_TEMPLE];
-      const right = lms[RIGHT_TEMPLE];
-      if (!forehead || !chin || !left || !right) {
-        hairRoot.visible = false;
-        renderer.render(scene, camera);
-        return false;
-      }
-
-      const toX = (lm: Landmark) => (lm.x - 0.5) * w;
-      const toY = (lm: Landmark) => -(lm.y - 0.5) * h;
-
-      const fx = toX(forehead);
-      const fy = toY(forehead);
-      const cx = toX(chin);
-      const cy = toY(chin);
-      const lx = toX(left);
-      const ly = toY(left);
-      const rx = toX(right);
-      const ry = toY(right);
-
-      const faceLen = Math.hypot(fx - cx, fy - cy) || 1;
-      const faceWidth = Math.hypot(rx - lx, ry - ly) || faceLen;
-
-      const upX = (fx - cx) / faceLen;
-      const upY = (fy - cy) / faceLen;
-      const rightDirX = (rx - lx) / faceWidth;
-      const rightDirY = (ry - ly) / faceWidth;
-      const angle = Math.atan2(upX, upY);
+      // Vídeo + canvas já são espelhados via CSS — matriz crua, sem mirror extra
+      faceMatrix.fromArray(mats[0].data);
+      hairRoot.matrix.copy(faceMatrix);
+      hairRoot.matrixWorldNeedsUpdate = true;
+      hairRoot.visible = true;
 
       const fit = HAIR_GLB_ASSET.fit;
-      const intensity = Math.min(1.5, Math.max(0.4, opts.intensity));
+      const intensity = Math.min(1.4, Math.max(0.5, opts.intensity));
+      hairPivot.scale.setScalar(fit.matrixScale * intensity);
 
-      // Topo do crânio ≈ fronte + crownUp × faceLen
-      const ax =
-        fx +
-        upX * faceLen * fit.crownUp +
-        rightDirX * faceWidth * fit.offsetX;
-      const ay =
-        fy +
-        upY * faceLen * fit.crownUp +
-        rightDirY * faceWidth * fit.offsetX;
-
-      // Escala para cobrir a cabeça (orelha a orelha + volume no topo)
-      const byWidth = faceWidth * fit.widthMul;
-      const byHeight = faceLen * fit.heightMul;
-      const s = Math.max(byWidth, byHeight) * fit.scale * intensity;
-
-      hairRoot.visible = true;
-      hairRoot.position.set(ax, ay, fit.offsetZ * faceWidth);
-      hairRoot.rotation.set(0, 0, -angle);
-      hairRoot.scale.setScalar(s);
-
+      // Câmera fixa na origem (não mover — senão o overlay descola do vídeo)
       renderer.render(scene, camera);
       return true;
     },

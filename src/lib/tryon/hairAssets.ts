@@ -15,20 +15,21 @@ export const HAIR_GLB_ASSET = {
   licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
   glbUrl: HAIR_GLB_URL,
   /**
-   * Calibração visual (frações da face / radianos locais no modelo).
-   * - scale: tamanho relativo à face
-   * - anchorUp: deslocamento da fronte ao longo do eixo “topo” (negativo = mais baixo)
-   * - rot*: orientação fixa do asset (oco para o couro, não para a câmera)
+   * Calibração para o cabelo “vestir” o crânio:
+   * - scalpFrac: onde fica o pivot no eixo Y do mesh (0=base, 1=topo)
+   * - crownUp: quanto sobe a âncora a partir da fronte (× faceLen)
+   * - widthMul / heightMul: escala vs largura/altura da face
    */
   fit: {
-    scale: 1.15,
-    anchorUp: -0.08,
+    scalpFrac: 0.18,
+    crownUp: 0.4,
+    widthMul: 1.85,
+    heightMul: 1.25,
+    scale: 1,
     offsetX: 0,
-    /** Empurra o pivot um pouco “para trás” no eixo da tela (Z ortográfico). */
-    offsetZ: -0.15,
-    /** Inclinação local do GLB (radianos). */
-    rotX: -0.35,
-    rotY: Math.PI,
+    offsetZ: 0,
+    rotX: 0.05,
+    rotY: 0,
     rotZ: 0,
   },
 } as const;

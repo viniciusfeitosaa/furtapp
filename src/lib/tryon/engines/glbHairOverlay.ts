@@ -20,13 +20,10 @@ const WASM_ROOT =
 const FACE_MODEL =
   "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task";
 
-/** Índices Face Mesh. */
 const FOREHEAD = 10;
 const CHIN = 152;
 const LEFT_TEMPLE = 234;
 const RIGHT_TEMPLE = 454;
-/** Pontos da linha anterior — média estabiliza a âncora. */
-const HAIRLINE = [54, 21, 162, 103, 67, 109, 10, 338, 297, 332, 284] as const;
 
 type FaceLandmarkerType = import("@mediapipe/tasks-vision").FaceLandmarker;
 type Landmark = { x: number; y: number; z: number };
@@ -36,8 +33,10 @@ export type GlbHairDrawOpts = {
 };
 
 /**
- * Overlay 3D: landmarks → pose 2.5D no plano do vídeo.
- * Calibração de orientação em HAIR_GLB_ASSET.fit (rotX/Y/Z, anchorUp).
+ * Cabelo 3D ancorado no crânio:
+ * - pivot na “base/scalp” do mesh (não no centro)
+ * - posição no topo estimado da cabeça
+ * - escala pela largura da face para cobrir orelha a orelha
  */
 export function createGlbHairOverlayEngine() {
   let landmarker: FaceLandmarkerType | null = null;
@@ -107,15 +106,13 @@ export function createGlbHairOverlayEngine() {
       camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 5000);
       camera.position.set(0, 0, 1000);
 
-      scene.add(new AmbientLight(0xffffff, 1.15));
-      const key = new DirectionalLight(0xffffff, 0.75);
-      key.position.set(0.35, 0.9, 1);
+      scene.add(new AmbientLight(0xffffff, 1.2));
+      const key = new DirectionalLight(0xffffff, 0.7);
+      key.position.set(0.3, 1, 1);
       scene.add(key);
 
       hairRoot = new Group();
       scene.add(hairRoot);
-
-      // Pivot: rotação fixa do asset + escala; root = pose na face
       hairPivot = new Group();
       hairRoot.add(hairPivot);
 
@@ -131,15 +128,15 @@ export function createGlbHairOverlayEngine() {
           : [obj.material];
         for (const m of mats) {
           if (!(m instanceof Material)) continue;
-          // Esconde o “oco” interno (backfaces) e corta alpha fraco
           m.transparent = true;
-          m.alphaTest = 0.28;
+          m.alphaTest = 0.22;
           m.depthWrite = true;
           m.side = FrontSide;
           m.needsUpdate = true;
         }
       });
 
+      // 1) Normalizar para maxDim = 1 e centralizar
       _box.setFromObject(hairModel);
       _box.getSize(_size);
       _box.getCenter(_center);
@@ -151,6 +148,14 @@ export function createGlbHairOverlayEngine() {
         -_center.y * unitScale,
         -_center.z * unitScale,
       );
+
+      // 2) Pivot no scalp: origem perto da base do mesh, volume sobe em +Y
+      hairModel.updateMatrixWorld(true);
+      _box.setFromObject(hairModel);
+      const scalpY =
+        _box.min.y +
+        (_box.max.y - _box.min.y) * HAIR_GLB_ASSET.fit.scalpFrac;
+      hairModel.position.y -= scalpY;
 
       const { rotX, rotY, rotZ } = HAIR_GLB_ASSET.fit;
       hairPivot.rotation.set(rotX, rotY, rotZ);
@@ -239,54 +244,37 @@ export function createGlbHairOverlayEngine() {
       const rx = toX(right);
       const ry = toY(right);
 
-      // Média da linha anterior (mais estável que só o ponto 10)
-      let hx = 0;
-      let hy = 0;
-      let hn = 0;
-      for (const idx of HAIRLINE) {
-        const lm = lms[idx];
-        if (!lm) continue;
-        hx += toX(lm);
-        hy += toY(lm);
-        hn += 1;
-      }
-      if (hn > 0) {
-        hx /= hn;
-        hy /= hn;
-      } else {
-        hx = fx;
-        hy = fy;
-      }
-
       const faceLen = Math.hypot(fx - cx, fy - cy) || 1;
       const faceWidth = Math.hypot(rx - lx, ry - ly) || faceLen;
 
       const upX = (fx - cx) / faceLen;
       const upY = (fy - cy) / faceLen;
-      // Eixo lateral (esquerda → direita na tela)
-      const rightX = (rx - lx) / faceWidth;
-      const rightY = (ry - ly) / faceWidth;
+      const rightDirX = (rx - lx) / faceWidth;
+      const rightDirY = (ry - ly) / faceWidth;
       const angle = Math.atan2(upX, upY);
 
       const fit = HAIR_GLB_ASSET.fit;
-      const intensity = Math.min(1.4, Math.max(0.3, opts.intensity));
-      const targetH = faceLen * (0.95 + intensity * 0.2) * fit.scale;
+      const intensity = Math.min(1.5, Math.max(0.4, opts.intensity));
 
-      // Âncora na hairline, com ajuste fino
+      // Topo do crânio ≈ fronte + crownUp × faceLen
       const ax =
-        hx +
-        upX * faceLen * fit.anchorUp +
-        rightX * faceWidth * fit.offsetX;
+        fx +
+        upX * faceLen * fit.crownUp +
+        rightDirX * faceWidth * fit.offsetX;
       const ay =
-        hy +
-        upY * faceLen * fit.anchorUp +
-        rightY * faceWidth * fit.offsetX;
+        fy +
+        upY * faceLen * fit.crownUp +
+        rightDirY * faceWidth * fit.offsetX;
 
-      hairRoot.visible = intensity > 0.05;
+      // Escala para cobrir a cabeça (orelha a orelha + volume no topo)
+      const byWidth = faceWidth * fit.widthMul;
+      const byHeight = faceLen * fit.heightMul;
+      const s = Math.max(byWidth, byHeight) * fit.scale * intensity;
+
+      hairRoot.visible = true;
       hairRoot.position.set(ax, ay, fit.offsetZ * faceWidth);
-      // Só roll no plano da câmera — pitch/yaw ficam no pivot do asset
       hairRoot.rotation.set(0, 0, -angle);
-      hairRoot.scale.setScalar(targetH);
+      hairRoot.scale.setScalar(s);
 
       renderer.render(scene, camera);
       return true;

@@ -3,9 +3,9 @@ import { LiveTryOn } from "@/components/tryon/LiveTryOn";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Experimente ao vivo | MediaPipe (grátis)",
+  title: "Experimente ao vivo | Cabelo 3D",
   description:
-    "Ative a câmera: MediaPipe segmenta seu cabelo e aplica reforço de tom/densidade no aparelho — experiência educativa do Dr. Francisco Furtado.",
+    "Ative a câmera e veja um modelo 3D de cabelo (CC BY) no seu rosto — experiência educativa do Dr. Francisco Furtado.",
 };
 
 export default function ExperimentePage() {
@@ -19,8 +19,8 @@ export default function ExperimentePage() {
           Veja a densidade se formar — ao vivo
         </h1>
         <p className="font-serif-body mt-5 max-w-2xl text-lg text-white/75">
-          Segmentação open source (MediaPipe) no seu aparelho — sem licença
-          comercial. Privado — {SITE.name} não recebe a imagem.
+          Modelo 3D gratuito do Sketchfab (CC BY) ancorado no rosto com
+          MediaPipe. Privado no aparelho — {SITE.name} não recebe a imagem.
         </p>
 
         <div className="mt-10">

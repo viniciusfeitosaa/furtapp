@@ -6,24 +6,37 @@ import { useCamera } from "@/hooks/useCamera";
 import type { HairTryOnEngine } from "@/lib/tryon/HairTryOnEngine";
 import { createHairTryOnEngine } from "@/lib/tryon/createHairTryOnEngine";
 import {
+  HAIR_GLB_ASSET,
+  hairGlbExists,
+} from "@/lib/tryon/hairAssets";
+import {
+  createGlbHairOverlayEngine,
+  type GlbHairOverlayEngine,
+} from "@/lib/tryon/engines/glbHairOverlay";
+import {
   HAIR_LOOKS,
   type HairLookId,
 } from "@/lib/tryon/hairTintPresets";
 import { whatsappUrl } from "@/lib/site";
 
+type Mode = "loading" | "glb" | "segment" | "waiting-glb";
+
 export function LiveTryOn() {
   const { videoRef, state, error, start, stop } = useCamera();
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const engineRef = useRef<HairTryOnEngine | null>(null);
+  const canvas2dRef = useRef<HTMLCanvasElement | null>(null);
+  const canvas3dRef = useRef<HTMLCanvasElement | null>(null);
+  const segmentEngineRef = useRef<HairTryOnEngine | null>(null);
+  const glbEngineRef = useRef<GlbHairOverlayEngine | null>(null);
   const rafRef = useRef(0);
   const styleRef = useRef<HairLookId>("natural");
-  const intensityRef = useRef(0.7);
-  const [intensity, setIntensity] = useState(70);
+  const intensityRef = useRef(0.75);
+  const [intensity, setIntensity] = useState(75);
   const [styleId, setStyleId] = useState<HairLookId>("natural");
+  const [mode, setMode] = useState<Mode>("loading");
   const [modelReady, setModelReady] = useState(false);
   const [modelError, setModelError] = useState<string | null>(null);
-  const [hasHair, setHasHair] = useState(false);
-  const hasHairRef = useRef(false);
+  const [hasTrack, setHasTrack] = useState(false);
+  const hasTrackRef = useRef(false);
 
   useEffect(() => {
     styleRef.current = styleId;
@@ -34,65 +47,134 @@ export function LiveTryOn() {
 
   useEffect(() => {
     let cancelled = false;
-    const engine = createHairTryOnEngine();
-    engineRef.current = engine;
     (async () => {
+      const hasGlb = await hairGlbExists();
+      if (cancelled) return;
+
+      if (hasGlb) {
+        const engine = createGlbHairOverlayEngine();
+        glbEngineRef.current = engine;
+        try {
+          // canvas pode ainda não existir; init lazy no start
+          setMode("glb");
+          setModelReady(true);
+        } catch (e) {
+          setModelError(
+            e instanceof Error ? e.message : "Falha ao preparar o modelo 3D.",
+          );
+          setMode("segment");
+        }
+        return;
+      }
+
+      // Sem GLB ainda: MediaPipe como fallback + aviso
+      setMode("waiting-glb");
+      const engine = createHairTryOnEngine();
+      segmentEngineRef.current = engine;
       try {
         await engine.init();
-        if (!cancelled) setModelReady(true);
+        if (!cancelled) {
+          setModelReady(true);
+          setMode("segment");
+        }
       } catch {
         if (!cancelled) {
           setModelError(
-            "Não foi possível carregar o modelo MediaPipe de cabelo. Recarregue a página.",
+            "Não foi possível carregar MediaPipe. Coloque o GLB em public/models/hair/short-layered.glb",
           );
         }
       }
     })();
+
     return () => {
       cancelled = true;
-      engine.dispose();
-      engineRef.current = null;
+      glbEngineRef.current?.dispose();
+      glbEngineRef.current = null;
+      segmentEngineRef.current?.dispose();
+      segmentEngineRef.current = null;
     };
   }, []);
 
   useEffect(() => {
     if (state !== "live") {
       cancelAnimationFrame(rafRef.current);
-      hasHairRef.current = false;
-      setHasHair(false);
+      hasTrackRef.current = false;
+      setHasTrack(false);
       return;
     }
 
     const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!video) return;
 
-    const loop = () => {
-      const engine = engineRef.current;
-      if (!engine || video.readyState < 2) {
+    let cancelled = false;
+
+    const boot = async () => {
+      if (mode === "glb" || (mode === "loading" && glbEngineRef.current)) {
+        const canvas = canvas3dRef.current;
+        const engine = glbEngineRef.current;
+        if (!canvas || !engine) return;
+        try {
+          await engine.init(canvas);
+        } catch (e) {
+          if (!cancelled) {
+            setModelError(
+              e instanceof Error
+                ? e.message
+                : "Não foi possível carregar o GLB de cabelo.",
+            );
+            // Fallback MediaPipe
+            const seg = createHairTryOnEngine();
+            segmentEngineRef.current = seg;
+            try {
+              await seg.init();
+              setMode("segment");
+              setModelError(
+                "GLB falhou ao carregar — usando segmentação MediaPipe. Verifique public/models/hair/short-layered.glb",
+              );
+            } catch {
+              /* keep error */
+            }
+          }
+          return;
+        }
+      }
+
+      const loop = () => {
+        if (cancelled) return;
+        const eng3d = glbEngineRef.current;
+        const eng2d = segmentEngineRef.current;
+        const c2d = canvas2dRef.current;
+
+        let tracked = false;
+        if (eng3d && canvas3dRef.current) {
+          tracked = eng3d.draw(video, { intensity: intensityRef.current });
+        } else if (eng2d && c2d) {
+          const ctx = c2d.getContext("2d");
+          if (ctx) {
+            tracked = eng2d.draw(video, ctx, {
+              styleId: styleRef.current,
+              intensity: intensityRef.current,
+            });
+          }
+        }
+
+        if (tracked !== hasTrackRef.current) {
+          hasTrackRef.current = tracked;
+          setHasTrack(tracked);
+        }
         rafRef.current = requestAnimationFrame(loop);
-        return;
-      }
-
-      const detected = engine.draw(video, ctx, {
-        styleId: styleRef.current,
-        intensity: intensityRef.current,
-      });
-
-      if (detected !== hasHairRef.current) {
-        hasHairRef.current = detected;
-        setHasHair(detected);
-      }
-
+      };
       rafRef.current = requestAnimationFrame(loop);
     };
 
-    rafRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [state, videoRef]);
+    void boot();
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [state, videoRef, mode]);
 
+  const usingGlb = mode === "glb";
   const active = HAIR_LOOKS.find((p) => p.id === styleId) ?? HAIR_LOOKS[0]!;
 
   return (
@@ -106,15 +188,28 @@ export function LiveTryOn() {
         <div className="relative aspect-[3/4] w-full bg-black sm:aspect-video">
           <video
             ref={videoRef}
-            className="pointer-events-none absolute h-px w-px opacity-0"
+            className={
+              usingGlb
+                ? "absolute inset-0 h-full w-full scale-x-[-1] object-cover"
+                : "pointer-events-none absolute h-px w-px opacity-0"
+            }
             playsInline
             muted
             autoPlay
           />
           <canvas
-            ref={canvasRef}
-            className="absolute inset-0 h-full w-full object-cover"
-            aria-label="Segmentação de cabelo ao vivo"
+            ref={canvas2dRef}
+            className={`absolute inset-0 h-full w-full object-cover ${
+              usingGlb ? "hidden" : ""
+            }`}
+            aria-label="Segmentação de cabelo"
+          />
+          <canvas
+            ref={canvas3dRef}
+            className={`absolute inset-0 h-full w-full scale-x-[-1] object-cover ${
+              usingGlb ? "" : "hidden"
+            }`}
+            aria-label="Cabelo 3D ao vivo"
           />
 
           {state !== "live" ? (
@@ -123,9 +218,9 @@ export function LiveTryOn() {
                 Experimente ao vivo
               </p>
               <p className="font-serif-body max-w-md text-sm text-white/70 sm:text-base">
-                MediaPipe (Google, open source) segmenta o cabelo no seu
-                aparelho e aplica reforço de tom/densidade — sem chapéu 3D, sem
-                conta paga. Nada é gravado ou enviado.
+                {usingGlb
+                  ? "Modelo 3D gratuito (Sketchfab CC BY) ancorado no rosto com MediaPipe Face Landmarker."
+                  : "Enquanto o GLB não estiver em public/models/hair/, usamos segmentação MediaPipe (tom/densidade)."}
               </p>
               <button
                 type="button"
@@ -134,7 +229,7 @@ export function LiveTryOn() {
                 className="inline-flex min-h-12 items-center justify-center bg-brand-gold px-7 py-3.5 text-sm font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {!modelReady && !modelError
-                  ? "Carregando modelo…"
+                  ? "Carregando…"
                   : "Ativar câmera"}
               </button>
               {modelError ? (
@@ -143,11 +238,6 @@ export function LiveTryOn() {
               {error ? (
                 <p className="max-w-sm text-sm text-red-300">{error}</p>
               ) : null}
-              {state === "unsupported" ? (
-                <p className="max-w-sm text-sm text-white/55">
-                  Use um celular ou computador com câmera e HTTPS.
-                </p>
-              ) : null}
             </div>
           ) : null}
 
@@ -155,11 +245,15 @@ export function LiveTryOn() {
             <div className="absolute top-3 left-3 z-20 max-w-[90%] rounded-full bg-black/50 px-3 py-1.5 text-[0.65rem] tracking-wide text-white/80 uppercase backdrop-blur-sm">
               <span className="inline-flex items-center gap-2">
                 <span
-                  className={`size-1.5 shrink-0 rounded-full ${hasHair ? "bg-brand-gold" : "bg-white/30"}`}
+                  className={`size-1.5 shrink-0 rounded-full ${hasTrack ? "bg-brand-gold" : "bg-white/30"}`}
                 />
-                {hasHair
-                  ? "Cabelo detectado"
-                  : "Sem cabelo na máscara — centralize o rosto"}
+                {usingGlb
+                  ? hasTrack
+                    ? "Rosto + cabelo 3D"
+                    : "Centralize o rosto"
+                  : hasTrack
+                    ? "Cabelo detectado"
+                    : "Sem máscara de cabelo"}
               </span>
             </div>
           ) : null}
@@ -167,48 +261,66 @@ export function LiveTryOn() {
       </div>
 
       <div className="mt-8 space-y-8">
-        <div>
-          <p className="mb-3 text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase">
-            Tom / reforço ilustrativo
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-            {HAIR_LOOKS.map((s) => {
-              const on = s.id === styleId;
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => setStyleId(s.id)}
-                  className={`border px-3 py-3 text-left transition-colors ${
-                    on
-                      ? "border-brand-gold bg-brand-gold/15 text-white"
-                      : "border-white/15 text-white/70 hover:border-white/35 hover:text-white"
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <span
-                      className="size-3 shrink-0 rounded-full border border-white/20"
-                      style={{
-                        backgroundColor: `rgb(${s.rgb.join(",")})`,
-                      }}
-                      aria-hidden
-                    />
+        <div className="rounded-sm border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/65">
+          Modelo:{" "}
+          <a
+            href={HAIR_GLB_ASSET.sketchfabUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-gold underline-offset-2 hover:underline"
+          >
+            {HAIR_GLB_ASSET.label}
+          </a>{" "}
+          por {HAIR_GLB_ASSET.author} ({HAIR_GLB_ASSET.license}). Créditos:{" "}
+          {HAIR_GLB_ASSET.originalCredit}.{" "}
+          {!usingGlb ? (
+            <span className="text-brand-gold/90">
+              Falta o arquivo{" "}
+              <code className="text-white/80">
+                public/models/hair/short-layered.glb
+              </code>{" "}
+              — baixe no Sketchfab e coloque nessa pasta.
+            </span>
+          ) : (
+            <span>GLB carregado.</span>
+          )}
+        </div>
+
+        {!usingGlb ? (
+          <div>
+            <p className="mb-3 text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase">
+              Fallback — tom / reforço
+            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+              {HAIR_LOOKS.map((s) => {
+                const on = s.id === styleId;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setStyleId(s.id)}
+                    className={`border px-3 py-3 text-left transition-colors ${
+                      on
+                        ? "border-brand-gold bg-brand-gold/15 text-white"
+                        : "border-white/15 text-white/70 hover:border-white/35 hover:text-white"
+                    }`}
+                  >
                     <span className="text-sm font-semibold tracking-wide">
                       {s.label}
                     </span>
-                  </span>
-                  <span className="mt-1 block text-[0.7rem] leading-snug text-white/45">
-                    {s.blurb}
-                  </span>
-                </button>
-              );
-            })}
+                    <span className="mt-1 block text-[0.7rem] text-white/45">
+                      {s.blurb}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-sm text-white/50">
+              Selecionado:{" "}
+              <span className="text-brand-gold">{active.label}</span>
+            </p>
           </div>
-          <p className="mt-3 text-sm text-white/50">
-            Selecionado: <span className="text-brand-gold">{active.label}</span>{" "}
-            — {active.blurb}
-          </p>
-        </div>
+        ) : null}
 
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
@@ -217,7 +329,7 @@ export function LiveTryOn() {
                 htmlFor="tryon-intensity"
                 className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
               >
-                Intensidade do reforço
+                Intensidade
               </label>
               <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
                 {intensity}%
@@ -241,16 +353,9 @@ export function LiveTryOn() {
 
           <div className="flex flex-col gap-4">
             <p className="text-sm leading-relaxed text-white/55">
-              Stack 100% gratuita: MediaPipe Hair Segmenter. Reforça o cabelo
-              existente — não troca o corte por uma peruca 3D. Não é prognóstico
-              cirúrgico.
+              Pausamos a “criação” procedural de cabelo. O caminho agora é o
+              modelo 3D CC BY do Sketchfab + tracking facial gratuito (MediaPipe).
             </p>
-            {!hasHair && state === "live" ? (
-              <p className="text-sm text-brand-gold/90">
-                Se a área estiver raspada ou a luz for fraca, a máscara pode
-                falhar.
-              </p>
-            ) : null}
             <div className="flex flex-wrap gap-3">
               {state === "live" ? (
                 <button
@@ -263,7 +368,7 @@ export function LiveTryOn() {
               ) : null}
               <a
                 href={whatsappUrl(
-                  "Olá! Testei a segmentação de cabelo ao vivo no site e gostaria de agendar minha avaliação.",
+                  "Olá! Testei o try-on 3D de cabelo no site e gostaria de agendar minha avaliação.",
                 )}
                 target="_blank"
                 rel="noopener noreferrer"

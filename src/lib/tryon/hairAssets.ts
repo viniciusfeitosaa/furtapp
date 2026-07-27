@@ -22,11 +22,10 @@ export const HAIR_GLB_ASSET = {
    *   localZ ↓ (mais negativo) empurra o volume para trás
    */
   fit: {
-    // Escala em cm no espaço da face: um cabelo real tem ~30 cm de extensão.
-    // Valores baixos viravam “topete” pequeno flutuando sobre a cabeça.
-    matrixScale: 32,
+    // Valores calibrados ao vivo pelos sliders do /experimente.
+    matrixScale: 24,
     localX: 0,
-    localY: 2,
+    localY: 6.5,
     localZ: -2,
     scalpFrac: 0.55,
     rotX: 0,

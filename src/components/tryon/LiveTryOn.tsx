@@ -5,21 +5,15 @@ import { useEffect, useRef, useState } from "react";
 import { useCamera } from "@/hooks/useCamera";
 import type { HairTryOnEngine } from "@/lib/tryon/HairTryOnEngine";
 import { createHairTryOnEngine } from "@/lib/tryon/createHairTryOnEngine";
-import {
-  HAIR_GLB_ASSET,
-  hairGlbExists,
-} from "@/lib/tryon/hairAssets";
+import { HAIR_GLB_ASSET, hairGlbExists } from "@/lib/tryon/hairAssets";
 import {
   createGlbHairOverlayEngine,
   type GlbHairOverlayEngine,
 } from "@/lib/tryon/engines/glbHairOverlay";
-import {
-  HAIR_LOOKS,
-  type HairLookId,
-} from "@/lib/tryon/hairTintPresets";
+import { HAIR_LOOKS, type HairLookId } from "@/lib/tryon/hairTintPresets";
 import { whatsappUrl } from "@/lib/site";
 
-type Mode = "loading" | "glb" | "segment" | "waiting-glb";
+type Mode = "loading" | "glb" | "segment";
 
 export function LiveTryOn() {
   const { videoRef, state, error, start, stop } = useCamera();
@@ -27,14 +21,16 @@ export function LiveTryOn() {
   const canvas3dRef = useRef<HTMLCanvasElement | null>(null);
   const segmentEngineRef = useRef<HairTryOnEngine | null>(null);
   const glbEngineRef = useRef<GlbHairOverlayEngine | null>(null);
+  const glbReadyRef = useRef(false);
   const rafRef = useRef(0);
   const styleRef = useRef<HairLookId>("natural");
-  const intensityRef = useRef(0.75);
-  const [intensity, setIntensity] = useState(75);
+  const intensityRef = useRef(0.8);
+  const [intensity, setIntensity] = useState(80);
   const [styleId, setStyleId] = useState<HairLookId>("natural");
   const [mode, setMode] = useState<Mode>("loading");
   const [modelReady, setModelReady] = useState(false);
   const [modelError, setModelError] = useState<string | null>(null);
+  const [statusHint, setStatusHint] = useState("Preparando…");
   const [hasTrack, setHasTrack] = useState(false);
   const hasTrackRef = useRef(false);
 
@@ -45,46 +41,77 @@ export function LiveTryOn() {
     intensityRef.current = intensity / 100;
   }, [intensity]);
 
+  // Boot: detectar GLB e pré-carregar motor
   useEffect(() => {
     let cancelled = false;
+
     (async () => {
+      setStatusHint("Verificando modelo 3D…");
       const hasGlb = await hairGlbExists();
       if (cancelled) return;
 
       if (hasGlb) {
+        setMode("glb");
+        setStatusHint("Carregando cabelo 3D + Face Landmarker…");
         const engine = createGlbHairOverlayEngine();
         glbEngineRef.current = engine;
+
+        // Espera o canvas montar (mode=glb remove hidden)
+        await new Promise<void>((resolve) => {
+          const tick = () => {
+            if (cancelled) return resolve();
+            if (canvas3dRef.current) return resolve();
+            requestAnimationFrame(tick);
+          };
+          tick();
+        });
+        if (cancelled) return;
+
+        const canvas = canvas3dRef.current;
+        if (!canvas) {
+          setModelError("Canvas 3D indisponível.");
+          return;
+        }
+
         try {
-          // canvas pode ainda não existir; init lazy no start
-          setMode("glb");
+          await engine.init(canvas);
+          if (cancelled) return;
+          glbReadyRef.current = true;
           setModelReady(true);
+          setStatusHint("Pronto — ative a câmera");
         } catch (e) {
-          setModelError(
-            e instanceof Error ? e.message : "Falha ao preparar o modelo 3D.",
-          );
-          setMode("segment");
+          console.error("[tryon] GLB init failed", e);
+          if (cancelled) return;
+          setStatusHint("GLB falhou — tentando MediaPipe…");
+          glbEngineRef.current?.dispose();
+          glbEngineRef.current = null;
+          await bootSegment(cancelled);
         }
         return;
       }
 
-      // Sem GLB ainda: MediaPipe como fallback + aviso
-      setMode("waiting-glb");
+      setStatusHint("GLB ausente — usando segmentação…");
+      await bootSegment(cancelled);
+    })();
+
+    async function bootSegment(cancelledFlag: boolean) {
+      setMode("segment");
       const engine = createHairTryOnEngine();
       segmentEngineRef.current = engine;
       try {
         await engine.init();
-        if (!cancelled) {
-          setModelReady(true);
-          setMode("segment");
-        }
-      } catch {
-        if (!cancelled) {
+        if (cancelledFlag) return;
+        setModelReady(true);
+        setStatusHint("Pronto — ative a câmera (fallback)");
+      } catch (e) {
+        console.error("[tryon] MediaPipe init failed", e);
+        if (!cancelledFlag) {
           setModelError(
-            "Não foi possível carregar MediaPipe. Verifique o GLB em public/models/short_hair_cut_in_layers_with_bones.glb",
+            "Não foi possível carregar o try-on. Recarregue a página.",
           );
         }
       }
-    })();
+    }
 
     return () => {
       cancelled = true;
@@ -92,9 +119,11 @@ export function LiveTryOn() {
       glbEngineRef.current = null;
       segmentEngineRef.current?.dispose();
       segmentEngineRef.current = null;
+      glbReadyRef.current = false;
     };
   }, []);
 
+  // Loop de render quando a câmera está live
   useEffect(() => {
     if (state !== "live") {
       cancelAnimationFrame(rafRef.current);
@@ -108,66 +137,33 @@ export function LiveTryOn() {
 
     let cancelled = false;
 
-    const boot = async () => {
-      if (mode === "glb" || (mode === "loading" && glbEngineRef.current)) {
-        const canvas = canvas3dRef.current;
-        const engine = glbEngineRef.current;
-        if (!canvas || !engine) return;
-        try {
-          await engine.init(canvas);
-        } catch (e) {
-          if (!cancelled) {
-            setModelError(
-              e instanceof Error
-                ? e.message
-                : "Não foi possível carregar o GLB de cabelo.",
-            );
-            // Fallback MediaPipe
-            const seg = createHairTryOnEngine();
-            segmentEngineRef.current = seg;
-            try {
-              await seg.init();
-              setMode("segment");
-              setModelError(
-                "GLB falhou ao carregar — usando segmentação MediaPipe. Verifique public/models/short_hair_cut_in_layers_with_bones.glb",
-              );
-            } catch {
-              /* keep error */
-            }
-          }
-          return;
+    const loop = () => {
+      if (cancelled) return;
+      const eng3d = glbEngineRef.current;
+      const eng2d = segmentEngineRef.current;
+      const c2d = canvas2dRef.current;
+
+      let tracked = false;
+      if (mode === "glb" && eng3d && glbReadyRef.current) {
+        tracked = eng3d.draw(video, { intensity: intensityRef.current });
+      } else if (eng2d && c2d) {
+        const ctx = c2d.getContext("2d");
+        if (ctx) {
+          tracked = eng2d.draw(video, ctx, {
+            styleId: styleRef.current,
+            intensity: intensityRef.current,
+          });
         }
       }
 
-      const loop = () => {
-        if (cancelled) return;
-        const eng3d = glbEngineRef.current;
-        const eng2d = segmentEngineRef.current;
-        const c2d = canvas2dRef.current;
-
-        let tracked = false;
-        if (eng3d && canvas3dRef.current) {
-          tracked = eng3d.draw(video, { intensity: intensityRef.current });
-        } else if (eng2d && c2d) {
-          const ctx = c2d.getContext("2d");
-          if (ctx) {
-            tracked = eng2d.draw(video, ctx, {
-              styleId: styleRef.current,
-              intensity: intensityRef.current,
-            });
-          }
-        }
-
-        if (tracked !== hasTrackRef.current) {
-          hasTrackRef.current = tracked;
-          setHasTrack(tracked);
-        }
-        rafRef.current = requestAnimationFrame(loop);
-      };
+      if (tracked !== hasTrackRef.current) {
+        hasTrackRef.current = tracked;
+        setHasTrack(tracked);
+      }
       rafRef.current = requestAnimationFrame(loop);
     };
 
-    void boot();
+    rafRef.current = requestAnimationFrame(loop);
     return () => {
       cancelled = true;
       cancelAnimationFrame(rafRef.current);
@@ -200,14 +196,16 @@ export function LiveTryOn() {
           <canvas
             ref={canvas2dRef}
             className={`absolute inset-0 h-full w-full object-cover ${
-              usingGlb ? "hidden" : ""
+              usingGlb ? "pointer-events-none opacity-0" : ""
             }`}
+            aria-hidden={usingGlb}
             aria-label="Segmentação de cabelo"
           />
+          {/* Não usar display:none — WebGL precisa do canvas no layout */}
           <canvas
             ref={canvas3dRef}
             className={`absolute inset-0 h-full w-full scale-x-[-1] object-cover ${
-              usingGlb ? "" : "hidden"
+              usingGlb ? "" : "pointer-events-none opacity-0"
             }`}
             aria-label="Cabelo 3D ao vivo"
           />
@@ -219,8 +217,11 @@ export function LiveTryOn() {
               </p>
               <p className="font-serif-body max-w-md text-sm text-white/70 sm:text-base">
                 {usingGlb
-                  ? "Modelo 3D gratuito (Sketchfab CC BY) ancorado no rosto com MediaPipe Face Landmarker."
-                  : "Enquanto o GLB não estiver em public/models/hair/, usamos segmentação MediaPipe (tom/densidade)."}
+                  ? "Modelo 3D (Sketchfab CC BY) ancorado no rosto com MediaPipe."
+                  : "Segmentação MediaPipe de tom/densidade (fallback)."}
+              </p>
+              <p className="text-[0.7rem] tracking-wide text-white/40 uppercase">
+                {statusHint}
               </p>
               <button
                 type="button"
@@ -229,7 +230,7 @@ export function LiveTryOn() {
                 className="inline-flex min-h-12 items-center justify-center bg-brand-gold px-7 py-3.5 text-sm font-semibold tracking-wide text-brand-charcoal transition-colors hover:bg-brand-gold-soft disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {!modelReady && !modelError
-                  ? "Carregando…"
+                  ? "Carregando modelo…"
                   : "Ativar câmera"}
               </button>
               {modelError ? (
@@ -273,16 +274,10 @@ export function LiveTryOn() {
           </a>{" "}
           por {HAIR_GLB_ASSET.author} ({HAIR_GLB_ASSET.license}). Créditos:{" "}
           {HAIR_GLB_ASSET.originalCredit}.{" "}
-          {!usingGlb ? (
-            <span className="text-brand-gold/90">
-              Falta o arquivo{" "}
-              <code className="text-white/80">
-                public/models/short_hair_cut_in_layers_with_bones.glb
-              </code>{" "}
-              — baixe no Sketchfab e coloque nessa pasta.
-            </span>
+          {usingGlb && modelReady ? (
+            <span className="text-brand-gold/90">Modo 3D ativo.</span>
           ) : (
-            <span>GLB carregado.</span>
+            <span>Modo: {mode}</span>
           )}
         </div>
 
@@ -329,7 +324,7 @@ export function LiveTryOn() {
                 htmlFor="tryon-intensity"
                 className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
               >
-                Intensidade
+                Intensidade / tamanho
               </label>
               <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
                 {intensity}%
@@ -338,23 +333,23 @@ export function LiveTryOn() {
             <input
               id="tryon-intensity"
               type="range"
-              min={15}
-              max={100}
+              min={30}
+              max={140}
               step={1}
               value={intensity}
               onChange={(e) => setIntensity(Number(e.target.value))}
               disabled={state !== "live"}
               className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
               style={{
-                background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${intensity}%, rgba(255,255,255,0.15) ${intensity}%, rgba(255,255,255,0.15) 100%)`,
+                background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) 100%)`,
               }}
             />
           </div>
 
           <div className="flex flex-col gap-4">
             <p className="text-sm leading-relaxed text-white/55">
-              Pausamos a “criação” procedural de cabelo. O caminho agora é o
-              modelo 3D CC BY do Sketchfab + tracking facial gratuito (MediaPipe).
+              Se o cabelo parecer pequeno ou alto demais, use o controle de
+              intensidade. Luz frontal ajuda o tracking.
             </p>
             <div className="flex flex-wrap gap-3">
               {state === "live" ? (

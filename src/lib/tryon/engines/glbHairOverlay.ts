@@ -24,7 +24,8 @@ const FACE_MODEL =
 type FaceLandmarkerType = import("@mediapipe/tasks-vision").FaceLandmarker;
 
 export type GlbHairDrawOpts = {
-  intensity: number;
+  /** Maior dimensão do cabelo no espaço da face, em cm. */
+  scale: number;
   /** Deslocamento vertical no espaço da face (cm). Negativo = desce. */
   offsetY: number;
 };
@@ -230,9 +231,8 @@ export function createGlbHairOverlayEngine() {
       hairRoot.visible = true;
 
       const fit = HAIR_GLB_ASSET.fit;
-      const intensity = Math.min(1.4, Math.max(0.5, opts.intensity));
       hairPivot.position.set(fit.localX, opts.offsetY, fit.localZ);
-      hairPivot.scale.setScalar(fit.matrixScale * intensity);
+      hairPivot.scale.setScalar(Math.min(60, Math.max(8, opts.scale)));
 
       // Câmera fixa na origem (não mover — senão o overlay descola do vídeo)
       renderer.render(scene, camera);

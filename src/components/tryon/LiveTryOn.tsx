@@ -26,8 +26,12 @@ export function LiveTryOn() {
   const styleRef = useRef<HairLookId>("natural");
   const intensityRef = useRef(0.8);
   const offsetYRef = useRef<number>(HAIR_GLB_ASSET.fit.localY);
+  const hairScaleRef = useRef<number>(HAIR_GLB_ASSET.fit.matrixScale);
   const [intensity, setIntensity] = useState(80);
   const [offsetY, setOffsetY] = useState<number>(HAIR_GLB_ASSET.fit.localY);
+  const [hairScale, setHairScale] = useState<number>(
+    HAIR_GLB_ASSET.fit.matrixScale,
+  );
   const [styleId, setStyleId] = useState<HairLookId>("natural");
   const [mode, setMode] = useState<Mode>("loading");
   const [modelReady, setModelReady] = useState(false);
@@ -45,6 +49,9 @@ export function LiveTryOn() {
   useEffect(() => {
     offsetYRef.current = offsetY;
   }, [offsetY]);
+  useEffect(() => {
+    hairScaleRef.current = hairScale;
+  }, [hairScale]);
 
   // Boot: detectar GLB e pré-carregar motor
   useEffect(() => {
@@ -151,7 +158,7 @@ export function LiveTryOn() {
       let tracked = false;
       if (mode === "glb" && eng3d && glbReadyRef.current) {
         tracked = eng3d.draw(video, {
-          intensity: intensityRef.current,
+          scale: hairScaleRef.current,
           offsetY: offsetYRef.current,
         });
       } else if (eng2d && c2d) {
@@ -359,39 +366,71 @@ export function LiveTryOn() {
               </div>
             ) : null}
 
-            <div>
-              <div className="mb-3 flex items-end justify-between gap-3">
-                <label
-                  htmlFor="tryon-intensity"
-                  className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
-                >
-                  Intensidade / tamanho
-                </label>
-                <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
-                  {intensity}%
+            {usingGlb ? (
+              <div>
+                <div className="mb-3 flex items-end justify-between gap-3">
+                  <label
+                    htmlFor="tryon-hair-scale"
+                    className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
+                  >
+                    Tamanho do cabelo
+                  </label>
+                  <p className="font-mono text-sm tracking-wide text-brand-gold">
+                    {hairScale.toFixed(1)}
+                  </p>
+                </div>
+                <input
+                  id="tryon-hair-scale"
+                  type="range"
+                  min={12}
+                  max={55}
+                  step={0.5}
+                  value={hairScale}
+                  onChange={(e) => setHairScale(Number(e.target.value))}
+                  className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15"
+                  style={{
+                    background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${((hairScale - 12) / 43) * 100}%, rgba(255,255,255,0.15) ${((hairScale - 12) / 43) * 100}%, rgba(255,255,255,0.15) 100%)`,
+                  }}
+                />
+                <p className="mt-2 text-[0.7rem] text-white/40">
+                  Maior = envolve mais o crânio (orelha a orelha)
                 </p>
               </div>
-              <input
-                id="tryon-intensity"
-                type="range"
-                min={30}
-                max={140}
-                step={1}
-                value={intensity}
-                onChange={(e) => setIntensity(Number(e.target.value))}
-                disabled={state !== "live"}
-                className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
-                style={{
-                  background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) 100%)`,
-                }}
-              />
-            </div>
+            ) : (
+              <div>
+                <div className="mb-3 flex items-end justify-between gap-3">
+                  <label
+                    htmlFor="tryon-intensity"
+                    className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
+                  >
+                    Intensidade / tamanho
+                  </label>
+                  <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
+                    {intensity}%
+                  </p>
+                </div>
+                <input
+                  id="tryon-intensity"
+                  type="range"
+                  min={30}
+                  max={140}
+                  step={1}
+                  value={intensity}
+                  onChange={(e) => setIntensity(Number(e.target.value))}
+                  disabled={state !== "live"}
+                  className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
+                  style={{
+                    background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) 100%)`,
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">
             <p className="text-sm leading-relaxed text-white/55">
               {usingGlb
-                ? "Use o slider de posição para sentar o cabelo no crânio. Quando ficar bom, diga o valor mostrado — fixamos no código."
+                ? "Ajuste tamanho e depois posição até o cabelo vestir a cabeça. Quando ficar bom, informe os dois valores — fixamos no código."
                 : "Ajuste a intensidade do reforço. Luz frontal ajuda o tracking."}
             </p>
             <div className="flex flex-wrap gap-3">

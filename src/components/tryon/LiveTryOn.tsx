@@ -25,7 +25,9 @@ export function LiveTryOn() {
   const rafRef = useRef(0);
   const styleRef = useRef<HairLookId>("natural");
   const intensityRef = useRef(0.8);
+  const offsetYRef = useRef(HAIR_GLB_ASSET.fit.localY);
   const [intensity, setIntensity] = useState(80);
+  const [offsetY, setOffsetY] = useState<number>(HAIR_GLB_ASSET.fit.localY);
   const [styleId, setStyleId] = useState<HairLookId>("natural");
   const [mode, setMode] = useState<Mode>("loading");
   const [modelReady, setModelReady] = useState(false);
@@ -40,6 +42,9 @@ export function LiveTryOn() {
   useEffect(() => {
     intensityRef.current = intensity / 100;
   }, [intensity]);
+  useEffect(() => {
+    offsetYRef.current = offsetY;
+  }, [offsetY]);
 
   // Boot: detectar GLB e pré-carregar motor
   useEffect(() => {
@@ -145,7 +150,10 @@ export function LiveTryOn() {
 
       let tracked = false;
       if (mode === "glb" && eng3d && glbReadyRef.current) {
-        tracked = eng3d.draw(video, { intensity: intensityRef.current });
+        tracked = eng3d.draw(video, {
+          intensity: intensityRef.current,
+          offsetY: offsetYRef.current,
+        });
       } else if (eng2d && c2d) {
         const ctx = c2d.getContext("2d");
         if (ctx) {
@@ -318,38 +326,74 @@ export function LiveTryOn() {
         ) : null}
 
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-          <div>
-            <div className="mb-3 flex items-end justify-between gap-3">
-              <label
-                htmlFor="tryon-intensity"
-                className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
-              >
-                Intensidade / tamanho
-              </label>
-              <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
-                {intensity}%
-              </p>
+          <div className="space-y-6">
+            {usingGlb ? (
+              <div>
+                <div className="mb-3 flex items-end justify-between gap-3">
+                  <label
+                    htmlFor="tryon-offset-y"
+                    className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
+                  >
+                    Posição na cabeça (↑↓)
+                  </label>
+                  <p className="font-mono text-sm tracking-wide text-brand-gold">
+                    {offsetY.toFixed(1)}
+                  </p>
+                </div>
+                <input
+                  id="tryon-offset-y"
+                  type="range"
+                  min={-20}
+                  max={15}
+                  step={0.5}
+                  value={offsetY}
+                  onChange={(e) => setOffsetY(Number(e.target.value))}
+                  disabled={state !== "live"}
+                  className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
+                  style={{
+                    background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${((offsetY + 20) / 35) * 100}%, rgba(255,255,255,0.15) ${((offsetY + 20) / 35) * 100}%, rgba(255,255,255,0.15) 100%)`,
+                  }}
+                />
+                <p className="mt-2 text-[0.7rem] text-white/40">
+                  Negativo desce · positivo sobe · anote o valor ideal
+                </p>
+              </div>
+            ) : null}
+
+            <div>
+              <div className="mb-3 flex items-end justify-between gap-3">
+                <label
+                  htmlFor="tryon-intensity"
+                  className="text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase"
+                >
+                  Intensidade / tamanho
+                </label>
+                <p className="text-[0.65rem] tracking-wide text-white/40 uppercase">
+                  {intensity}%
+                </p>
+              </div>
+              <input
+                id="tryon-intensity"
+                type="range"
+                min={30}
+                max={140}
+                step={1}
+                value={intensity}
+                onChange={(e) => setIntensity(Number(e.target.value))}
+                disabled={state !== "live"}
+                className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
+                style={{
+                  background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) 100%)`,
+                }}
+              />
             </div>
-            <input
-              id="tryon-intensity"
-              type="range"
-              min={30}
-              max={140}
-              step={1}
-              value={intensity}
-              onChange={(e) => setIntensity(Number(e.target.value))}
-              disabled={state !== "live"}
-              className="plan-range h-2 w-full cursor-pointer appearance-none rounded-none bg-white/15 disabled:opacity-40"
-              style={{
-                background: `linear-gradient(to right, var(--color-brand-gold, #b6a46e) 0%, var(--color-brand-gold, #b6a46e) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) ${Math.min(100, intensity)}%, rgba(255,255,255,0.15) 100%)`,
-              }}
-            />
           </div>
 
           <div className="flex flex-col gap-4">
             <p className="text-sm leading-relaxed text-white/55">
-              Se o cabelo parecer pequeno ou alto demais, use o controle de
-              intensidade. Luz frontal ajuda o tracking.
+              {usingGlb
+                ? "Use o slider de posição para sentar o cabelo no crânio. Quando ficar bom, diga o valor mostrado — fixamos no código."
+                : "Ajuste a intensidade do reforço. Luz frontal ajuda o tracking."}
             </p>
             <div className="flex flex-wrap gap-3">
               {state === "live" ? (

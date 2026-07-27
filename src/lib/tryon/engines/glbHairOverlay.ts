@@ -25,6 +25,8 @@ type FaceLandmarkerType = import("@mediapipe/tasks-vision").FaceLandmarker;
 
 export type GlbHairDrawOpts = {
   intensity: number;
+  /** Deslocamento vertical no espaço da face (cm). Negativo = desce. */
+  offsetY: number;
 };
 
 /**
@@ -229,6 +231,7 @@ export function createGlbHairOverlayEngine() {
 
       const fit = HAIR_GLB_ASSET.fit;
       const intensity = Math.min(1.4, Math.max(0.5, opts.intensity));
+      hairPivot.position.set(fit.localX, opts.offsetY, fit.localZ);
       hairPivot.scale.setScalar(fit.matrixScale * intensity);
 
       // Câmera fixa na origem (não mover — senão o overlay descola do vídeo)

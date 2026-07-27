@@ -15,21 +15,26 @@ export const HAIR_GLB_ASSET = {
   licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
   glbUrl: HAIR_GLB_URL,
   /**
-   * Ajuste fino após carregar o GLB real (escala/offset no espaço da face canônica).
-   * Valores iniciais — calibrar olhando a câmera.
+   * fit.scale multiplica a altura do cabelo relativa à face.
+   * offsetY em frações da faceLen (para cima da fronte).
+   * offsetZ em frações da largura (profundidade ortográfica).
    */
   fit: {
-    scale: 1.05,
-    offsetY: 0.02,
-    offsetZ: -0.02,
+    scale: 1.35,
+    offsetY: 0.12,
+    offsetZ: 0,
   },
 } as const;
 
-/** Verifica se o GLB está em /public (runtime no browser). */
+/** Verifica se o GLB está em /public (GET — HEAD falha em alguns hosts). */
 export async function hairGlbExists(): Promise<boolean> {
   try {
-    const res = await fetch(HAIR_GLB_URL, { method: "HEAD", cache: "no-store" });
-    return res.ok;
+    const res = await fetch(HAIR_GLB_URL, {
+      method: "GET",
+      headers: { Range: "bytes=0-0" },
+      cache: "force-cache",
+    });
+    return res.ok || res.status === 206;
   } catch {
     return false;
   }

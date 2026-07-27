@@ -2,6 +2,8 @@
 
 Arquivo em uso (já no repo):
 
-`public/models/short_hair_cut_in_layers_with_bones.glb`
+`public/models/beautiful_hair_4.glb`
 
-Fonte: https://skfb.ly/pK7T6 (CC BY 4.0) — ver ATTRIBUTION.md
+Arquivo anterior (ainda no repo, não usado pelo try-on):
+
+`public/models/short_hair_cut_in_layers_with_bones.glb` — ver ATTRIBUTION.md

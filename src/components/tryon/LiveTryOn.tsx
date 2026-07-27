@@ -5,7 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { useCamera } from "@/hooks/useCamera";
 import type { HairTryOnEngine } from "@/lib/tryon/HairTryOnEngine";
 import { createHairTryOnEngine } from "@/lib/tryon/createHairTryOnEngine";
-import { HAIR_GLB_ASSET, hairGlbExists } from "@/lib/tryon/hairAssets";
+import {
+  DEFAULT_HAIR_GLB_STYLE_ID,
+  getHairGlbStyle,
+  hairGlbExists,
+  HAIR_GLB_STYLES,
+  type HairGlbStyleId,
+} from "@/lib/tryon/hairAssets";
 import {
   createGlbHairOverlayEngine,
   type GlbHairOverlayEngine,
@@ -25,13 +31,16 @@ export function LiveTryOn() {
   const rafRef = useRef(0);
   const styleRef = useRef<HairLookId>("natural");
   const intensityRef = useRef(0.8);
-  const offsetYRef = useRef<number>(HAIR_GLB_ASSET.fit.localY);
-  const hairScaleRef = useRef<number>(HAIR_GLB_ASSET.fit.matrixScale);
+  const defaultFit = getHairGlbStyle(DEFAULT_HAIR_GLB_STYLE_ID).fit;
+  const offsetYRef = useRef<number>(defaultFit.localY);
+  const hairScaleRef = useRef<number>(defaultFit.matrixScale);
   const [intensity, setIntensity] = useState(80);
-  const [offsetY, setOffsetY] = useState<number>(HAIR_GLB_ASSET.fit.localY);
-  const [hairScale, setHairScale] = useState<number>(
-    HAIR_GLB_ASSET.fit.matrixScale,
+  const [offsetY, setOffsetY] = useState<number>(defaultFit.localY);
+  const [hairScale, setHairScale] = useState<number>(defaultFit.matrixScale);
+  const [hairStyleId, setHairStyleId] = useState<HairGlbStyleId>(
+    DEFAULT_HAIR_GLB_STYLE_ID,
   );
+  const [hairSwitching, setHairSwitching] = useState(false);
   const [styleId, setStyleId] = useState<HairLookId>("natural");
   const [mode, setMode] = useState<Mode>("loading");
   const [modelReady, setModelReady] = useState(false);
@@ -39,6 +48,8 @@ export function LiveTryOn() {
   const [statusHint, setStatusHint] = useState("Preparando…");
   const [hasTrack, setHasTrack] = useState(false);
   const hasTrackRef = useRef(false);
+
+  const activeHair = getHairGlbStyle(hairStyleId);
 
   useEffect(() => {
     styleRef.current = styleId;
@@ -86,7 +97,7 @@ export function LiveTryOn() {
         }
 
         try {
-          await engine.init(canvas);
+          await engine.init(canvas, DEFAULT_HAIR_GLB_STYLE_ID);
           if (cancelled) return;
           glbReadyRef.current = true;
           setModelReady(true);
@@ -188,6 +199,35 @@ export function LiveTryOn() {
   const usingGlb = mode === "glb";
   const active = HAIR_LOOKS.find((p) => p.id === styleId) ?? HAIR_LOOKS[0]!;
 
+  async function switchHairStyle(nextId: HairGlbStyleId) {
+    if (nextId === hairStyleId || hairSwitching) return;
+    const engine = glbEngineRef.current;
+    if (!engine) return;
+
+    setHairSwitching(true);
+    setStatusHint("Trocando corte…");
+    glbReadyRef.current = false;
+    try {
+      await engine.setStyle(nextId);
+      const fit = getHairGlbStyle(nextId).fit;
+      setHairStyleId(nextId);
+      setOffsetY(fit.localY);
+      setHairScale(fit.matrixScale);
+      offsetYRef.current = fit.localY;
+      hairScaleRef.current = fit.matrixScale;
+      glbReadyRef.current = true;
+      setStatusHint(
+        state === "live" ? "Corte atualizado" : "Pronto — ative a câmera",
+      );
+    } catch (e) {
+      console.error("[tryon] troca de corte falhou", e);
+      glbReadyRef.current = true;
+      setStatusHint("Falha ao trocar o corte");
+    } finally {
+      setHairSwitching(false);
+    }
+  }
+
   return (
     <div className="mx-auto w-full max-w-5xl">
       <div className="relative overflow-hidden border border-white/10 bg-[#080a12]">
@@ -278,13 +318,48 @@ export function LiveTryOn() {
 
       <div className="mt-8 space-y-8">
         <div className="rounded-sm border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/65">
-          Modelo: {HAIR_GLB_ASSET.label}.{" "}
+          Modelo: {activeHair.label}.{" "}
           {usingGlb && modelReady ? (
-            <span className="text-brand-gold/90">Modo 3D ativo.</span>
+            <span className="text-brand-gold/90">
+              {hairSwitching ? "Trocando corte…" : "Modo 3D ativo."}
+            </span>
           ) : (
             <span>Modo: {mode}</span>
           )}
         </div>
+
+        {usingGlb ? (
+          <div>
+            <p className="mb-3 text-[0.7rem] font-semibold tracking-wide text-white/70 uppercase">
+              Estilo de corte
+            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {HAIR_GLB_STYLES.map((s) => {
+                const on = s.id === hairStyleId;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    disabled={hairSwitching || !modelReady}
+                    onClick={() => void switchHairStyle(s.id)}
+                    className={`border px-4 py-3.5 text-left transition-colors disabled:cursor-wait disabled:opacity-50 ${
+                      on
+                        ? "border-brand-gold bg-brand-gold/15 text-white"
+                        : "border-white/15 text-white/70 hover:border-white/35 hover:text-white"
+                    }`}
+                  >
+                    <span className="text-sm font-semibold tracking-wide">
+                      {s.label}
+                    </span>
+                    <span className="mt-1 block text-[0.7rem] text-white/45">
+                      {s.blurb}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
 
         {!usingGlb ? (
           <div>

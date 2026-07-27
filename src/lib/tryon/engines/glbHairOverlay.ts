@@ -8,13 +8,19 @@ import {
   Material,
   Matrix4,
   Mesh,
+  Object3D,
   PerspectiveCamera,
   Scene,
   Vector3,
   WebGLRenderer,
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { HAIR_GLB_ASSET } from "@/lib/tryon/hairAssets";
+import {
+  DEFAULT_HAIR_GLB_STYLE_ID,
+  getHairGlbStyle,
+  type HairGlbAsset,
+  type HairGlbStyleId,
+} from "@/lib/tryon/hairAssets";
 
 const WASM_ROOT =
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm";
@@ -44,21 +50,107 @@ export function createGlbHairOverlayEngine() {
   let hairRoot: Group | null = null;
   let hairPivot: Group | null = null;
   let hairModel: Group | null = null;
+  let activeStyleId: HairGlbStyleId = DEFAULT_HAIR_GLB_STYLE_ID;
+  let activeFit: HairGlbAsset["fit"] = getHairGlbStyle(activeStyleId).fit;
   let lastTs = -1;
   let ready = false;
   let inited = false;
+  let loadingStyle = false;
 
   const faceMatrix = new Matrix4();
   const _size = new Vector3();
   const _center = new Vector3();
   const _box = new Box3();
+  const loader = new GLTFLoader();
+
+  function disposeObject(obj: Object3D) {
+    obj.traverse((child) => {
+      if (!(child instanceof Mesh)) return;
+      child.geometry?.dispose();
+      const mats = Array.isArray(child.material)
+        ? child.material
+        : [child.material];
+      for (const m of mats) {
+        if (m instanceof Material) m.dispose();
+      }
+    });
+  }
+
+  async function mountHairAsset(asset: HairGlbAsset) {
+    if (!hairPivot) throw new Error("hairPivot ausente");
+
+    const gltf = await loader.loadAsync(asset.glbUrl);
+    const next = gltf.scene;
+
+    next.traverse((obj) => {
+      if (!(obj instanceof Mesh)) return;
+      obj.frustumCulled = false;
+      const mats = Array.isArray(obj.material)
+        ? obj.material
+        : [obj.material];
+      for (const m of mats) {
+        if (!(m instanceof Material)) continue;
+        m.transparent = true;
+        m.alphaTest = 0.2;
+        m.depthWrite = true;
+        m.side = FrontSide;
+        m.needsUpdate = true;
+      }
+    });
+
+    // Mesh unitário (maxDim=1), centralizado
+    _box.setFromObject(next);
+    _box.getSize(_size);
+    _box.getCenter(_center);
+    const maxDim = Math.max(_size.x, _size.y, _size.z, 1e-8);
+    const unitScale = 1 / maxDim;
+    next.scale.setScalar(unitScale);
+    next.position.set(
+      -_center.x * unitScale,
+      -_center.y * unitScale,
+      -_center.z * unitScale,
+    );
+
+    // Pivot no scalp
+    next.updateMatrixWorld(true);
+    _box.setFromObject(next);
+    const scalpY =
+      _box.min.y + (_box.max.y - _box.min.y) * asset.fit.scalpFrac;
+    next.position.y -= scalpY;
+
+    if (hairModel) {
+      hairPivot.remove(hairModel);
+      disposeObject(hairModel);
+    }
+
+    hairModel = next;
+    activeStyleId = asset.id as HairGlbStyleId;
+    activeFit = asset.fit;
+    hairPivot.rotation.set(asset.fit.rotX, asset.fit.rotY, asset.fit.rotZ);
+    hairPivot.position.set(
+      asset.fit.localX,
+      asset.fit.localY,
+      asset.fit.localZ,
+    );
+    hairPivot.add(hairModel);
+  }
 
   return {
     kind: "glb-overlay" as const,
     ownsCamera: false as const,
 
-    async init(canvas: HTMLCanvasElement) {
-      if (inited && renderer?.domElement === canvas) return;
+    getActiveStyleId(): HairGlbStyleId {
+      return activeStyleId;
+    },
+
+    async init(
+      canvas: HTMLCanvasElement,
+      styleId: HairGlbStyleId = DEFAULT_HAIR_GLB_STYLE_ID,
+    ) {
+      if (inited && renderer?.domElement === canvas) {
+        if (styleId !== activeStyleId) await this.setStyle(styleId);
+        return;
+      }
       if (inited) {
         landmarker?.close();
         renderer?.dispose();
@@ -119,59 +211,29 @@ export function createGlbHairOverlayEngine() {
       hairPivot = new Group();
       hairRoot.add(hairPivot);
 
-      const loader = new GLTFLoader();
-      const gltf = await loader.loadAsync(HAIR_GLB_ASSET.glbUrl);
-      hairModel = gltf.scene;
-
-      hairModel.traverse((obj) => {
-        if (!(obj instanceof Mesh)) return;
-        obj.frustumCulled = false;
-        const mats = Array.isArray(obj.material)
-          ? obj.material
-          : [obj.material];
-        for (const m of mats) {
-          if (!(m instanceof Material)) continue;
-          m.transparent = true;
-          m.alphaTest = 0.2;
-          m.depthWrite = true;
-          m.side = FrontSide;
-          m.needsUpdate = true;
-        }
-      });
-
-      // Mesh unitário (maxDim=1), centralizado
-      _box.setFromObject(hairModel);
-      _box.getSize(_size);
-      _box.getCenter(_center);
-      const maxDim = Math.max(_size.x, _size.y, _size.z, 1e-8);
-      const unitScale = 1 / maxDim;
-      hairModel.scale.setScalar(unitScale);
-      hairModel.position.set(
-        -_center.x * unitScale,
-        -_center.y * unitScale,
-        -_center.z * unitScale,
-      );
-
-      // Pivot no scalp (base do volume)
-      hairModel.updateMatrixWorld(true);
-      _box.setFromObject(hairModel);
-      const scalpY =
-        _box.min.y +
-        (_box.max.y - _box.min.y) * HAIR_GLB_ASSET.fit.scalpFrac;
-      hairModel.position.y -= scalpY;
-
-      const fit = HAIR_GLB_ASSET.fit;
-      hairPivot.rotation.set(fit.rotX, fit.rotY, fit.rotZ);
-      hairPivot.position.set(fit.localX, fit.localY, fit.localZ);
-      hairPivot.add(hairModel);
+      await mountHairAsset(getHairGlbStyle(styleId));
 
       ready = true;
       inited = true;
     },
 
+    async setStyle(styleId: HairGlbStyleId) {
+      if (!inited || !hairPivot || loadingStyle) return;
+      if (styleId === activeStyleId && hairModel) return;
+      loadingStyle = true;
+      ready = false;
+      try {
+        await mountHairAsset(getHairGlbStyle(styleId));
+        ready = true;
+      } finally {
+        loadingStyle = false;
+      }
+    },
+
     dispose() {
       landmarker?.close();
       landmarker = null;
+      if (hairModel) disposeObject(hairModel);
       hairModel = null;
       hairPivot = null;
       hairRoot = null;
@@ -230,8 +292,7 @@ export function createGlbHairOverlayEngine() {
       hairRoot.matrixWorldNeedsUpdate = true;
       hairRoot.visible = true;
 
-      const fit = HAIR_GLB_ASSET.fit;
-      hairPivot.position.set(fit.localX, opts.offsetY, fit.localZ);
+      hairPivot.position.set(activeFit.localX, opts.offsetY, activeFit.localZ);
       hairPivot.scale.setScalar(Math.min(60, Math.max(8, opts.scale)));
 
       // Câmera fixa na origem (não mover — senão o overlay descola do vídeo)

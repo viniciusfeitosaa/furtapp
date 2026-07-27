@@ -278,17 +278,7 @@ export function LiveTryOn() {
 
       <div className="mt-8 space-y-8">
         <div className="rounded-sm border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/65">
-          Modelo:{" "}
-          <a
-            href={HAIR_GLB_ASSET.sketchfabUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand-gold underline-offset-2 hover:underline"
-          >
-            {HAIR_GLB_ASSET.label}
-          </a>{" "}
-          por {HAIR_GLB_ASSET.author} ({HAIR_GLB_ASSET.license}). Créditos:{" "}
-          {HAIR_GLB_ASSET.originalCredit}.{" "}
+          Modelo: {HAIR_GLB_ASSET.label}.{" "}
           {usingGlb && modelReady ? (
             <span className="text-brand-gold/90">Modo 3D ativo.</span>
           ) : (

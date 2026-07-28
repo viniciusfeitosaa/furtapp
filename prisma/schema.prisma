@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ASSISTENTE
+  PACIENTE
+}
+
+enum CheckpointStatus {
+  PENDING
+  OPEN
+  SUBMITTED
+  IN_REVIEW
+  COMPLETED
+  LATE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  patientProfile PatientProfile?
+  auditLogs      AuditLog[]
+}
+
+model PatientProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone       String?
+  surgeryDate DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  checkpoints Checkpoint[]
+}
+
+model Checkpoint {
+  id          String           @id @default(cuid())
+  patientId   String
+  patient     PatientProfile   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  code        String
+  status      CheckpointStatus @default(PENDING)
+  windowStart DateTime?
+  windowEnd   DateTime?
+  submittedAt DateTime?
+  createdAt   DateTime         @default(now())
+
+  photos Photo[]
+  review ClinicalReview?
+
+  @@unique([patientId, code])
+}
+
+model Photo {
+  id           String     @id @default(cuid())
+  checkpointId String
+  checkpoint   Checkpoint @relation(fields: [checkpointId], references: [id], onDelete: Cascade)
+  region       String
+  storageKey   String
+  mimeType     String
+  uploadedAt   DateTime   @default(now())
+
+  @@unique([checkpointId, region])
+}
+
+model ClinicalReview {
+  id              String     @id @default(cuid())
+  checkpointId    String     @unique
+  checkpoint      Checkpoint @relation(fields: [checkpointId], references: [id], onDelete: Cascade)
+  privateNote     String?
+  patientFeedback String?
+  densityScore    Int?
+  releasedAt      DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  meta      String?
+  createdAt DateTime @default(now())
+}

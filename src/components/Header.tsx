@@ -67,7 +67,7 @@ export function Header() {
             </Link>
           ))}
           <Link
-            href="/paciente/login"
+            href="/login"
             className="text-xs tracking-wide text-white/60 transition-colors hover:text-white"
           >
             Área do paciente
@@ -120,27 +120,11 @@ export function Header() {
               </Link>
             ))}
             <Link
-              href="/paciente/login"
+              href="/login"
               className="text-sm text-white/60"
               onClick={() => setOpen(false)}
             >
-              Área do paciente
-            </Link>
-            <a
-              href={SITE.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-white/60"
-              onClick={() => setOpen(false)}
-            >
-              Instagram {SITE.instagramHandle}
-            </a>
-            <Link
-              href="/admin/login"
-              className="text-sm text-white/40"
-              onClick={() => setOpen(false)}
-            >
-              Área administrativa
+              Entrar no portal
             </Link>
             <a
               href={whatsappUrl()}

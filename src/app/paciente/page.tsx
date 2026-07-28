@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { PhotoUploadGrid } from "@/components/patient/PhotoUploadGrid";
+import { requirePatient } from "@/lib/auth/guards";
+import { formatCheckpointLabel, daysUntil } from "@/lib/checkpoints";
+import { prisma } from "@/lib/db";
 import { CHECKPOINTS, PHOTO_REGIONS } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -7,73 +10,117 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function PacienteDashboardPage() {
+const STATUS_PT: Record<string, string> = {
+  PENDING: "Aguardando",
+  OPEN: "Em janela",
+  SUBMITTED: "Enviado — em análise",
+  IN_REVIEW: "Em análise",
+  COMPLETED: "Concluído",
+  LATE: "Janela encerrada",
+};
+
+export default async function PacienteDashboardPage() {
+  const session = await requirePatient();
+
+  const profile = await prisma.patientProfile.findUnique({
+    where: { userId: session.userId },
+    include: {
+      checkpoints: {
+        include: { photos: true, review: true },
+        orderBy: { code: "asc" },
+      },
+    },
+  });
+
+  if (!profile) {
+    return (
+      <p className="text-sm text-brand-gray">
+        Perfil de paciente não encontrado. Contate a clínica.
+      </p>
+    );
+  }
+
+  const active =
+    profile.checkpoints.find((c) => c.status === "OPEN" || c.status === "LATE") ??
+    profile.checkpoints.find((c) => c.status === "SUBMITTED" || c.status === "IN_REVIEW");
+
+  const latestFeedback = profile.checkpoints
+    .filter((c) => c.review?.releasedAt && c.review.patientFeedback)
+    .sort((a, b) => (b.review!.releasedAt!.getTime() - a.review!.releasedAt!.getTime()))
+    [0];
+
   return (
-    <div className="bg-white pt-28 pb-20">
-      <div className="mx-auto max-w-5xl px-4 md:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
-              Painel do paciente
-            </p>
-            <h1 className="font-display mt-2 text-4xl text-black md:text-5xl">
-              Acompanhamento 12 meses
-            </h1>
-          </div>
-          <Link href="/paciente/login" className="text-sm text-brand-gray underline">
-            Sair
-          </Link>
+    <div>
+      <p className="text-[0.7rem] tracking-[0.3em] text-brand-charcoal uppercase">
+        Olá, {session.name.split(" ")[0]}
+      </p>
+      <h1 className="font-display mt-2 text-4xl text-black md:text-5xl">
+        Acompanhamento 12 meses
+      </h1>
+
+      {latestFeedback?.review?.patientFeedback ? (
+        <div className="mt-6 border border-brand-gold/40 bg-brand-quiet p-5">
+          <p className="text-xs font-semibold tracking-wide text-brand-gold-dark uppercase">
+            Último feedback — {latestFeedback.code}
+          </p>
+          <p className="font-serif-body mt-2 text-brand-charcoal">
+            {latestFeedback.review.patientFeedback}
+          </p>
         </div>
+      ) : null}
 
-        <p className="font-serif-body mt-6 max-w-2xl text-lg text-brand-charcoal">
-          Próximo checkpoint (protótipo): <strong>M3</strong> — envie as 5
-          regiões enquanto a janela estiver aberta. O Dr. analisa e libera o
-          feedback por aqui.
-        </p>
-
-        <div className="mt-10 grid gap-3 sm:grid-cols-5">
-          {CHECKPOINTS.map((cp, i) => (
+      <div className="mt-10 grid gap-3 sm:grid-cols-5">
+        {CHECKPOINTS.map((cp) => {
+          const row = profile.checkpoints.find((c) => c.code === cp);
+          const status = row?.status ?? "PENDING";
+          const isActive = active?.code === cp;
+          return (
             <div
               key={cp}
               className={`border px-3 py-4 text-center ${
-                i === 1
-                  ? "border-black bg-brand-quiet"
-                  : "border-brand-gray-mid"
+                isActive ? "border-black bg-brand-quiet" : "border-brand-gray-mid"
               }`}
             >
               <span className="text-xs tracking-widest text-brand-gray uppercase">
-                {i === 0 ? "Baseline" : `+${i * 3} meses`}
+                {formatCheckpointLabel(cp)}
               </span>
               <span className="mt-1 block text-xl font-semibold">{cp}</span>
               <span className="mt-2 block text-[0.65rem] text-brand-gray">
-                {i === 0 ? "Concluído" : i === 1 ? "Em janela" : "Aguardando"}
+                {STATUS_PT[status] ?? status}
               </span>
             </div>
-          ))}
-        </div>
-
-        <h2 className="mt-14 text-sm tracking-[0.2em] uppercase">
-          Upload — 5 regiões (M3)
-        </h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {PHOTO_REGIONS.map((region) => (
-            <label
-              key={region.id}
-              className="flex cursor-pointer flex-col gap-2 border border-dashed border-brand-gray-mid p-5 transition-colors hover:border-brand-gold"
-            >
-              <span className="text-sm font-medium">{region.label}</span>
-              <span className="text-xs text-brand-gray">
-                Guia visual (overlay) na Fase 2 · toque para selecionar foto
-              </span>
-              <input type="file" accept="image/*" className="text-xs" disabled />
-            </label>
-          ))}
-        </div>
-        <p className="mt-6 text-xs text-brand-gray">
-          Upload real, storage privado e LGPD entram na Fase 2 — ver MAPA DE
-          BORDO §3.
-        </p>
+          );
+        })}
       </div>
+
+      {active && (active.status === "OPEN" || active.status === "LATE") ? (
+        <section className="mt-14">
+          <h2 className="text-sm tracking-[0.2em] uppercase">
+            Upload — 5 regiões ({active.code})
+          </h2>
+          {active.windowEnd ? (
+            <p className="mt-2 text-sm text-brand-gray">
+              {active.status === "OPEN"
+                ? `Janela fecha em ${daysUntil(active.windowEnd)} dia(s).`
+                : "Janela encerrada — envio ainda permitido para regularização."}
+            </p>
+          ) : null}
+          <div className="mt-4">
+            <PhotoUploadGrid
+              checkpointId={active.id}
+              code={active.code}
+              regions={PHOTO_REGIONS}
+              uploaded={active.photos.map((p) => p.region)}
+            />
+          </div>
+        </section>
+      ) : (
+        <p className="mt-10 text-sm text-brand-gray">
+          {active?.status === "SUBMITTED" || active?.status === "IN_REVIEW"
+            ? `Seu envio ${active.code} está em análise. Você receberá o feedback aqui.`
+            : "Nenhum checkpoint aberto no momento. Aguarde a próxima janela."}
+        </p>
+      )}
     </div>
   );
 }

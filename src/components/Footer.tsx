@@ -53,11 +53,11 @@ export function Footer() {
             <Link href="/blog" className="hover:text-white">
               Blog
             </Link>
-            <Link href="/paciente/login" className="hover:text-white">
+            <Link href="/login" className="hover:text-white">
               Área do paciente
             </Link>
-            <Link href="/admin/login" className="hover:text-white">
-              Área administrativa
+            <Link href="/login" className="hover:text-white">
+              Entrar no portal
             </Link>
             <Link href="/contato" className="hover:text-white">
               Agendar avaliação

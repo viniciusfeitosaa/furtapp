@@ -429,7 +429,7 @@ export function HomeSections() {
                 segue com fotos padronizadas a cada três meses, até o marco de 12
                 meses — registros na{" "}
                 <a
-                  href="/paciente/login"
+                  href="/login"
                   className="text-black underline decoration-brand-gold underline-offset-4"
                 >
                   área do paciente

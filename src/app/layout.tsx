@@ -5,9 +5,8 @@ import {
   Great_Vibes,
   Poppins,
 } from "next/font/google";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { PhysicianJsonLd } from "@/components/JsonLd";
+import { SiteChrome } from "@/components/SiteChrome";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -87,9 +86,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-white text-black">
         <PhysicianJsonLd />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
